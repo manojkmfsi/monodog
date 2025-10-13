@@ -1,6 +1,5 @@
 # MonoDog
 
-
 The dashboard will provide visual management and monitoring capabilities for packages in monorepos using pnpm, turbo, or Nx. It will be distributed as an npm package installable in any monorepo to auto-generate a web UI for package oversight.
 
 ## Why MonoDog
@@ -18,7 +17,6 @@ npm install @lakinmindfire/monodog
 # pnpm
 pnpm add @lakinmindfire/monodog
 ```
-
 
 ## License
 

@@ -7,24 +7,24 @@ module.exports = {
     '@typescript-eslint/recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
-    'prettier'
+    'prettier',
   ],
   settings: {
     react: {
-      version: 'detect'
-    }
+      version: 'detect',
+    },
   },
   env: {
     browser: true,
     node: true,
-    es2022: true
+    es2022: true,
   },
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
     ecmaFeatures: {
-      jsx: true
-    }
+      jsx: true,
+    },
   },
   rules: {
     // TypeScript specific
@@ -32,16 +32,16 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    
+
     // React specific
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
     'react/no-unescaped-entities': 'off',
-    
+
     // General
     'no-console': 'warn',
     'prefer-const': 'error',
-    'no-var': 'error'
+    'no-var': 'error',
   },
-  ignorePatterns: ['dist', 'node_modules', '*.config.js']
+  ignorePatterns: ['dist', 'node_modules', '*.config.js'],
 };

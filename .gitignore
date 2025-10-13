@@ -54,10 +54,6 @@ pnpm-debug.log*
 # Package manager specific
 .pnpm-store/
 
-# Project specific
-# Don't ignore the lib directory in vanilla-js-demo
-!examples/vanilla-js-demo/lib
-
 # Temporary files
 *.log
 *.tmp

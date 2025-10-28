@@ -24,6 +24,7 @@ export interface DependencyInfo {
   type: 'dependency' | 'devDependency' | 'peerDependency';
   latest?: string;
   outdated?: boolean;
+  status: string;
 }
 
 export interface HealthMetric {
@@ -198,23 +199,11 @@ class MonorepoService {
     return await res.json();
   }
 
-  // async getDependencies(): Promise<DependencyInfo[]> {
-  //   await new Promise(resolve => setTimeout(resolve, 200));
-  //   const allDeps = new Set<string>();
-
-  //   this.mockPackages.forEach(pkg => {
-  //     pkg.dependenciesList?.forEach(dep => allDeps.add(dep));
-  //     pkg.devDependenciesList?.forEach(dep => allDeps.add(dep));
-  //   });
-
-  //   return Array.from(allDeps).map(dep => ({
-  //     name: dep,
-  //     version: 'latest',
-  //     type: 'dependency',
-  //     latest: 'latest',
-  //     outdated: Math.random() > 0.7,
-  //   }));
-  // }
+  async getPackage(name: string): Promise<Package[]> {
+    const res = await fetch(`${API_BASE}/packages/` + encodeURIComponent(name));
+    if (!res.ok) throw new Error('Failed to fetch packages');
+    return await res.json();
+  }
 
   async getHealthStatus(): Promise<{
     overallScore: number;

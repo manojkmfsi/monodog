@@ -1,5 +1,7 @@
 // Shared types for packages module components
 
+import type { DependencyInfo } from '@/services/monorepoService';
+
 export interface Package {
   name: string;
   version: string;
@@ -24,7 +26,7 @@ export interface Commit {
   message: string;
   author: string;
   date: string;
-  type: 'feature' | 'fix' | 'chore' | 'breaking';
+  type: 'feat' | 'fix' | 'chore' | 'breaking';
 }
 
 export interface PackageDetail {
@@ -39,14 +41,15 @@ export interface PackageDetail {
   peerDependencies: Dependency[];
   maintainers: string[];
   tags: string[];
-  repository: string;
+  repository: Record<string, string>;
   license: string;
   scripts: Record<string, string>;
-  recentCommits: Commit[];
+  commits: Commit[];
   healthScore: number;
   buildStatus: 'success' | 'failed' | 'running' | 'unknown';
   testCoverage: number;
   lintStatus: 'pass' | 'fail' | 'warning';
+  dependenciesInfo: DependencyInfo[];
 }
 
 export interface PackageStats {

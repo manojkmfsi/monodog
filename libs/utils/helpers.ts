@@ -1,27 +1,34 @@
+import { Package } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
 
 export interface PackageInfo {
   name: string;
   version: string;
-  type: 'app' | 'lib' | 'tool';
+  type: string; //'app' | 'lib' | 'tool';
   path: string;
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;
-  peerDependencies?: Record<string, string>;
+  peerDependencies: Record<string, string>;
   scripts: Record<string, string>;
-  maintainers?: string[];
+  maintainers: string[];
   description?: string;
   license?: string;
-  repository?: string;
+  repository?: Record<string, string>;
 }
 
 export interface DependencyInfo {
+  // name: string;
+  // currentVersion: string;
+  // latestVersion?: string;
+  // status: 'up-to-date' | 'outdated' | 'major-update' | 'unknown';
+  // type: 'production' | 'development';
   name: string;
-  currentVersion: string;
-  latestVersion?: string;
-  status: 'up-to-date' | 'outdated' | 'major-update' | 'unknown';
-  type: 'production' | 'development';
+  version: string;
+  type: 'dependency' | 'devDependency' | 'peerDependency';
+  latest?: string;
+  status?: 'up-to-date' | 'outdated' | 'major-update' | 'unknown';
+  outdated?: boolean;
 }
 
 export interface PackageHealth {
@@ -143,7 +150,7 @@ function parsePackageInfo(
       maintainers: packageJson.maintainers || [],
       description: packageJson.description,
       license: packageJson.license,
-      repository: packageJson.repository?.url || packageJson.repository,
+      repository: packageJson.repository || {},
     };
   } catch (error) {
     console.error(`Error parsing package.json for ${packageName}:`, error);

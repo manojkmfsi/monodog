@@ -59,7 +59,7 @@ export default function ConfigurationTab({
   "version": "${packageData.version}",
   "description": "${packageData.description}",
   "license": "${packageData.license}",
-  "repository": "${packageData.repository}",
+  "repository": "${packageData.repository || {}}",
   "scripts": {${Object.entries(packageData.scripts)
     .map(
       ([key, value]) => `

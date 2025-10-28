@@ -55,7 +55,6 @@ export default function DependencyDetails({
             </span>
           </div>
           {Object.keys(pkg.dependencies).length > 0 ? (
-
             <div className="space-y-1 max-h-32 overflow-y-auto">
               {Object.keys(pkg.dependencies).map(depName => {
                 const dep = packages.find(p => p.name === depName);
@@ -149,7 +148,9 @@ export default function DependencyDetails({
           <div className="space-y-1 text-xs text-gray-600">
             <div className="flex justify-between">
               <span>Direct dependencies:</span>
-              <span className="font-medium">{Object.keys(pkg.dependencies).length}</span>
+              <span className="font-medium">
+                {Object.keys(pkg.dependencies).length}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>Direct dependents:</span>

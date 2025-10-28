@@ -253,18 +253,24 @@ const calculateHierarchicalLayout = (
   };
   // Start with packages that have no dependencies and build downwards with their dependents
   packages
-    .filter(pkg => Object.keys(pkg.dependencies).length === 0 && pkg.dependents.length > 0)
+    .filter(
+      pkg =>
+        Object.keys(pkg.dependencies).length === 0 && pkg.dependents.length > 0
+    )
     .forEach(pkg => {
       assignLayers(pkg.name, 0);
     });
-    if (layers.length === 0) {
-      // In case there are no root packages with dependents, start with others
-      packages
-        .filter(pkg => Object.keys(pkg.dependencies).length > 0 && pkg.dependents.length > 0)
-        .forEach(pkg => {
-          assignLayers(pkg.name, 0);
-        });
-    }
+  if (layers.length === 0) {
+    // In case there are no root packages with dependents, start with others
+    packages
+      .filter(
+        pkg =>
+          Object.keys(pkg.dependencies).length > 0 && pkg.dependents.length > 0
+      )
+      .forEach(pkg => {
+        assignLayers(pkg.name, 0);
+      });
+  }
 
   // Position packages
   return packages.map(pkg => {
@@ -391,7 +397,7 @@ type DependentsMap = Record<string, string[]>;
  * * @param packages The array of packages, where dependency lists are already parsed into string arrays.
  * @returns A map where keys are dependencies and values are arrays of dependents.
  */
-export const mapAllDependents = (packages: PackageNode[]): DependentsMap  =>{
+export const mapAllDependents = (packages: PackageNode[]): DependentsMap => {
   // Use a Record to build the map efficiently.
   const allDependentsMap: DependentsMap = {};
 
@@ -427,4 +433,4 @@ export const mapAllDependents = (packages: PackageNode[]): DependentsMap  =>{
   });
 
   return allDependentsMap;
-}
+};

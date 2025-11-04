@@ -4,7 +4,7 @@ import {
   XCircleIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
-import { ValidationPanelProps } from '../types/config.types';
+import { type ValidationPanelProps } from '../types/config.types';
 import { getValidationColor } from '../utils/config.utils';
 
 export default function ValidationPanel({

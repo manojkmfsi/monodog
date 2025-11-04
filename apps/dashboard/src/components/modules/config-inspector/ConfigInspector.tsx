@@ -31,7 +31,7 @@ export type { ConfigFile, ConfigFilters } from './types/config.types';
 export default function ConfigInspector() {
   // State management
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false)
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [configFiles, setConfigFiles] = useState<ConfigFile[]>([]);
 
@@ -92,6 +92,7 @@ export default function ConfigInspector() {
   const selectedConfigData = selectedConfig
     ? configFiles.find(config => config.id === selectedConfig) || null
     : null;
+  console.log('selectedConfigData:', selectedConfigData);
 
   // Event handlers
   const handleRefresh = () => {
@@ -154,10 +155,10 @@ export default function ConfigInspector() {
           prev.map(config =>
             config.id === selectedConfig
               ? {
-                ...updatedFile,
-                // Keep the original isEditable flag
-                isEditable: config.isEditable,
-              }
+                  ...updatedFile,
+                  // Keep the original isEditable flag
+                  isEditable: config.isEditable,
+                }
               : config
           )
         );
@@ -172,7 +173,6 @@ export default function ConfigInspector() {
 
         // Show success message (you can add a toast notification here)
         console.log('Config file saved successfully');
-
       } catch (err: any) {
         console.error('Error saving config file:', err);
         // Show error message to user
@@ -180,8 +180,7 @@ export default function ConfigInspector() {
 
         // You could add a toast notification here:
         // toast.error(`Failed to save configuration: ${err.message}`);
-      }
-      finally {
+      } finally {
         setSaving(false);
       }
     }
@@ -275,14 +274,14 @@ export default function ConfigInspector() {
           />
 
           {/* Preview Panel */}
-          {selectedConfigData && !isEditing && (
+          {/* {selectedConfigData && !isEditing && (
             <ConfigPreview
               content={selectedConfigData.content}
               language={detectLanguage(selectedConfigData.name)}
               showSecrets={showSecrets}
               onToggleSecrets={handleToggleSecrets}
             />
-          )}
+          )} */}
         </div>
       </div>
 
@@ -295,28 +294,28 @@ export default function ConfigInspector() {
           </h3>
           <p className="text-gray-600 mb-4">
             {filters.search ||
-              filters.type !== 'all' ||
-              filters.status !== 'all'
+            filters.type !== 'all' ||
+            filters.status !== 'all'
               ? 'Try adjusting your filters to see more results.'
               : 'No configuration files are available to inspect.'}
           </p>
           {(filters.search ||
             filters.type !== 'all' ||
             filters.status !== 'all') && (
-              <button
-                onClick={() =>
-                  setFilters({
-                    section: 'all',
-                    type: 'all',
-                    status: 'all',
-                    search: '',
-                  })
-                }
-                className="text-blue-600 hover:text-blue-500"
-              >
-                Clear Filters
-              </button>
-            )}
+            <button
+              onClick={() =>
+                setFilters({
+                  section: 'all',
+                  type: 'all',
+                  status: 'all',
+                  search: '',
+                })
+              }
+              className="text-blue-600 hover:text-blue-500"
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
       )}
     </div>

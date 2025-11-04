@@ -552,6 +552,64 @@ class MonorepoService {
   //   return 'error';
   // }
 
+  // Add this method to your MonorepoService class
+  async updatePackageConfiguration(
+    packageName: string,
+    config: string,
+    packagePath: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    package: any;
+    healthRefreshed?: boolean;
+    preservedFields?: boolean;
+  }> {
+    try {
+      console.log(
+        '📤 Updating package configuration via MonorepoService:',
+        packageName
+      );
+
+      const response = await fetch(`${API_BASE}/packages/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          packageName,
+          config,
+          packagePath,
+        }),
+      });
+
+      console.log('📥 Response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('📥 Error response:', errorText);
+
+        let errorMessage = `HTTP error ${response.status}`;
+        if (errorText) {
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.error || errorData.message || errorMessage;
+          } catch {
+            errorMessage = errorText || errorMessage;
+          }
+        }
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      console.log('📥 Success response:', result);
+
+      return result;
+    } catch (error) {
+      console.error('❌ Error updating package configuration:', error);
+      throw error;
+    }
+  }
+
   async getBuildStatus(): Promise<BuildStatus[]> {
     await new Promise(resolve => setTimeout(resolve, 500));
 

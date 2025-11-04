@@ -193,8 +193,35 @@ class MonorepoService {
   ];
 
   async getPackages(): Promise<Package[]> {
-    const res = await fetch(`${API_BASE}/packages`);
-    if (!res.ok) throw new Error('Failed to fetch packages');
+    try {
+      const res = await fetch(`${API_BASE}/packages`);
+
+      if (!res.ok) {
+        throw new Error(
+          `Failed to fetch package data: HTTP status ${res.status}`
+        );
+      }
+
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error(
+        'Error during getPackages. Attempting to refresh data...',
+        error
+      );
+
+      const refreshedData = await this.refreshPackages();
+      return refreshedData;
+    }
+  }
+
+  async getPackage(name: string): Promise<Package[]> {
+    const res = await fetch(`${API_BASE}/packages/` + encodeURIComponent(name));
+    if (!res.ok) {
+      throw new Error(
+        `Failed to fetch package details for "${name}" (Status: ${res.status})`
+      );
+    }
     return await res.json();
   }
 
@@ -202,18 +229,20 @@ class MonorepoService {
     await new Promise(resolve => setTimeout(resolve, 200));
     const allDeps = new Set<string>();
 
-    this.mockPackages.forEach(pkg => {
-      pkg.dependenciesList?.forEach(dep => allDeps.add(dep));
-      pkg.devDependenciesList?.forEach(dep => allDeps.add(dep));
-    });
+      if (!pkg.ok) {
+        // Log the failure status before throwing (which will be caught below)
+        throw new Error(
+          `Failed to fetch package data: HTTP status ${pkg.status}`
+        );
+      }
+      const pkgData = await pkg.json();
+      console.log('data from refreshPackage:', pkgData);
 
-    return Array.from(allDeps).map(dep => ({
-      name: dep,
-      version: 'latest',
-      type: 'dependency',
-      latest: 'latest',
-      outdated: Math.random() > 0.7,
-    }));
+      return pkgData;
+    } catch (error) {
+      console.error('Error fetching package data (refresh):', error);
+      return [];
+    }
   }
 
   // async getHealthStatus(): Promise<{
@@ -531,6 +560,64 @@ class MonorepoService {
   //   if (ratio >= 0.6) return 'warning';
   //   return 'error';
   // }
+
+  // Add this method to your MonorepoService class
+  async updatePackageConfiguration(
+    packageName: string,
+    config: string,
+    packagePath: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    package: any;
+    healthRefreshed?: boolean;
+    preservedFields?: boolean;
+  }> {
+    try {
+      console.log(
+        '📤 Updating package configuration via MonorepoService:',
+        packageName
+      );
+
+      const response = await fetch(`${API_BASE}/packages/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          packageName,
+          config,
+          packagePath,
+        }),
+      });
+
+      console.log('📥 Response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('📥 Error response:', errorText);
+
+        let errorMessage = `HTTP error ${response.status}`;
+        if (errorText) {
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.error || errorData.message || errorMessage;
+          } catch {
+            errorMessage = errorText || errorMessage;
+          }
+        }
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      console.log('📥 Success response:', result);
+
+      return result;
+    } catch (error) {
+      console.error('❌ Error updating package configuration:', error);
+      throw error;
+    }
+  }
 
   async getBuildStatus(): Promise<BuildStatus[]> {
     await new Promise(resolve => setTimeout(resolve, 500));

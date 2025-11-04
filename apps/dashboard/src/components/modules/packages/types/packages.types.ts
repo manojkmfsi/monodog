@@ -1,5 +1,8 @@
 // Shared types for packages module components
 
+import type { DependencyInfo } from '@/services/monorepoService';
+import type { PackageHealth } from '../../health-status/types/health.types';
+
 export interface Package {
   name: string;
   version: string;
@@ -10,6 +13,7 @@ export interface Package {
   dependencies: number;
   tags: string[];
   maintainers: string[];
+  packageHealth: PackageHealth;
 }
 
 export interface Dependency {
@@ -46,6 +50,8 @@ export interface PackageDetail {
   buildStatus: 'success' | 'failed' | 'running' | 'unknown';
   testCoverage: number;
   lintStatus: 'pass' | 'fail' | 'warning';
+  dependenciesInfo: DependencyInfo[];
+  path?: string;
 }
 
 export interface PackageStats {

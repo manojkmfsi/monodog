@@ -32,5 +32,6 @@
     "@monodog/ci-status": "workspace:*",
     "@monodog/monorepo-scanner": "workspace:*",
     "@monodog/utils": "workspace:*"
-  }
+  },
+  "repository": {}
 }

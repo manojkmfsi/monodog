@@ -1,5 +1,5 @@
-import { Package } from '@prisma/client';
-import fs from 'fs';
+// import { Package } from '@prisma/client';
+import * as fs from 'fs';
 import path from 'path';
 
 export interface PackageInfo {
@@ -159,17 +159,17 @@ function parsePackageInfo(
 /**
  * Analyzes dependencies and determines their status
  */
-function analyzeDependencies(
-  dependencies: Record<string, string>,
-  type: 'production' | 'development' = 'production'
-): DependencyInfo[] {
-  return Object.entries(dependencies).map(([name, version]) => ({
-    name,
-    currentVersion: version,
-    status: 'unknown', // Would be determined by npm registry check
-    type,
-  }));
-}
+// function analyzeDependencies(
+//   dependencies: Record<string, string>,
+//   type: 'production' | 'development' = 'production'
+// ): DependencyInfo[] {
+//   return Object.entries(dependencies).map(([name, version]) => ({
+//     name,
+//     currentVersion: version,
+//     status: 'unknown', // Would be determined by npm registry check
+//     type,
+//   }));
+// }
 
 /**
  * Calculates package health score based on various metrics
@@ -350,9 +350,9 @@ function checkOutdatedDependencies(packageInfo: PackageInfo): DependencyInfo[] {
       // Could be outdated, would need registry check
       outdated.push({
         name,
-        currentVersion: version,
+        version: version,
         status: 'unknown',
-        type: 'production',
+        type: 'dependency',
       });
     }
   });
@@ -363,30 +363,30 @@ function checkOutdatedDependencies(packageInfo: PackageInfo): DependencyInfo[] {
 /**
  * Formats version numbers for comparison
  */
-function parseVersion(version: string): number[] {
-  return version
-    .replace(/^[^0-9]*/, '')
-    .split('.')
-    .map(Number);
-}
+// function parseVersion(version: string): number[] {
+//   return version
+//     .replace(/^[^0-9]*/, '')
+//     .split('.')
+//     .map(Number);
+// }
 
 /**
  * Compares two version strings
  */
-function compareVersions(v1: string, v2: string): number {
-  const parsed1 = parseVersion(v1);
-  const parsed2 = parseVersion(v2);
+// function compareVersions(v1: string, v2: string): number {
+//   const parsed1 = parseVersion(v1);
+//   const parsed2 = parseVersion(v2);
 
-  for (let i = 0; i < Math.max(parsed1.length, parsed2.length); i++) {
-    const num1 = parsed1[i] || 0;
-    const num2 = parsed2[i] || 0;
+//   for (let i = 0; i < Math.max(parsed1.length, parsed2.length); i++) {
+//     const num1 = parsed1[i] || 0;
+//     const num2 = parsed2[i] || 0;
 
-    if (num1 > num2) return 1;
-    if (num1 < num2) return -1;
-  }
+//     if (num1 > num2) return 1;
+//     if (num1 < num2) return -1;
+//   }
 
-  return 0;
-}
+//   return 0;
+// }
 
 /**
  * Gets package size information
@@ -399,7 +399,7 @@ function getPackageSize(packagePath: string): {
     let totalSize = 0;
     let fileCount = 0;
 
-    function calculateSize(dirPath: string): void {
+    const calculateSize = (dirPath: string): void => {
       const items = fs.readdirSync(dirPath, { withFileTypes: true });
 
       for (const item of items) {
@@ -440,6 +440,6 @@ export {
   generateDependencyGraph,
   checkOutdatedDependencies,
   getPackageSize,
-  analyzeDependencies,
+  // analyzeDependencies,
   calculatePackageHealth,
 };

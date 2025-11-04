@@ -2,7 +2,6 @@
   "name": "@monodog/monorepo-scanner",
   "version": "1.0.0",
   "description": "Monorepo scanner for analyzing packages, dependencies, and health",
-  "main": "index.ts",
   "license": "MIT",
   "scripts": {
     "dev": "tsx watch index.ts",

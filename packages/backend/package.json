@@ -2,12 +2,19 @@
   "name": "@monodog/backend",
   "version": "1.0.0",
   "description": "Backend API server for monodog monorepo dashboard",
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
+  "bin": {
+    "monodog-cli": "dist/cli.js"
+  },
   "scripts": {
-    "dev": "tsx watch index.ts",
+    "dev": "tsx watch src/index.ts",
     "start": "tsx index.ts",
-    "build": "echo \"Configuration package build success (no code compilation)\"",
+    "prepublishOnly": "pnpm run build",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "prestart": "npm run build",
+    "cli": "pnpm run build && node dist/cli.js",
     "test": "jest --coverage",
     "clean": "rm -rf dist node_modules/.cache",
     "test:coverage": "jest --coverage",
@@ -18,7 +25,10 @@
     "@prisma/client": "^5.7.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "@monodog/ci-status": "workspace:*",
+    "@monodog/monorepo-scanner": "workspace:*",
+    "@monodog/utils": "workspace:*"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -27,10 +37,5 @@
     "prisma": "^5.22.0",
     "tsx": "^4.6.0",
     "typescript": "^5.3.0"
-  },
-  "peerDependencies": {
-    "@monodog/ci-status": "workspace:*",
-    "@monodog/monorepo-scanner": "workspace:*",
-    "@monodog/utils": "workspace:*"
   }
 }

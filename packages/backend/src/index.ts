@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
 import path from 'path';
-import fs from 'fs';
-import { glob } from 'glob';
+import  fs from 'fs';
+// import { glob } from 'glob';
 import { json } from 'body-parser';
 import {
   scanner,
@@ -12,19 +12,19 @@ import {
   funCheckTestCoverage,
   funCheckLintStatus,
   funCheckSecurityAudit,
-} from '../monorepo-scanner';
-import { ciStatusManager, getMonorepoCIStatus } from '../ci-status';
+} from '@monodog/monorepo-scanner';
+import { ciStatusManager, getMonorepoCIStatus } from '@monodog/ci-status';
 import {
   scanMonorepo,
   generateMonorepoStats,
   findCircularDependencies,
   generateDependencyGraph,
   calculatePackageHealth,
-} from '../../libs/utils/helpers';
+} from '@monodog/utils/helpers';
 import {storePackage} from './utils/helpers';
 import { PrismaClient } from '@prisma/client';
 // Import the validateConfig function from your utils
-import { validateConfig } from '../../apps/dashboard/src/components/modules/config-inspector/utils/config.utils';
+// import { validateConfig } from '../../apps/dashboard/src/components/modules/config-inspector/utils/config.utils';
 import { GitService } from './gitService';
 
 export interface HealthMetric {
@@ -33,7 +33,6 @@ export interface HealthMetric {
   status: 'healthy' | 'warning' | 'error';
   description: string;
 }
-import { GitService } from './gitService';
 export interface HealthMetric {
   name: string;
   value: number;
@@ -42,10 +41,33 @@ export interface HealthMetric {
 }
 
 const prisma = new PrismaClient();
-
+const DEFAULT_PORT = 4000;
+// The main function exported and called by the CLI
+export function startServer(rootPath: string) {
 const app = express();
+    const port = process.env.PORT ? parseInt(process.env.PORT) : DEFAULT_PORT;
+
+    // --- Middleware ---
+
+    // 1. Logging Middleware
+    app.use((_req: Request, _res: Response, next: NextFunction) => {
+        console.log(`[SERVER] ${_req.method} ${_req.url} (Root: ${rootPath})`);
+        next();
+    });
 app.use(cors());
 app.use(json());
+    // // 2. CORS (Critical for the frontend app to talk to this local server)
+    // // In a production setup, this would be highly restricted, but for local monorepo tools,
+    // // we often allow all origins or restrict to a known local hostname/port.
+    // app.use((_req: Request, res: Response, next: NextFunction) => {
+    //     res.setHeader('Access-Control-Allow-Origin', '*'); // Adjust this in production
+    //     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    //     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    //     next();
+    // });
+
+    // // 3. JSON body parser
+    // app.use(express.json());
 
 // Health check
 app.get('/api/health', (_, res) => {
@@ -62,7 +84,7 @@ app.get('/api/health', (_, res) => {
 });
 
 // Get all packages from database (DONE)
-app.get('/api/packages', async (req, res) => {
+app.get('/api/packages', async (_req, res) => {
   try {
     // Try to get packages from database first
     const dbPackages = await prisma.package.findMany();
@@ -107,7 +129,7 @@ app.get('/api/packages', async (req, res) => {
   }
 });
 
-app.get('/api/packages/refresh', async (req, res) => {
+app.get('/api/packages/refresh', async (_req, res) => {
   try {
     const rootDir = path.resolve(__dirname, '../../');
     const packages = scanMonorepo(rootDir);
@@ -123,9 +145,9 @@ app.get('/api/packages/refresh', async (req, res) => {
 });
 
 // Get package details
-app.get('/api/packages/:name', async (req, res) => {
+app.get('/api/packages/:name', async (_req, res) => {
   try {
-    const { name } = req.params;
+    const { name } = _req.params;
     const pkg = await prisma.package.findUnique({
       where: {
         name: name,
@@ -186,9 +208,9 @@ app.get('/api/packages/:name', async (req, res) => {
 });
 
 // Get commit details
-app.get('/api/commits/:packagePath', async (req, res) => {
+app.get('/api/commits/:packagePath', async (_req, res) => {
   try {
-    const { packagePath } = req.params;
+    const { packagePath } = _req.params;
 
     // Decode the package path
     const decodedPath = decodeURIComponent(packagePath);
@@ -243,7 +265,7 @@ app.get('/api/commits/:packagePath', async (req, res) => {
 });
 
 // Get dependency graph
-app.get('/api/graph', async (req, res) => {
+app.get('/api/graph', async (_req, res) => {
   try {
     const packages = scanMonorepo(process.cwd());
     const graph = generateDependencyGraph(packages);
@@ -264,7 +286,7 @@ app.get('/api/graph', async (req, res) => {
 });
 
 // Get monorepo statistics
-app.get('/api/stats', async (req, res) => {
+app.get('/api/stats', async (_req, res) => {
   try {
     const packages = scanMonorepo(process.cwd());
     const stats = generateMonorepoStats(packages);
@@ -280,7 +302,7 @@ app.get('/api/stats', async (req, res) => {
 });
 
 // Get CI status for all packages
-app.get('/api/ci/status', async (req, res) => {
+app.get('/api/ci/status', async (_req, res) => {
   try {
     const packages = scanMonorepo(process.cwd());
     const ciStatus = await getMonorepoCIStatus(packages);
@@ -291,9 +313,9 @@ app.get('/api/ci/status', async (req, res) => {
 });
 
 // Get CI status for specific package
-app.get('/api/ci/packages/:name', async (req, res) => {
+app.get('/api/ci/packages/:name', async (_req, res) => {
   try {
-    const { name } = req.params;
+    const { name } = _req.params;
     const status = await ciStatusManager.getPackageStatus(name);
 
     if (!status) {
@@ -307,9 +329,9 @@ app.get('/api/ci/packages/:name', async (req, res) => {
 });
 
 // Trigger CI build for package
-app.post('/api/ci/trigger', async (req, res) => {
+app.post('/api/ci/trigger', async (_req, res) => {
   try {
-    const { packageName, providerName, branch } = req.body;
+    const { packageName, providerName, branch } = _req.body;
 
     if (!packageName) {
       return res.status(400).json({ error: 'Package name is required' });
@@ -339,10 +361,10 @@ app.post('/api/ci/trigger', async (req, res) => {
 });
 
 // Get build logs
-app.get('/api/ci/builds/:buildId/logs', async (req, res) => {
+app.get('/api/ci/builds/:buildId/logs', async (_req, res) => {
   try {
-    const { buildId } = req.params;
-    const { provider } = req.query;
+    const { buildId } = _req.params;
+    const { provider } = _req.query;
 
     if (!provider) {
       return res.status(400).json({ error: 'Provider is required' });
@@ -359,10 +381,10 @@ app.get('/api/ci/builds/:buildId/logs', async (req, res) => {
 });
 
 // Get build artifacts
-app.get('/api/ci/builds/:buildId/artifacts', async (req, res) => {
+app.get('/api/ci/builds/:buildId/artifacts', async (_req, res) => {
   try {
-    const { buildId } = req.params;
-    const { provider } = req.query;
+    const { buildId } = _req.params;
+    const { provider } = _req.query;
 
     if (!provider) {
       return res.status(400).json({ error: 'Provider is required' });
@@ -379,9 +401,9 @@ app.get('/api/ci/builds/:buildId/artifacts', async (req, res) => {
 });
 
 // Perform full monorepo scan
-app.post('/api/scan', async (req, res) => {
+app.post('/api/scan', async (_req, res) => {
   try {
-    const { force } = req.body;
+    const { force } = _req.body;
 
     if (force) {
       scanner.clearCache();
@@ -402,7 +424,7 @@ app.post('/api/scan', async (req, res) => {
 });
 
 // Get scan results
-app.get('/api/scan/results', async (req, res) => {
+app.get('/api/scan/results', async (_req, res) => {
   try {
     const result = await quickScan();
     res.json(result);
@@ -412,10 +434,10 @@ app.get('/api/scan/results', async (req, res) => {
 });
 
 // Export scan results
-app.get('/api/scan/export/:format', async (req, res) => {
+app.get('/api/scan/export/:format', async (_req, res) => {
   try {
-    const { format } = req.params;
-    const { filename } = req.query;
+    const { format } = _req.params;
+    const { filename } = _req.query;
 
     if (!['json', 'csv', 'html'].includes(format)) {
       return res.status(400).json({ error: 'Invalid export format' });
@@ -446,10 +468,10 @@ app.get('/api/scan/export/:format', async (req, res) => {
 
 // ---------- HEALTH --------------------
 // Get package health metrics
-app.get('/api/health/packages/:name', async (req, res) => {
+app.get('/api/health/packages/:name', async (_req, res) => {
   try {
-    console.log('req.params -->', req.params);
-    const { name } = req.params;
+    console.log('_req.params -->', _req.params);
+    const { name } = _req.params;
     const packages = scanMonorepo(process.cwd());
     const packageInfo = packages.find(p => p.name === name);
 
@@ -481,7 +503,7 @@ app.get('/api/health/packages/:name', async (req, res) => {
 });
 
 // Get all package health metrics
-// app.get('/api/health/packages', async (req, res) => {
+// app.get('/api/health/packages', async (_req, res) => {
 //   try {
 //     // Try to get health data from database
 //     const healthData = await prisma.healthStatus.findMany();
@@ -530,7 +552,7 @@ app.get('/api/health/packages/:name', async (req, res) => {
 //   }
 // });
 
-app.get('/api/health/packages', async (req, res) => {
+app.get('/api/health/packages', async (_req, res) => {
   try {
     // Fetch all package health data from database
     const packageHealthData = await prisma.packageHealth.findMany();
@@ -583,7 +605,7 @@ app.get('/api/health/packages', async (req, res) => {
   }
 });
 
-app.get('/api/health/refresh', async (req, res) => {
+app.get('/api/health/refresh', async (_req, res) => {
   try {
     const rootDir = path.resolve(__dirname, '../../');
     const packages = scanMonorepo(rootDir);
@@ -678,20 +700,20 @@ app.get('/api/health/refresh', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch health metrics' });
   }
 });
-function calculateHealthStatus(
-  healthy: number,
-  total: number
-): 'healthy' | 'warning' | 'error' {
-  if (total === 0) return 'healthy';
-  const ratio = healthy / total;
-  if (ratio >= 0.8) return 'healthy';
-  if (ratio >= 0.6) return 'warning';
-  return 'error';
-}
+// function calculateHealthStatus(
+//   healthy: number,
+//   total: number
+// ): 'healthy' | 'warning' | 'error' {
+//   if (total === 0) return 'healthy';
+//   const ratio = healthy / total;
+//   if (ratio >= 0.8) return 'healthy';
+//   if (ratio >= 0.6) return 'warning';
+//   return 'error';
+// }
 // Search packages
-app.get('/api/search', async (req, res) => {
+app.get('/api/search', async (_req, res) => {
   try {
-    const { q: query, type, status } = req.query;
+    const { q: query, type, status } = _req.query;
     const packages = scanMonorepo(process.cwd());
 
     let filtered = packages;
@@ -729,9 +751,9 @@ app.get('/api/search', async (req, res) => {
 });
 
 // Get recent activity
-app.get('/api/activity', async (req, res) => {
+app.get('/api/activity', async (_req, res) => {
   try {
-    const { limit = 20 } = req.query;
+    const { limit = 20 } = _req.query;
     const packages = scanMonorepo(process.cwd());
 
     // Mock recent activity data
@@ -787,7 +809,7 @@ app.get('/api/system', (_, res) => {
 
 // ------------------------- CONFIGURATION TAB ------------------------- //
 // Get all configuration files from the file system
-app.get('/api/config/files', async (req, res) => {
+app.get('/api/config/files', async (_req, res) => {
   try {
     // Find the monorepo root instead of using process.cwd()
     const rootDir = findMonorepoRoot();
@@ -807,7 +829,7 @@ app.get('/api/config/files', async (req, res) => {
       lastModified: file.lastModified,
       hasSecrets: file.hasSecrets,
       isEditable: true,
-      validation: validateConfig(file.content, file.name),
+      // validation: validateConfig(file.content, file.name),
     }));
 
     res.json({
@@ -1065,10 +1087,10 @@ function containsSecrets(content: string, filename: string): boolean {
 }
 
 // Save configuration file
-// app.put('/api/config/files/:id', async (req, res) => {
+// app.put('/api/config/files/:id', async (_req, res) => {
 //   try {
-//     const { id } = req.params;
-//     const { content } = req.body;
+//     const { id } = _req.params;
+//     const { content } = _req.body;
 
 //     if (!content) {
 //       return res.status(400).json({
@@ -1141,10 +1163,10 @@ function containsSecrets(content: string, filename: string): boolean {
 //   }
 // });
 
-app.put('/api/config/files/:id', async (req, res) => {
+app.put('/api/config/files/:id', async (_req, res) => {
   try {
-    const { id } = req.params;
-    const { content } = req.body;
+    const { id } = _req.params;
+    const { content } = _req.body;
 
     if (!content) {
       return res.status(400).json({
@@ -1195,7 +1217,7 @@ app.put('/api/config/files/:id', async (req, res) => {
       lastModified: stats.mtime.toISOString(),
       hasSecrets: containsSecrets(content, filename),
       isEditable: true,
-      validation: validateConfig(content, filename),
+      // validation: validateConfig(content, filename),
     };
 
     res.json({
@@ -1216,9 +1238,9 @@ app.put('/api/config/files/:id', async (req, res) => {
 app.use(
   (
     error: any,
-    req: express.Request,
+    _req: express.Request,
     res: express.Response,
-    next: express.NextFunction
+    _next: express.NextFunction
   ) => {
     console.error('Error:', error);
     res.status(500).json({
@@ -1256,9 +1278,18 @@ app.listen(PORT, () => {
   console.log(`   - GET  /api/search`);
   console.log(`   - GET  /api/activity`);
   console.log(`   - GET  /api/system`);
-});
+}).on('error', (err) => {
+        // Handle common errors like EADDRINUSE (port already in use)
+        if (err.message.includes('EADDRINUSE')) {
+            console.error(`Error: Port ${port} is already in use. Please specify a different port via the PORT environment variable.`);
+            process.exit(1);
+        } else {
+            console.error('Server failed to start:', err);
+            process.exit(1);
+        }
+    });
 
-export default app;
+// export default app;
 
 // const overallScore =
 //   healthMetrics.reduce((sum, h) => sum + h.health!.overallScore, 0) /
@@ -1313,3 +1344,13 @@ export default app;
 //   metrics,
 //   packageHealth,
 // });
+
+}
+
+
+// This is a test file to ensure the TypeScript compiler can find an input.
+// export const runBackend = (name: string): string => {
+//   return `Backend running successfully for ${name}.`;
+// };
+
+// console.log(runBackend("MonoDog"));

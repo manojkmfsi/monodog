@@ -8,7 +8,7 @@ import {
   PackageHealth,
   MonorepoStats,
   scanMonorepo,
-  analyzeDependencies,
+  // analyzeDependencies,
   calculatePackageHealth,
   generateMonorepoStats,
   findCircularDependencies,

@@ -1,26 +1,20 @@
-import {
 
-  generateReports,
-
-} from '@monodog/monorepo-scanner';
 import {
 
   PackageInfo,
   DependencyInfo,
-} from '../../../libs/utils/helpers'
+} from '@monodog/utils/helpers'
 import dotenv from 'dotenv';
 import path from 'path';
-import fs from 'fs';
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 import { PrismaClient, Prisma, Commit } from '@prisma/client';
-import { Package } from '@prisma/client/edge';
 const prisma = new PrismaClient();
 const API_BASE = `http://localhost:4000/api`;
 
 async function getCommits(path: string): Promise<Commit[]> {
   const res = await fetch(API_BASE + `/commits/` + encodeURIComponent(path));
   if (!res.ok) throw new Error('Failed to fetch commits');
-  return await res.json();
+  return await res.json() as Commit[];
 }
 
 async function storeCommits(
@@ -73,7 +67,7 @@ async function storePackage(pkg: PackageInfo): Promise<void> {
     try {
 
       // Create or update package
-      const dbPackage = await prisma.package.upsert({
+      await prisma.package.upsert({
         where: { name: pkg.name },
         update: {
           version: pkg.version,
@@ -109,8 +103,8 @@ async function storePackage(pkg: PackageInfo): Promise<void> {
           version: pkg.version,
           type: pkg.type,
           path: pkg.path,
-          description: pkg.description,
-          license: pkg.license,
+          description: pkg.description??'',
+          license: pkg.license??'',
           repository: JSON.stringify(pkg.repository),
           status: '',
         },

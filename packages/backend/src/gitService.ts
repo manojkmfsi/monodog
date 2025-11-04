@@ -45,7 +45,7 @@ const VALID_COMMIT_TYPES: string[] = [
  * The delimiter used to separate individual commit records in the git log output.
  * We use a unique string to ensure reliable splitting.
  */
-const COMMIT_DELIMITER = '|---COMMIT-END---|';
+// const COMMIT_DELIMITER = '|---COMMIT-END---|';
 
 /**
  * The custom format string passed to 'git log'.
@@ -56,7 +56,7 @@ const COMMIT_DELIMITER = '|---COMMIT-END---|';
  * %ad: Author date (ISO 8601 format)
  * %s: Subject (commit message's first line - used for 'message' and 'type' fields)
  */
-const GIT_LOG_FORMAT = `{"hash": "%H", "author": "%ae", "packageName": "%pn", "date": "%ad", "message": "%s", "type": "%s"}${COMMIT_DELIMITER}`;
+// const GIT_LOG_FORMAT = `{"hash": "%H", "author": "%ae", "packageName": "%pn", "date": "%ad", "message": "%s", "type": "%s"}${COMMIT_DELIMITER}`;
 
 // export class GitService {
 //   private repoPath: string;

@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
-import { glob } from 'glob';
 import { json } from 'body-parser';
 import {
   scanner,
@@ -33,7 +32,6 @@ export interface HealthMetric {
   status: 'healthy' | 'warning' | 'error';
   description: string;
 }
-import { GitService } from './gitService';
 export interface HealthMetric {
   name: string;
   value: number;
@@ -1208,6 +1206,162 @@ app.put('/api/config/files/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to save configuration file',
+    });
+  }
+});
+
+// Update package configuration with path from frontend - preserving all fields, no backups
+app.put('/api/packages/update', async (req, res) => {
+  try {
+    const { packageName, config, packagePath } = req.body;
+
+    if (!packageName || !config || !packagePath) {
+      return res.status(400).json({
+        success: false,
+        error: 'Package name, configuration, and package path are required',
+      });
+    }
+
+    console.log('💾 Updating package configuration for:', packageName);
+    console.log('📁 Package path:', packagePath);
+
+    // Validate JSON syntax with better error handling
+    let newConfig;
+    try {
+      newConfig = JSON.parse(config);
+    } catch (error) {
+      console.error('JSON parsing error:', error);
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid JSON configuration',
+        message: `JSON parsing error: ${error instanceof Error ? error.message : 'Invalid format'}`,
+      });
+    }
+
+    const packageJsonPath = path.join(packagePath, 'package.json');
+
+    // Security check: ensure the path is valid
+    if (!fs.existsSync(packagePath)) {
+      return res.status(404).json({
+        success: false,
+        error: 'Package directory not found',
+      });
+    }
+
+    // Check if package.json exists
+    if (!fs.existsSync(packageJsonPath)) {
+      return res.status(404).json({
+        success: false,
+        error: 'package.json not found in the specified directory',
+      });
+    }
+
+    // Read the existing package.json to preserve all fields
+    const existingContent = await fs.promises.readFile(packageJsonPath, 'utf8');
+    let existingConfig;
+    try {
+      existingConfig = JSON.parse(existingContent);
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        error: 'Existing package.json contains invalid JSON',
+        message: `Error parsing existing package.json: ${error instanceof Error ? error.message : 'Invalid JSON'}`,
+      });
+    }
+
+    // Merge the new configuration with existing configuration
+    const mergedConfig = {
+      ...existingConfig,
+      name: newConfig.name || existingConfig.name,
+      version: newConfig.version || existingConfig.version,
+      description:
+        newConfig.description !== undefined
+          ? newConfig.description
+          : existingConfig.description,
+      license:
+        newConfig.license !== undefined
+          ? newConfig.license
+          : existingConfig.license,
+      repository: newConfig.repository || existingConfig.repository,
+      scripts: newConfig.scripts || existingConfig.scripts,
+      dependencies: newConfig.dependencies || existingConfig.dependencies,
+      devDependencies:
+        newConfig.devDependencies || existingConfig.devDependencies,
+      peerDependencies:
+        newConfig.peerDependencies || existingConfig.peerDependencies,
+    };
+
+    // Write the merged configuration back
+    const formattedConfig = JSON.stringify(mergedConfig, null, 2);
+    await fs.promises.writeFile(packageJsonPath, formattedConfig, 'utf8');
+
+    // Update the package in the database - use correct field names based on your Prisma schema
+    const updateData: any = {
+      // Use 'lastUpdated' instead of 'updatedAt' based on the error message
+      lastUpdated: new Date(),
+    };
+
+    // Only update fields that exist in your Prisma schema
+    if (newConfig.version) updateData.version = newConfig.version;
+    if (newConfig.description !== undefined)
+      updateData.description = newConfig.description || '';
+    if (newConfig.license !== undefined)
+      updateData.license = newConfig.license || '';
+    if (newConfig.scripts)
+      updateData.scripts = JSON.stringify(newConfig.scripts);
+    if (newConfig.repository)
+      updateData.repository = JSON.stringify(newConfig.repository);
+    if (newConfig.dependencies)
+      updateData.dependencies = JSON.stringify(newConfig.dependencies);
+    if (newConfig.devDependencies)
+      updateData.devDependencies = JSON.stringify(newConfig.devDependencies);
+    if (newConfig.peerDependencies)
+      updateData.peerDependencies = JSON.stringify(newConfig.peerDependencies);
+
+    console.log('📝 Updating database with:', updateData);
+
+    const updatedPackage = await prisma.package.update({
+      where: { name: packageName },
+      data: updateData,
+    });
+
+    // Transform the response
+    const transformedPackage = {
+      ...updatedPackage,
+      maintainers: updatedPackage.maintainers
+        ? JSON.parse(updatedPackage.maintainers)
+        : [],
+      scripts: updatedPackage.scripts ? JSON.parse(updatedPackage.scripts) : {},
+      repository: updatedPackage.repository
+        ? JSON.parse(updatedPackage.repository)
+        : {},
+      dependencies: updatedPackage.dependencies
+        ? JSON.parse(updatedPackage.dependencies)
+        : {},
+      devDependencies: updatedPackage.devDependencies
+        ? JSON.parse(updatedPackage.devDependencies)
+        : {},
+      peerDependencies: updatedPackage.peerDependencies
+        ? JSON.parse(updatedPackage.peerDependencies)
+        : {},
+    };
+
+    // Return success response
+    return res.json({
+      success: true,
+      message: 'Package configuration updated successfully',
+      package: transformedPackage,
+      preservedFields: true,
+    });
+  } catch (error) {
+    console.error('Error updating package configuration:', error);
+
+    // Ensure we always return JSON, even for errors
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to update package configuration',
+      message:
+        error instanceof Error ? error.message : 'Unknown error occurred',
     });
   }
 });

@@ -1,5 +1,5 @@
 import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
-import { ConfigSidebarProps } from '../types/config.types';
+import { type ConfigSidebarProps } from '../types/config.types';
 import {
   getTypeColor,
   formatFileSize,
@@ -18,7 +18,7 @@ export default function ConfigSidebar({
   const availableTypes = getUniqueTypes(configs);
 
   return (
-    <div className="bg-white rounded-lg shadow border h-full flex flex-col">
+    <div className="bg-white rounded-lg shadow border h-full flex flex-col max-h-[calc(100vh-180px)]">
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <h3 className="text-lg font-medium text-gray-900 mb-4">

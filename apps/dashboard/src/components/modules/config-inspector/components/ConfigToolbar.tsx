@@ -22,10 +22,9 @@ export default function ConfigToolbar({
   onCancelEdit,
   onToggleSecrets,
   onRefresh,
-  content
+  content,
 }: ConfigToolbarProps) {
-
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState(false);
 
   // const copyToClipboard = () => {
   //   // In a real implementation, this would copy the config content
@@ -43,17 +42,16 @@ export default function ConfigToolbar({
       // Reset the copied state after 2 seconds
       setTimeout(() => {
         setCopied(false);
-      }, 2000);
-
+      }, 4000);
     } catch (err) {
       console.error('Failed to copy to clipboard:', err);
       // Fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = content || 'No content available';
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
+      // const textArea = document.createElement('textarea');
+      // textArea.value = content || 'No content available';
+      // document.body.appendChild(textArea);
+      // textArea.select();
+      // document.execCommand('copy');
+      // document.body.removeChild(textArea);
 
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -81,12 +79,11 @@ export default function ConfigToolbar({
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="flex items-center justify-between p-4 bg-gray-50 border-b border-gray-200">
-
       <div className="flex items-center space-x-2">
         {/* Edit Controls */}
         {isEditing ? (
@@ -122,10 +119,11 @@ export default function ConfigToolbar({
         {hasSecrets && (
           <button
             onClick={onToggleSecrets}
-            className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${showSecrets
-              ? 'text-red-700 bg-red-100 hover:bg-red-200'
-              : 'text-yellow-700 bg-yellow-100 hover:bg-yellow-200'
-              }`}
+            className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              showSecrets
+                ? 'text-red-700 bg-red-100 hover:bg-red-200'
+                : 'text-yellow-700 bg-yellow-100 hover:bg-yellow-200'
+            }`}
           >
             {showSecrets ? (
               <>
@@ -146,10 +144,11 @@ export default function ConfigToolbar({
         {/* Copy Button */}
         <button
           onClick={copyToClipboard}
-          className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${copied
-            ? 'text-green-700 bg-green-100 border border-green-300'
-            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-            }`}
+          className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+            copied
+              ? 'text-green-700 bg-green-100 border border-green-300'
+              : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+          }`}
         >
           {copied ? (
             <>
@@ -172,13 +171,13 @@ export default function ConfigToolbar({
         </button> */}
 
         {/* Refresh Button */}
-        <button
+        {/* <button
           onClick={onRefresh}
           className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <ArrowPathIcon className="w-4 h-4 mr-1" />
           Refresh
-        </button>
+        </button> */}
       </div>
     </div>
   );

@@ -211,13 +211,47 @@ export default function ConfigurationTab({
 
       {/* Package.json Preview/Editor */}
       <div className="bg-white border rounded-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-900">
-            Package Configuration
-          </h3>
-          {!isEditing && (
-            <div className="text-sm text-gray-500">Read-only preview</div>
-          )}
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Package Configuration
+        </h3>
+
+        <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
+          <pre className="text-sm">
+            {`{
+  "name": "${packageData.name}",
+  "version": "${packageData.version}",
+  "description": "${packageData.description}",
+  "license": "${packageData.license}",
+  "repository": {${Object.entries(packageData.repository)
+    .map(
+      ([key, value]) => `
+    "${key}": "${value}"`
+    )
+    .join(',')}
+  },
+  "scripts": {${Object.entries(packageData.scripts)
+    .map(
+      ([key, value]) => `
+    "${key}": "${value}"`
+    )
+    .join(',')}
+  },
+  "dependencies": {${Object.keys(packageData.dependencies)
+    .map(
+      name => `
+    "${name}": "${packageData.dependencies[name]}"`
+    )
+    .join(',')}
+  },
+  "devDependencies": {${Object.keys(packageData.devDependencies)
+    .map(
+      name => `
+    "${name}": "${packageData.devDependencies[name]}"`
+    )
+    .join(',')}
+  }
+}`}
+          </pre>
         </div>
 
         {isEditing ? (

@@ -7,15 +7,15 @@ export interface Package {
   type: 'app' | 'lib' | 'tool' | 'service';
   status: 'healthy' | 'warning' | 'error' | 'building';
   lastUpdated: string;
-  dependencies: number;
+  dependencies: string[];
   maintainers: string[];
   tags: string[];
   description: string;
   path: string;
   private?: boolean;
   scripts?: Record<string, string>;
-  dependenciesList?: string[];
-  devDependenciesList?: string[];
+  peerDependencies?: string[];
+  devDependencies?: string[];
 }
 
 export interface DependencyInfo {
@@ -24,6 +24,7 @@ export interface DependencyInfo {
   type: 'dependency' | 'devDependency' | 'peerDependency';
   latest?: string;
   outdated?: boolean;
+  status: string;
 }
 
 export interface HealthMetric {
@@ -65,131 +66,131 @@ const API_BASE = `http://localhost:4000/api`;
 class MonorepoService {
   // Simulated monorepo data based on typical monorepo structure
   private mockPackages: Package[] = [
-    {
-      name: '@monodog/dashboard',
-      version: '1.0.0',
-      type: 'app',
-      status: 'healthy',
-      lastUpdated: '2024-01-16',
-      dependencies: 12,
-      maintainers: ['team-frontend'],
-      tags: ['core', 'ui', 'application'],
-      description: 'React dashboard for monodog monorepo management',
-      path: 'apps/dashboard',
-      private: false,
-      scripts: {
-        dev: 'vite',
-        build: 'tsc && vite build',
-        preview: 'vite preview',
-        lint: 'eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0',
-        test: 'jest',
-      },
-      dependenciesList: [
-        'react',
-        'react-dom',
-        'react-router-dom',
-        '@heroicons/react',
-        'recharts',
-        'clsx',
-        'date-fns',
-        'zustand',
-      ],
-      devDependenciesList: [
-        '@types/react',
-        '@types/react-dom',
-        '@vitejs/plugin-react',
-        'typescript',
-        'vite',
-        'tailwindcss',
-      ],
-    },
-    {
-      name: '@monodog/backend',
-      version: '1.0.0',
-      type: 'service',
-      status: 'healthy',
-      lastUpdated: '2024-01-16',
-      dependencies: 8,
-      maintainers: ['team-backend'],
-      tags: ['core', 'api', 'service'],
-      description: 'Backend API server for monodog monorepo dashboard',
-      path: 'packages/backend',
-      private: false,
-      scripts: {
-        dev: 'tsx watch index.ts',
-        start: 'tsx index.ts',
-        build: 'tsc',
-        test: 'jest',
-      },
-      dependenciesList: ['express', 'cors', 'body-parser', '@prisma/client'],
-      devDependenciesList: [
-        '@types/express',
-        '@types/cors',
-        '@types/node',
-        'tsx',
-        'typescript',
-        'prisma',
-      ],
-    },
-    {
-      name: '@monodog/utils',
-      version: '1.0.0',
-      type: 'lib',
-      status: 'healthy',
-      lastUpdated: '2024-01-16',
-      dependencies: 3,
-      maintainers: ['team-shared'],
-      tags: ['shared', 'utilities', 'library'],
-      description: 'Shared utility functions for monodog monorepo dashboard',
-      path: 'libs/utils',
-      private: false,
-      scripts: {
-        build: 'tsc',
-        test: 'jest',
-      },
-      dependenciesList: [],
-      devDependenciesList: ['@types/node', 'typescript'],
-    },
-    {
-      name: '@monodog/monorepo-scanner',
-      version: '0.2.0',
-      type: 'tool',
-      status: 'warning',
-      lastUpdated: '2024-01-15',
-      dependencies: 7,
-      maintainers: ['team-devops'],
-      tags: ['tooling', 'scanner', 'core'],
-      description: 'Monorepo package discovery and analysis tool',
-      path: 'packages/monorepo-scanner',
-      private: false,
-      scripts: {
-        build: 'tsc',
-        test: 'jest',
-        scan: 'node dist/index.js',
-      },
-      dependenciesList: ['chalk', 'commander', 'glob', 'fs-extra'],
-      devDependenciesList: ['@types/node', 'typescript', 'jest'],
-    },
-    {
-      name: '@monodog/ci-status',
-      version: '0.3.1',
-      type: 'tool',
-      status: 'healthy',
-      lastUpdated: '2024-01-14',
-      dependencies: 5,
-      maintainers: ['team-devops'],
-      tags: ['tooling', 'ci', 'monitoring'],
-      description: 'CI/CD status monitoring and reporting tool',
-      path: 'packages/ci-status',
-      private: false,
-      scripts: {
-        build: 'tsc',
-        test: 'jest',
-        start: 'node dist/index.js',
-      },
-      dependenciesList: ['axios', 'ws', 'dotenv'],
-      devDependenciesList: ['@types/node', 'typescript', 'jest'],
-    },
+    // {
+    //   name: '@monodog/dashboard',
+    //   version: '1.0.0',
+    //   type: 'app',
+    //   status: 'healthy',
+    //   lastUpdated: '2024-01-16',
+    //   dependencies: 12,
+    //   maintainers: ['team-frontend'],
+    //   tags: ['core', 'ui', 'application'],
+    //   description: 'React dashboard for monodog monorepo management',
+    //   path: 'apps/dashboard',
+    //   private: false,
+    //   scripts: {
+    //     dev: 'vite',
+    //     build: 'tsc && vite build',
+    //     preview: 'vite preview',
+    //     lint: 'eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0',
+    //     test: 'jest',
+    //   },
+    //   dependenciesList: [
+    //     'react',
+    //     'react-dom',
+    //     'react-router-dom',
+    //     '@heroicons/react',
+    //     'recharts',
+    //     'clsx',
+    //     'date-fns',
+    //     'zustand',
+    //   ],
+    //   devDependenciesList: [
+    //     '@types/react',
+    //     '@types/react-dom',
+    //     '@vitejs/plugin-react',
+    //     'typescript',
+    //     'vite',
+    //     'tailwindcss',
+    //   ],
+    // },
+    // {
+    //   name: '@monodog/backend',
+    //   version: '1.0.0',
+    //   type: 'service',
+    //   status: 'healthy',
+    //   lastUpdated: '2024-01-16',
+    //   dependencies: 8,
+    //   maintainers: ['team-backend'],
+    //   tags: ['core', 'api', 'service'],
+    //   description: 'Backend API server for monodog monorepo dashboard',
+    //   path: 'packages/backend',
+    //   private: false,
+    //   scripts: {
+    //     dev: 'tsx watch index.ts',
+    //     start: 'tsx index.ts',
+    //     build: 'tsc',
+    //     test: 'jest',
+    //   },
+    //   dependenciesList: ['express', 'cors', 'body-parser', '@prisma/client'],
+    //   devDependenciesList: [
+    //     '@types/express',
+    //     '@types/cors',
+    //     '@types/node',
+    //     'tsx',
+    //     'typescript',
+    //     'prisma',
+    //   ],
+    // },
+    // {
+    //   name: '@monodog/utils',
+    //   version: '1.0.0',
+    //   type: 'lib',
+    //   status: 'healthy',
+    //   lastUpdated: '2024-01-16',
+    //   dependencies: 3,
+    //   maintainers: ['team-shared'],
+    //   tags: ['shared', 'utilities', 'library'],
+    //   description: 'Shared utility functions for monodog monorepo dashboard',
+    //   path: 'libs/utils',
+    //   private: false,
+    //   scripts: {
+    //     build: 'tsc',
+    //     test: 'jest',
+    //   },
+    //   dependenciesList: [],
+    //   devDependenciesList: ['@types/node', 'typescript'],
+    // },
+    // {
+    //   name: '@monodog/monorepo-scanner',
+    //   version: '0.2.0',
+    //   type: 'tool',
+    //   status: 'warning',
+    //   lastUpdated: '2024-01-15',
+    //   dependencies: 7,
+    //   maintainers: ['team-devops'],
+    //   tags: ['tooling', 'scanner', 'core'],
+    //   description: 'Monorepo package discovery and analysis tool',
+    //   path: 'packages/monorepo-scanner',
+    //   private: false,
+    //   scripts: {
+    //     build: 'tsc',
+    //     test: 'jest',
+    //     scan: 'node dist/index.js',
+    //   },
+    //   dependenciesList: ['chalk', 'commander', 'glob', 'fs-extra'],
+    //   devDependenciesList: ['@types/node', 'typescript', 'jest'],
+    // },
+    // {
+    //   name: '@monodog/ci-status',
+    //   version: '0.3.1',
+    //   type: 'tool',
+    //   status: 'healthy',
+    //   lastUpdated: '2024-01-14',
+    //   dependencies: 5,
+    //   maintainers: ['team-devops'],
+    //   tags: ['tooling', 'ci', 'monitoring'],
+    //   description: 'CI/CD status monitoring and reporting tool',
+    //   path: 'packages/ci-status',
+    //   private: false,
+    //   scripts: {
+    //     build: 'tsc',
+    //     test: 'jest',
+    //     start: 'node dist/index.js',
+    //   },
+    //   dependenciesList: ['axios', 'ws', 'dotenv'],
+    //   devDependenciesList: ['@types/node', 'typescript', 'jest'],
+    // },
   ];
 
   async getPackages(): Promise<Package[]> {
@@ -197,18 +198,13 @@ class MonorepoService {
       const res = await fetch(`${API_BASE}/packages`);
 
       if (!res.ok) {
-        throw new Error(
-          `Failed to fetch package data: HTTP status ${res.status}`
-        );
+        throw new Error(`Failed to fetch package data: HTTP status ${res.status}`);
       }
 
       const data = await res.json();
       return data;
     } catch (error) {
-      console.error(
-        'Error during getPackages. Attempting to refresh data...',
-        error
-      );
+      console.error('Error during getPackages. Attempting to refresh data...', error);
 
       const refreshedData = await this.refreshPackages();
       return refreshedData;
@@ -245,6 +241,23 @@ class MonorepoService {
     }
   }
 
+  async refreshPackages(): Promise<Package[]> {
+    try {
+      const pkg = await fetch(`${API_BASE}/packages/refresh`);
+
+      if (!pkg.ok) {
+        // Log the failure status before throwing (which will be caught below)
+        throw new Error(`Failed to fetch package data: HTTP status ${pkg.status}`);
+      }
+      const pkgData = await pkg.json();
+      console.log('data from refreshPackage:', pkgData);
+
+      return pkgData;
+    } catch (error) {
+      console.error('Error fetching package data (refresh):', error);
+      return [];
+    }
+  }
   // async getHealthStatus(): Promise<{
   //   overallScore: number;
   //   metrics: HealthMetric[];

@@ -149,13 +149,13 @@ importers:
   packages/backend:
     dependencies:
       '@monodog/ci-status':
-        specifier: workspace:*
+        specifier: 1.1.1
         version: link:../ci-status
       '@monodog/monorepo-scanner':
-        specifier: workspace:*
+        specifier: 1.0.7
         version: link:../monorepo-scanner
       '@monodog/utils':
-        specifier: workspace:*
+        specifier: 1.0.0
         version: link:../../libs/utils
       '@prisma/client':
         specifier: ^5.7.0
@@ -169,30 +169,39 @@ importers:
       express:
         specifier: ^4.18.2
         version: 4.21.2
+      init:
+        specifier: ^0.1.2
+        version: 0.1.2
+      prisma:
+        specifier: ^5.22.0
+        version: 5.22.0
     devDependencies:
+      '@types/body-parser':
+        specifier: ^1.19.5
+        version: 1.19.6
       '@types/cors':
         specifier: ^2.8.17
         version: 2.8.19
+      '@types/dotenv':
+        specifier: ^8.2.0
+        version: 8.2.3
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.23
       '@types/node':
         specifier: ^20.10.0
         version: 20.19.20
-      prisma:
-        specifier: ^5.22.0
-        version: 5.22.0
       tsx:
         specifier: ^4.6.0
         version: 4.20.6
       typescript:
-        specifier: ^5.3.0
+        specifier: ^5.3.8
         version: 5.9.3
 
   packages/ci-status:
     dependencies:
       '@monodog/utils':
-        specifier: workspace:*
+        specifier: 1.0.0
         version: link:../../libs/utils
       '@prisma/client':
         specifier: ^5.7.0
@@ -233,7 +242,7 @@ importers:
   packages/monorepo-scanner:
     dependencies:
       '@monodog/utils':
-        specifier: workspace:*
+        specifier: 1.0.0
         version: link:../../libs/utils
       '@prisma/client':
         specifier: ^5.7.0
@@ -804,8 +813,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@emnapi/core@1.5.0:
-    resolution: {integrity: sha512-sbP8GzB1WDzacS8fgNPpHlp6C9VZe+SJP3F90W9rLemaQj2PzIuTEl1qDOYQf58YIpyjViI24y9aPWCjEzY2cg==}
+  /@emnapi/core@1.7.0:
+    resolution: {integrity: sha512-pJdKGq/1iquWYtv1RRSljZklxHCOCAJFJrImO5ZLKPJVJlVUcs8yFwNQlqS0Lo8xT1VAXXTCZocF9n26FWEKsw==}
     requiresBuild: true
     dependencies:
       '@emnapi/wasi-threads': 1.1.0
@@ -813,8 +822,8 @@ packages:
     dev: false
     optional: true
 
-  /@emnapi/runtime@1.5.0:
-    resolution: {integrity: sha512-97/BJ3iXHww3djw6hYIfErCZFee7qCtrneuLa20UXFCOTCfBM2cvQHjWJ2EG0s0MtdNwInarqCTz35i4wWXHsQ==}
+  /@emnapi/runtime@1.7.0:
+    resolution: {integrity: sha512-oAYoQnCYaQZKVS53Fq23ceWMRxq5EhQsE0x0RdQ55jT7wagMu5k+fS39v1fiSLrtrLQlXwVINenqhLMtTrV/1Q==}
     requiresBuild: true
     dependencies:
       tslib: 2.8.1
@@ -1407,8 +1416,8 @@ packages:
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
     requiresBuild: true
     dependencies:
-      '@emnapi/core': 1.5.0
-      '@emnapi/runtime': 1.5.0
+      '@emnapi/core': 1.7.0
+      '@emnapi/runtime': 1.7.0
       '@tybys/wasm-util': 0.10.1
     dev: false
     optional: true
@@ -1881,6 +1890,13 @@ packages:
   /@types/d3-timer@3.0.2:
     resolution: {integrity: sha512-Ps3T8E8dZDam6fUyNiMkekK3XUsaUEik+idO9/YjPtfj2qruF8tFBXS7XhtE4iIXBLxhmLjP3SXpLhVf21I9Lw==}
     dev: false
+
+  /@types/dotenv@8.2.3:
+    resolution: {integrity: sha512-g2FXjlDX/cYuc5CiQvyU/6kkbP1JtmGzh0obW50zD7OKeILVL0NSpPWLXVfqoAGQjom2/SLLx9zHq0KXvD6mbw==}
+    deprecated: This is a stub types definition. dotenv provides its own type definitions, so you do not need this installed.
+    dependencies:
+      dotenv: 17.2.3
+    dev: true
 
   /@types/express-serve-static-core@4.19.7:
     resolution: {integrity: sha512-FvPtiIf1LfhzsaIXhv/PHan/2FeQBbtBDtfX2QfvPxdUelMDEckK08SM6nqo1MIZY3RUlfA+HV8+hFUSio78qg==}
@@ -3127,6 +3143,11 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
+  /daemon@1.1.0:
+    resolution: {integrity: sha512-1vX9YVcP21gt12nSD3SQRC/uPU7fyA6M8qyClTBIFuiRWoylFn57PwXhjBAqRl085bZAje7sILhZU48qcS9SWw==}
+    engines: {node: '>= 0.8.0'}
+    dev: false
+
   /damerau-levenshtein@1.0.8:
     resolution: {integrity: sha512-sdQSFB7+llfUcQHUQO3+B8ERRj0Oa4w9POWMI/puGtuf7gFywGmkaLCElnudfTiKZV+NvHqL0ifzdrI8Ro7ESA==}
     dev: false
@@ -3343,7 +3364,6 @@ packages:
   /dotenv@17.2.3:
     resolution: {integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==}
     engines: {node: '>=12'}
-    dev: false
 
   /dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -4668,6 +4688,13 @@ packages:
   /ini@1.3.8:
     resolution: {integrity: sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==}
     dev: true
+
+  /init@0.1.2:
+    resolution: {integrity: sha512-IvHUjULS2q+BXJdiu4FHkByh3+qSFmkOXQ2ItSfYTtkdUksQc0yNX6f1uDyokzRV71tjpFsFc3ckeYLJXunTGw==}
+    engines: {node: '>=0.4.7'}
+    dependencies:
+      daemon: 1.1.0
+    dev: false
 
   /internal-slot@1.1.0:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}

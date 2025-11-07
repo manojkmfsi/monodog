@@ -15,7 +15,7 @@ import {
   generateDependencyGraph,
   checkOutdatedDependencies,
   getPackageSize,
-} from '../../libs/utils/helpers';
+} from '@monodog/utils/helpers';
 
 export interface ScanResult {
   packages: PackageInfo[];

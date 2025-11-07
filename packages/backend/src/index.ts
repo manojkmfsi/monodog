@@ -87,9 +87,19 @@ app.get('/api/health', (_, res) => {
 app.get('/api/packages', async (_req, res) => {
   try {
     // Try to get packages from database first
-    const dbPackages = await prisma.package.findMany();
+    let dbPackages = await prisma.package.findMany();
     if (!dbPackages.length) {
-        throw new Error(`No package found`);
+      try {
+        const rootDir = path.resolve(rootPath);
+        const packages = scanMonorepo(rootDir);
+        console.log('packages --> scan', packages.length);
+        for (const pkg of packages) {
+          await storePackage(pkg)
+        }
+      } catch (error) {
+        throw new Error('Error ' + error);
+      }
+      dbPackages = await prisma.package.findMany();
     }
     const transformedPackages = dbPackages.map(pkg => {
       // We create a new object 'transformedPkg' based on the database record 'pkg'
@@ -125,13 +135,13 @@ app.get('/api/packages', async (_req, res) => {
     });
     res.json(transformedPackages);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch packages' });
+    res.status(500).json({ error: 'Failed to fetch packages, '+error });
   }
 });
 
 app.get('/api/packages/refresh', async (_req, res) => {
   try {
-    const rootDir = path.resolve(__dirname, '../../');
+    const rootDir = path.resolve(rootPath);
     const packages = scanMonorepo(rootDir);
     console.log('packages -->', packages.length);
     for (const pkg of packages) {
@@ -192,8 +202,8 @@ app.get('/api/packages/:name', async (_req, res) => {
       ? JSON.parse(pkg.peerDependencies)
       : [];
     // Get additional package information
-    const reports = await generateReports();
-    const packageReport = reports.find(r => r.package.name === name);
+    const reports: any[] = await generateReports();
+    const packageReport = reports.find((r: any) => r.package.name === name);
 
     const result = {
       ...transformedPkg,
@@ -607,7 +617,7 @@ app.get('/api/health/packages', async (_req, res) => {
 
 app.get('/api/health/refresh', async (_req, res) => {
   try {
-    const rootDir = path.resolve(__dirname, '../../');
+    const rootDir = path.resolve(rootPath);
     const packages = scanMonorepo(rootDir);
     console.log('packages -->', packages.length);
     const healthMetrics = await Promise.all(
@@ -1288,7 +1298,18 @@ app.listen(PORT, () => {
             process.exit(1);
         }
     });
+// const appD = express();
+// // Serve static files from the 'dist' directory
+// appD.use(express.static(rootPath + '/apps/dashboard/dist'));
 
+// // For any other routes, serve the index.html
+// appD.get('*', (req, res) => {
+//   res.sendFile(path.join(rootPath, '/apps/dashboard/dist', 'index.html'));
+// });
+
+// appD.listen(3000, () => {
+//   console.log(`dashboard Server listening at http://localhost:${3000}`);
+// });
 // export default app;
 
 // const overallScore =

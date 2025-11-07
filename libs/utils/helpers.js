@@ -1,51 +1,6 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.scanMonorepo = scanMonorepo;
-exports.generateMonorepoStats = generateMonorepoStats;
-exports.findCircularDependencies = findCircularDependencies;
-exports.generateDependencyGraph = generateDependencyGraph;
-exports.checkOutdatedDependencies = checkOutdatedDependencies;
-exports.getPackageSize = getPackageSize;
-exports.calculatePackageHealth = calculatePackageHealth;
 // import { Package } from '@prisma/client';
-const fs = __importStar(require("fs"));
-const path_1 = __importDefault(require("path"));
+import * as fs from 'fs';
+import path from 'path';
 /**
  * Scans the monorepo and returns information about all packages
  */
@@ -53,14 +8,14 @@ function scanMonorepo(rootDir) {
     const packages = [];
     console.log('rootDir', rootDir);
     // Scan packages directory
-    const packagesDir = path_1.default.join(rootDir, 'packages');
+    const packagesDir = path.join(rootDir, 'packages');
     if (fs.existsSync(packagesDir)) {
         const packageDirs = fs
             .readdirSync(packagesDir, { withFileTypes: true })
             .filter(dirent => dirent.isDirectory())
             .map(dirent => dirent.name);
         for (const packageName of packageDirs) {
-            const packagePath = path_1.default.join(packagesDir, packageName);
+            const packagePath = path.join(packagesDir, packageName);
             const packageInfo = parsePackageInfo(packagePath, packageName);
             if (packageInfo) {
                 packages.push(packageInfo);
@@ -68,14 +23,14 @@ function scanMonorepo(rootDir) {
         }
     }
     // Scan apps directory
-    const appsDir = path_1.default.join(rootDir, 'apps');
+    const appsDir = path.join(rootDir, 'apps');
     if (fs.existsSync(appsDir)) {
         const appDirs = fs
             .readdirSync(appsDir, { withFileTypes: true })
             .filter(dirent => dirent.isDirectory())
             .map(dirent => dirent.name);
         for (const appName of appDirs) {
-            const appPath = path_1.default.join(appsDir, appName);
+            const appPath = path.join(appsDir, appName);
             const appInfo = parsePackageInfo(appPath, appName, 'app');
             if (appInfo) {
                 packages.push(appInfo);
@@ -83,14 +38,14 @@ function scanMonorepo(rootDir) {
         }
     }
     // Scan libs directory
-    const libsDir = path_1.default.join(rootDir, 'libs');
+    const libsDir = path.join(rootDir, 'libs');
     if (fs.existsSync(libsDir)) {
         const libDirs = fs
             .readdirSync(libsDir, { withFileTypes: true })
             .filter(dirent => dirent.isDirectory())
             .map(dirent => dirent.name);
         for (const libName of libDirs) {
-            const libPath = path_1.default.join(libsDir, libName);
+            const libPath = path.join(libsDir, libName);
             const libInfo = parsePackageInfo(libPath, libName, 'lib');
             if (libInfo) {
                 packages.push(libInfo);
@@ -101,7 +56,7 @@ function scanMonorepo(rootDir) {
 }
 /*** Parses package.json and determines package type */
 function parsePackageInfo(packagePath, packageName, forcedType) {
-    const packageJsonPath = path_1.default.join(packagePath, 'package.json');
+    const packageJsonPath = path.join(packagePath, 'package.json');
     if (!fs.existsSync(packageJsonPath)) {
         return null;
     }
@@ -344,7 +299,7 @@ function getPackageSize(packagePath) {
         const calculateSize = (dirPath) => {
             const items = fs.readdirSync(dirPath, { withFileTypes: true });
             for (const item of items) {
-                const fullPath = path_1.default.join(dirPath, item.name);
+                const fullPath = path.join(dirPath, item.name);
                 if (item.isDirectory()) {
                     // Skip node_modules and other build artifacts
                     if (!['node_modules', 'dist', 'build', '.git'].includes(item.name)) {
@@ -373,3 +328,6 @@ function getPackageSize(packagePath) {
         return { size: 0, files: 0 };
     }
 }
+export { scanMonorepo, generateMonorepoStats, findCircularDependencies, generateDependencyGraph, checkOutdatedDependencies, getPackageSize, 
+// analyzeDependencies,
+calculatePackageHealth, };

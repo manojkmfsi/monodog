@@ -30,12 +30,9 @@ importers:
       '@lakinmindfire/tsconfig':
         specifier: workspace:*
         version: link:packages/tsconfig
-      '@monodog/backend':
+      '@monodog/monoapp':
         specifier: workspace:^
-        version: link:packages/backend
-      '@monodog/dashboard':
-        specifier: workspace:^
-        version: link:apps/dashboard
+        version: link:packages/monoapp
       '@semantic-release/changelog':
         specifier: ^6.0.3
         version: 6.0.3(semantic-release@21.1.2)
@@ -256,6 +253,64 @@ importers:
       eslint:
         specifier: ^8.50.0
         version: 8.57.1
+
+  packages/monoapp:
+    dependencies:
+      '@monodog/ci-status':
+        specifier: 1.1.2
+        version: link:../ci-status
+      '@monodog/monorepo-scanner':
+        specifier: 1.0.7
+        version: 1.0.7(prisma@5.22.0)
+      '@monodog/utils':
+        specifier: 1.0.1
+        version: link:../../libs/utils
+      '@prisma/client':
+        specifier: ^5.7.0
+        version: 5.22.0(prisma@5.22.0)
+      body-parser:
+        specifier: ^1.20.2
+        version: 1.20.3
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.5
+      express:
+        specifier: ^4.18.2
+        version: 4.21.2
+      init:
+        specifier: ^0.1.2
+        version: 0.1.2
+      prisma:
+        specifier: ^5.22.0
+        version: 5.22.0
+    devDependencies:
+      '@types/body-parser':
+        specifier: ^1.19.5
+        version: 1.19.6
+      '@types/cors':
+        specifier: ^2.8.17
+        version: 2.8.19
+      '@types/dotenv':
+        specifier: ^8.2.0
+        version: 8.2.3
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.23
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.20
+      cross-env:
+        specifier: ^10.1.0
+        version: 10.1.0
+      ts-node:
+        specifier: ^10.0.0
+        version: 10.9.2(@types/node@20.19.20)(typescript@5.9.3)
+      tsx:
+        specifier: ^4.6.0
+        version: 4.20.6
+      typescript:
+        specifier: ^5.3.8
+        version: 5.9.3
 
   packages/monorepo-scanner:
     dependencies:

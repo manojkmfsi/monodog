@@ -50,8 +50,8 @@ function loadConfig() {
     // 1. Determine the path to the config file
     // We assume the backend package is running from the monorepo root (cwd is root)
     // or that we can navigate up to the root from the current file's location.
-    let rootPath = path.resolve(process.cwd()); // Adjust based on your workspace folder depth  from root if needed
-    let configPath = path.resolve(rootPath, 'monodog-conf.json');
+    const rootPath = path.resolve(process.cwd()); // Adjust based on your workspace folder depth  from root if needed
+    const configPath = path.resolve(rootPath, 'monodog-conf.json');
     createConfigFileIfMissing(rootPath);
     if (!fs.existsSync(configPath)) {
         console.error(`ERROR1: Configuration file not found at ${configPath}`);

@@ -11,17 +11,17 @@ import {
   funCheckTestCoverage,
   funCheckLintStatus,
   funCheckSecurityAudit,
-} from '@monodog/monorepo-scanner';
+} from './utils/monorepo-scanner';
 export const scanner = new MonorepoScanner();
 
-import { ciStatusManager, getMonorepoCIStatus } from '@monodog/ci-status';
+import { ciStatusManager, getMonorepoCIStatus } from './utils/ci-status';
 import {
   scanMonorepo,
   generateMonorepoStats,
   findCircularDependencies,
   generateDependencyGraph,
   calculatePackageHealth,
-} from '@monodog/utils/helpers';
+} from './utils/utilities';
 import {storePackage} from './utils/helpers';
 import { PrismaClient } from '@prisma/client';
 // Import the validateConfig function from your utils

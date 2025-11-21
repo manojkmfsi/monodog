@@ -11,11 +11,11 @@ const cors_1 = __importDefault(require("cors"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const body_parser_1 = require("body-parser");
-const monorepo_scanner_1 = require("@monodog/monorepo-scanner");
+const monorepo_scanner_1 = require("./utils/monorepo-scanner");
 exports.scanner = new monorepo_scanner_1.MonorepoScanner();
-const ci_status_1 = require("@monodog/ci-status");
-const helpers_1 = require("@monodog/utils/helpers");
-const helpers_2 = require("./utils/helpers");
+const ci_status_1 = require("./utils/ci-status");
+const utilities_1 = require("./utils/utilities");
+const helpers_1 = require("./utils/helpers");
 const client_1 = require("@prisma/client");
 // Import the validateConfig function from your utils
 // import { validateConfig } from '../../apps/dashboard/src/components/modules/config-inspector/utils/config.utils';
@@ -55,10 +55,10 @@ function startServer(rootPath, port, host) {
             if (!dbPackages.length) {
                 try {
                     const rootDir = path_1.default.resolve(rootPath);
-                    const packages = (0, helpers_1.scanMonorepo)(rootDir);
+                    const packages = (0, utilities_1.scanMonorepo)(rootDir);
                     console.log('packages --> scan', packages.length);
                     for (const pkg of packages) {
-                        await (0, helpers_2.storePackage)(pkg);
+                        await (0, helpers_1.storePackage)(pkg);
                     }
                 }
                 catch (error) {
@@ -103,10 +103,10 @@ function startServer(rootPath, port, host) {
     app.get('/api/packages/refresh', async (_req, res) => {
         try {
             const rootDir = path_1.default.resolve(rootPath);
-            const packages = (0, helpers_1.scanMonorepo)(rootDir);
+            const packages = (0, utilities_1.scanMonorepo)(rootDir);
             console.log('packages -->', packages.length);
             for (const pkg of packages) {
-                await (0, helpers_2.storePackage)(pkg);
+                await (0, helpers_1.storePackage)(pkg);
             }
             res.json(packages);
         }
@@ -241,8 +241,8 @@ function startServer(rootPath, port, host) {
     // Get monorepo statistics
     app.get('/api/stats', async (_req, res) => {
         try {
-            const packages = (0, helpers_1.scanMonorepo)(process.cwd());
-            const stats = (0, helpers_1.generateMonorepoStats)(packages);
+            const packages = (0, utilities_1.scanMonorepo)(process.cwd());
+            const stats = (0, utilities_1.generateMonorepoStats)(packages);
             res.json({
                 ...stats,
                 timestamp: Date.now(),
@@ -256,7 +256,7 @@ function startServer(rootPath, port, host) {
     // Get CI status for all packages
     app.get('/api/ci/status', async (_req, res) => {
         try {
-            const packages = (0, helpers_1.scanMonorepo)(process.cwd());
+            const packages = (0, utilities_1.scanMonorepo)(process.cwd());
             const ciStatus = await (0, ci_status_1.getMonorepoCIStatus)(packages);
             res.json(ciStatus);
         }
@@ -398,7 +398,7 @@ function startServer(rootPath, port, host) {
         try {
             console.log('_req.params -->', _req.params);
             const { name } = _req.params;
-            const packages = (0, helpers_1.scanMonorepo)(process.cwd());
+            const packages = (0, utilities_1.scanMonorepo)(process.cwd());
             const packageInfo = packages.find(p => p.name === name);
             if (!packageInfo) {
                 return res.status(404).json({ error: 'Package not found' });
@@ -519,7 +519,7 @@ function startServer(rootPath, port, host) {
     app.get('/api/health/refresh', async (_req, res) => {
         try {
             const rootDir = path_1.default.resolve(rootPath);
-            const packages = (0, helpers_1.scanMonorepo)(rootDir);
+            const packages = (0, utilities_1.scanMonorepo)(rootDir);
             console.log('packages -->', packages.length);
             const healthMetrics = await Promise.all(packages.map(async (pkg) => {
                 try {
@@ -529,7 +529,7 @@ function startServer(rootPath, port, host) {
                     const lintStatus = await (0, monorepo_scanner_1.funCheckLintStatus)(pkg);
                     const securityAudit = await (0, monorepo_scanner_1.funCheckSecurityAudit)(pkg);
                     // Calculate overall health score
-                    const overallScore = (0, helpers_1.calculatePackageHealth)(buildStatus, testCoverage, lintStatus, securityAudit);
+                    const overallScore = (0, utilities_1.calculatePackageHealth)(buildStatus, testCoverage, lintStatus, securityAudit);
                     const health = {
                         buildStatus: buildStatus,
                         testCoverage: testCoverage,
@@ -616,7 +616,7 @@ function startServer(rootPath, port, host) {
     app.get('/api/search', async (_req, res) => {
         try {
             const { q: query, type, status } = _req.query;
-            const packages = (0, helpers_1.scanMonorepo)(process.cwd());
+            const packages = (0, utilities_1.scanMonorepo)(process.cwd());
             let filtered = packages;
             // Filter by search query
             if (query) {
@@ -648,7 +648,7 @@ function startServer(rootPath, port, host) {
     app.get('/api/activity', async (_req, res) => {
         try {
             const { limit = 20 } = _req.query;
-            const packages = (0, helpers_1.scanMonorepo)(process.cwd());
+            const packages = (0, utilities_1.scanMonorepo)(process.cwd());
             // Mock recent activity data
             const activities = packages
                 .slice(0, Math.min(Number(limit), packages.length))

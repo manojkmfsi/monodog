@@ -2,10 +2,9 @@
 
 ## 🎯 Overview
 
-This is the backend service designed to provide comprehensive analytics, health monitoring, and dependency tracking for a large **JavaScript/TypeScript monorepo**.
-It leverages specialized **@monodog** tools and a database layer (via **Prisma**) to efficiently manage, persist, and expose data about all packages within the repository.
+The dashboard will provide visual management and monitoring capabilities for packages in monorepos using pnpm, turbo, or Nx. It will be distributed as an npm package installable in any monorepo to auto-generate a web UI for package oversight.
 
-This service is typically run locally or on a central server to power a dedicated frontend dashboard.
+This service is typically run locally or on a central server and power a dedicated frontend dashboard.
 
 ---
 
@@ -14,11 +13,11 @@ This service is typically run locally or on a central server to power a dedicate
 | Component | Technology | Description |
 |------------|-------------|--------------|
 | **Language** | TypeScript & Node.js | Core language for runtime execution. |
-| **Framework** | Express.js | Handles all API routing and middleware. |
+| **Framework** | Express.js, React | Express Handles all API routing and middleware and React for building the user interface.|
+| **Styling** | Tailwind CSS | Utility-first framework for responsive, modern, and aesthetic design. |
 | **ORM** | Prisma | Database layer for managing package and health status records. |
-| **Scanning** | @monodog/monorepo-scanner | Core logic for file system scanning and package metadata extraction. |
+| **Scanning** | monorepo-scanner | Core logic for file system scanning and package metadata extraction. |
 | **VCS** | GitService | Used to fetch and analyze commit history per package path. |
-| **Networking** | cors, body-parser | Essential middleware for API connectivity. |
 
 ---
 
@@ -28,36 +27,20 @@ You must have the following installed to run the service:
 
 - **Node.js:** Version 18+ recommended
 - **Package Manager:** `pnpm` or `npm` (use the one your monorepo uses)
-- **Database:** A running instance of a database supported by Prisma (e.g., PostgreSQL, SQLite, MySQL)
 
 ---
 
 ## 🚀 Getting Started
 
-###  Installation
+### Install Package in Monorepo
 
-Clone the repository and install the dependencies:
+Install monoapp in a monorepo workspace root:
 
-```bash
-# Clone the repository
-git clone https://github.com/lakinmindfire/MonoDog.git
-cd packages/backend
+    pnpm install --save-dev @monodog/monoapp -w
 
-# Install dependencies
-pnpm install
+Run app using serve script:
 
-# Database Setup (Prisma)
-
-The application requires the database schema to be set up using **Prisma Migrate**.
-
-pnpm prisma generate
-
-pnpm prisma migrate dev
-
-### Run backend server on port 4000 (default)
-
-pnpm monodog-cli --serve --root .
-```
+    npm --workspace @monodog/monoapp run serve
 
 ### Key API Endpoints
 

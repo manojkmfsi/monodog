@@ -3,7 +3,7 @@ import {
 
   PackageInfo,
   DependencyInfo,
-} from '@monodog/utils/helpers'
+} from './utilities'
 // import dotenv from 'dotenv';
 import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '../.env') });

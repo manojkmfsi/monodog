@@ -30,9 +30,6 @@ importers:
       '@lakinmindfire/tsconfig':
         specifier: workspace:*
         version: link:packages/tsconfig
-      '@monodog/monoapp':
-        specifier: workspace:^
-        version: link:packages/monoapp
       '@semantic-release/changelog':
         specifier: ^6.0.3
         version: 6.0.3(semantic-release@21.1.2)
@@ -256,15 +253,6 @@ importers:
 
   packages/monoapp:
     dependencies:
-      '@monodog/ci-status':
-        specifier: 1.1.2
-        version: link:../ci-status
-      '@monodog/monorepo-scanner':
-        specifier: 1.0.7
-        version: 1.0.7(prisma@5.22.0)
-      '@monodog/utils':
-        specifier: 1.0.1
-        version: link:../../libs/utils
       '@prisma/client':
         specifier: ^5.7.0
         version: 5.22.0(prisma@5.22.0)

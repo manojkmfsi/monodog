@@ -24,7 +24,7 @@ To run this application, ensure the following:
 
 - **Node.js** and a package manager (`npm`, `yarn`, or `pnpm`) are installed.
 - The **Monorepo Analytics API** backend service is running and accessible.
-  - Default backend URL: **http://localhost:4000**
+  - Default backend URL: **http://localhost:8999**
 
 ---
 
@@ -33,12 +33,7 @@ To run this application, ensure the following:
 The dashboard connects to the backend API using the following base URL:
 
 ```javascript
-const API_BASE_URL = 'http://localhost:4000/api';
-
-# Install dependencies (if not already installed)
-pnpm install
-
-pnpm run dev
+const API_BASE_URL = 'http://localhost:8999/api';
 
 ```
 ## 🚀 Getting Started
@@ -50,14 +45,14 @@ Clone the repository and install the dependencies:
 ```bash
 # Clone the repository
 git clone https://github.com/lakinmindfire/MonoDog.git
-cd apps/dashboard
+cd packages/monoapp/monodog-dashboard
 
 # Install dependencies
-pnpm install
+npm install
 
 # build
-pnpm run build
+npm run build
 
 # run dashboard
-pnpm run dev
+npm run dev
 ```

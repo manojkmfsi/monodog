@@ -7,7 +7,9 @@ interface DependenciesTabProps {
 }
 
 export default function DependenciesTab({ packageData }: DependenciesTabProps) {
-  console.log(packageData);
+  if (!packageData.dependenciesInfo.length) {
+    return <p className="py-6 text-gray-600">No dependency found.</p>;
+  }
   const renderDependencyTable = (
     dependencies: PackageDetail['dependenciesInfo'],
     title: string

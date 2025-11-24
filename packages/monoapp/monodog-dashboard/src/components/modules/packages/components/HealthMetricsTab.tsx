@@ -64,7 +64,9 @@ export default function HealthMetricsTab({
         return 'bg-gray-100 text-gray-800';
     }
   };
-
+  if (!packageData.packageHealth?.packageOverallScore) {
+    return <p className="py-6 text-gray-600">No health data available.</p>;
+  }
   return (
     <div className="py-6">
       {/* Health Score Overview */}
@@ -87,7 +89,9 @@ export default function HealthMetricsTab({
                   ? 'bg-yellow-500'
                   : 'bg-red-500'
             }`}
-            style={{ width: `${packageData.packageHealth.packageOverallScore}%` }}
+            style={{
+              width: `${packageData.packageHealth.packageOverallScore}%`,
+            }}
           />
         </div>
 
@@ -147,7 +151,9 @@ export default function HealthMetricsTab({
                     ? 'bg-yellow-500'
                     : 'bg-red-500'
               }`}
-              style={{ width: `${packageData.packageHealth.packageTestCoverage}%` }}
+              style={{
+                width: `${packageData.packageHealth.packageTestCoverage}%`,
+              }}
             />
           </div>
         </div>
@@ -231,7 +237,8 @@ export default function HealthMetricsTab({
                   className={`font-medium ${
                     packageData.packageHealth.packageBuildStatus === 'success'
                       ? 'text-green-600'
-                      : packageData.packageHealth.packageBuildStatus === 'failed'
+                      : packageData.packageHealth.packageBuildStatus ===
+                          'failed'
                         ? 'text-red-600'
                         : 'text-yellow-600'
                   }`}
@@ -241,7 +248,9 @@ export default function HealthMetricsTab({
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Test Coverage:</span>
-                <span className="font-medium">{packageData.packageHealth.packageTestCoverage}%</span>
+                <span className="font-medium">
+                  {packageData.packageHealth.packageTestCoverage}%
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Lint Status:</span>

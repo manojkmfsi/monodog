@@ -1,6 +1,6 @@
 {
   "name": "@monodog/monoapp",
-  "version": "1.2.54",
+  "version": "1.2.72",
   "description": "App for monodog monorepo",
   "license": "MIT",
   "bin": {
@@ -19,9 +19,9 @@
     "db:url": "node dist/get-db-url.js",
     "generate": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma generate",
     "migrate": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate dev",
-    "migrate:reset": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate reset",
+    "migrate:reset": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate reset --force",
     "serve": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') node dist/setup.js --serve --root ../../",
-    "postinstall": "npm run generate && npm run migrate && pnpm monoapp-setup @monodog/monoapp --root $INIT_CWD"
+    "postinstall": "npm run generate && npm run migrate:reset && pnpm monoapp-setup @monodog/monoapp --root $INIT_CWD"
   },
   "dependencies": {
     "@prisma/client": "^5.7.0",

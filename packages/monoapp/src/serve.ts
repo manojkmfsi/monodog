@@ -14,7 +14,6 @@ import { startServer, serveDashboard } from './index'; // Assume index.ts export
 
 import { appConfig } from './config-loader';
 
-
 // --- Argument Parsing ---
 
 // 1. Get arguments excluding the node executable and script name
@@ -48,6 +47,8 @@ console.log(`Starting Monodog API server...`);
 console.log(`Analyzing monorepo at root: ${rootPath}`);
 // Start the Express server and begin analysis
 startServer(rootPath, port, host);
-serveDashboard(path.join(rootPath, appConfig.workspace.install_path), appConfig.dashboard.port, appConfig.dashboard.host);
-
-
+serveDashboard(
+  path.join(rootPath, appConfig.workspace.install_path),
+  appConfig.dashboard.port,
+  appConfig.dashboard.host
+);

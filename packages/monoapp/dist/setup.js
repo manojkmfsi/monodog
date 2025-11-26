@@ -70,8 +70,8 @@ console.log('rp2', rootPath);
 // --- Execution Logic ---
 console.log(`\nInitializing Setup...`);
 copyPackageToWorkspace(rootPath);
-console.log("\n*** Run the server ***");
-console.log("npm --workspace @monodog/monoapp run serve");
+console.log('\n*** Run the server ***');
+console.log('npm --workspace @monodog/monoapp run serve');
 process.exit(0);
 /**
  * Copies an installed NPM package from node_modules into the local install_path workspace directory.
@@ -81,8 +81,8 @@ function copyPackageToWorkspace(rootDir) {
     // The package name is expected as the first command-line argument (process.argv[2])
     const packageName = process.argv[2];
     if (!packageName || packageName.startsWith('--')) {
-        console.error("Error: Please provide the package name as an argument if you want to setup dashboard.");
-        console.log("Usage: pnpm monodog-cli @monodog/dashboard --serve --root .");
+        console.error('Error: Please provide the package name as an argument if you want to setup dashboard.');
+        console.log('Usage: pnpm monodog-cli @monodog/dashboard --serve --root .');
     }
     const sourcePath = path.join(rootDir, 'node_modules', packageName);
     // Convert package name to a valid folder name (e.g., @scope/name -> scope-name)

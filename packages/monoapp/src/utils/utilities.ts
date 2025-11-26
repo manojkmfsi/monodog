@@ -74,7 +74,7 @@ function scanMonorepo(rootDir: string): PackageInfo[] {
     }
   }
 
-    // Scan packages directory
+  // Scan packages directory
   const examplesDir = path.join(rootDir, 'examples');
   if (fs.existsSync(examplesDir)) {
     const packageDirs = fs
@@ -437,7 +437,7 @@ function getPackageSize(packagePath: string): {
           }
         }
       }
-    }
+    };
 
     calculateSize(packagePath);
 

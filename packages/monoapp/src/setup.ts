@@ -13,7 +13,6 @@ import * as path from 'path';
 
 import { appConfig } from './config-loader';
 
-
 // --- Argument Parsing ---
 
 // 1. Get arguments excluding the node executable and script name
@@ -23,8 +22,7 @@ const args = process.argv.slice(2);
 let rootPath = path.resolve(appConfig.workspace.root_dir ?? process.cwd()); // Default to the current working directory ?(inside node modules)
 const host = appConfig.server.host ?? 'localhost'; //Default host
 
-
-console.log('rp1', rootPath)
+console.log('rp1', rootPath);
 // Simple argument parsing loop
 for (let i = 0; i < args.length; i++) {
   const arg = args[i];
@@ -40,18 +38,16 @@ for (let i = 0; i < args.length; i++) {
     }
   }
 }
-console.log('rp2', rootPath)
+console.log('rp2', rootPath);
 
 // --- Execution Logic ---
-
 
 console.log(`\nInitializing Setup...`);
 
 copyPackageToWorkspace(rootPath);
-console.log("\n*** Run the server ***");
-console.log("npm --workspace @monodog/monoapp run serve");
+console.log('\n*** Run the server ***');
+console.log('npm --workspace @monodog/monoapp run serve');
 process.exit(0);
-
 
 /**
  * Copies an installed NPM package from node_modules into the local install_path workspace directory.
@@ -62,40 +58,55 @@ function copyPackageToWorkspace(rootDir: string): void {
   const packageName = process.argv[2];
 
   if (!packageName || packageName.startsWith('--')) {
-    console.error("Error: Please provide the package name as an argument if you want to setup dashboard.");
-    console.log("Usage: pnpm monodog-cli @monodog/dashboard --serve --root .");
+    console.error(
+      'Error: Please provide the package name as an argument if you want to setup dashboard.'
+    );
+    console.log('Usage: pnpm monodog-cli @monodog/dashboard --serve --root .');
   }
   const sourcePath = path.join(rootDir, 'node_modules', packageName);
 
   // Convert package name to a valid folder name (e.g., @scope/name -> scope-name)
   // This is optional but makes file paths cleaner.
   const folderName = packageName.replace('@', '').replace('/', '-');
-  const destinationPath = path.join(rootDir, appConfig.workspace.install_path, folderName);
+  const destinationPath = path.join(
+    rootDir,
+    appConfig.workspace.install_path,
+    folderName
+  );
 
   console.log(`\n--- Monorepo Workspace Conversion ---`);
   console.log(`Target Package: ${packageName}`);
-  console.log(`New Workspace:  ${appConfig.workspace.install_path}/${folderName}`);
+  console.log(
+    `New Workspace:  ${appConfig.workspace.install_path}/${folderName}`
+  );
   console.log(`-----------------------------------`);
-
 
   // 2. Validate Source existence
   if (!fs.existsSync(sourcePath)) {
     console.error(`\n❌ Error: Source package not found at ${sourcePath}.`);
-    console.error("Please ensure the package is installed via 'pnpm install <package-name>' first.");
+    console.error(
+      "Please ensure the package is installed via 'pnpm install <package-name>' first."
+    );
     process.exit(1);
   }
 
   // Check if source path exists and is a directory before copying
   if (!fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isDirectory()) {
-    console.error(`\n❌ Fatal Error: Source package directory not found or is not a directory.`);
+    console.error(
+      `\n❌ Fatal Error: Source package directory not found or is not a directory.`
+    );
     console.error(`Attempted source path: ${sourcePath}`);
-    console.error(`This likely means the package '${packageName}' was not fully installed or is improperly linked by the package manager.`);
+    console.error(
+      `This likely means the package '${packageName}' was not fully installed or is improperly linked by the package manager.`
+    );
     process.exit(1);
   }
 
   // 3. Handle Destination existence: Delete if found to allow clean re-setup
   if (fs.existsSync(destinationPath)) {
-    console.log(`\n⚠️ Warning: Destination directory already exists at ${destinationPath}.`);
+    console.log(
+      `\n⚠️ Warning: Destination directory already exists at ${destinationPath}.`
+    );
     console.log(`\nSkipping Setup.`);
     process.exit(0);
   }
@@ -104,7 +115,9 @@ function copyPackageToWorkspace(rootDir: string): void {
   const packagesDir = path.join(rootDir, appConfig.workspace.install_path);
   if (!fs.existsSync(packagesDir)) {
     fs.mkdirSync(packagesDir, { recursive: true });
-    console.log(`Created ${appConfig.workspace.install_path} directory: ${packagesDir}`);
+    console.log(
+      `Created ${appConfig.workspace.install_path} directory: ${packagesDir}`
+    );
   }
 
   // 4. Perform the copy operation
@@ -125,12 +138,12 @@ function copyPackageToWorkspace(rootDir: string): void {
       // filter: (src: string): boolean => !src.includes('node_modules'),
     });
 
-    console.log(`\n✅ Success! Contents of '${packageName}' copied to '${destinationPath}'`);
-
+    console.log(
+      `\n✅ Success! Contents of '${packageName}' copied to '${destinationPath}'`
+    );
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`\n❌ Failed to copy files: ${message}`);
     process.exit(1);
   }
 }
-

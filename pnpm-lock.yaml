@@ -24,10 +24,10 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^17.7.0
         version: 17.8.1
-      '@lakinmindfire/eslint-config':
+      '@manojk/eslint-config':
         specifier: workspace:*
         version: link:packages/eslint-config
-      '@lakinmindfire/tsconfig':
+      '@manojk/tsconfig':
         specifier: workspace:*
         version: link:packages/tsconfig
       '@semantic-release/changelog':
@@ -156,13 +156,13 @@ importers:
     dependencies:
       '@monodog/ci-status':
         specifier: 1.1.2
-        version: link:../ci-status
+        version: 1.1.2(prisma@5.22.0)
       '@monodog/monorepo-scanner':
         specifier: 1.0.7
         version: 1.0.7(prisma@5.22.0)
       '@monodog/utils':
         specifier: 1.0.1
-        version: link:../../libs/utils
+        version: 1.0.1
       '@prisma/client':
         specifier: ^5.7.0
         version: 5.22.0(prisma@5.22.0)
@@ -214,7 +214,7 @@ importers:
     dependencies:
       '@monodog/utils':
         specifier: 1.0.1
-        version: link:../../libs/utils
+        version: 1.0.1
       '@prisma/client':
         specifier: ^5.7.0
         version: 5.22.0(prisma@5.22.0)
@@ -304,7 +304,7 @@ importers:
     dependencies:
       '@monodog/utils':
         specifier: 1.0.1
-        version: link:../../libs/utils
+        version: 1.0.1
       '@prisma/client':
         specifier: ^5.7.0
         version: 5.22.0(prisma@5.22.0)
@@ -1477,6 +1477,15 @@ packages:
       read-yaml-file: 1.1.0
     dev: true
 
+  /@monodog/ci-status@1.1.2(prisma@5.22.0):
+    resolution: {integrity: sha512-PbFHFxXNii/DhQOHV6RdmpT5rhFfAgv3li3Q9kdpKBx9aeZ6p1h8ue5STT9KXHq+Fa8X49CMA3UXFTxCu0BoSQ==}
+    dependencies:
+      '@monodog/utils': 1.0.1
+      '@prisma/client': 5.22.0(prisma@5.22.0)
+    transitivePeerDependencies:
+      - prisma
+    dev: false
+
   /@monodog/monorepo-scanner@1.0.7(prisma@5.22.0):
     resolution: {integrity: sha512-W3V4XrVAam9vKXuCXy1msvbQ2Qx3oKUQXznNbmBFhGT7jX7F7r9wCyIr7sKBOGwVSJ4d8nzxwP3bOnxxMfk/yQ==}
     dependencies:
@@ -1488,6 +1497,10 @@ packages:
 
   /@monodog/utils@1.0.0:
     resolution: {integrity: sha512-DTkgTajhDZhLKMzGfp5HznrFSrnUugq8PgGNNnLHyn1mfZV4RIEsMskmlH+To2NRfbGNl4lr4lLj4BcJ0pXq9w==}
+    dev: false
+
+  /@monodog/utils@1.0.1:
+    resolution: {integrity: sha512-s7NrQt9TFj/BMYrt8ND3coUgl0ABmVTMhAg650M3KAZ3BUL0zqQmvQXpmySMC+7WFFV6TwEEbi7nF6aBPspy1A==}
     dev: false
 
   /@napi-rs/wasm-runtime@0.2.12:

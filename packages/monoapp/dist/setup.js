@@ -124,12 +124,29 @@ function copyPackageToWorkspace(rootDir) {
         // fs.cpSync provides cross-platform recursive copying (Node 16.7+)
         // Added filter to exclude node_modules, dist, and cache folders from the copy,
         // which prevents recursive errors and corrupted copies.
+        // const INCLUDED_ROOT_ITEMS = ['package.json', 'README.md', 'dist', 'monodog-conf.json', 'monodog-dashboard'];
         fs.cpSync(sourcePath, destinationPath, {
             recursive: true,
             dereference: true,
             // filter: (src: string): boolean => {
-            //     const basename = path.basename(src);
-            //     return !(['node_modules', 'dist', 'out', '.cache'].includes(basename));
+            //     const relative = path.relative(sourcePath, src);
+            //     // 1. Always include the source root itself to initiate the copy
+            //     if (relative === '') {
+            //         return true;
+            //     }
+            //     // 2. Get the top-level path segment (e.g., 'dist', 'prisma', 'package.json')
+            //     // This is the file/directory name immediately under the source path.
+            //     const topLevelItem = relative.split(path.sep)[0];
+            //     // 3. Include if the top-level item is one of the desired items.
+            //     if (INCLUDED_ROOT_ITEMS.includes(topLevelItem)) {
+            //         return true;
+            //     }
+            //     // 4. Exclude everything else (like /src, /test, /node_modules, etc.)
+            //     return false;
+            // }
+            // filter: (src: string): boolean => {
+            //   const basename = path.basename(src);
+            //   return !(['node_modules', '.turbo'].includes(basename));
             // }
             // Filter out node_modules inside the package itself to avoid deep recursion
             // filter: (src: string): boolean => !src.includes('node_modules'),

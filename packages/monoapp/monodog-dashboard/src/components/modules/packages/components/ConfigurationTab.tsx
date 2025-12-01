@@ -190,7 +190,7 @@ export default function ConfigurationTab({
                       </>
                     )}
                   </button>
-                  <button className="text-blue-600 hover:text-blue-500 text-sm">
+                  <button className="hidden text-blue-600 hover:text-blue-500 text-sm">
                     Run
                   </button>
                 </div>

@@ -32,7 +32,7 @@ export default function DependenciesTab({ packageData }: DependenciesTabProps) {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="hidden px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -62,7 +62,7 @@ export default function DependenciesTab({ packageData }: DependenciesTabProps) {
                     {dep.status.replace('-', ' ')}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <td className="hidden px-6 py-4 whitespace-nowrap text-sm">
                   {dep.status !== 'up-to-date' && (
                     <button className="text-blue-600 hover:text-blue-500 flex items-center space-x-1">
                       <ArrowUpIcon className="w-4 h-4" />

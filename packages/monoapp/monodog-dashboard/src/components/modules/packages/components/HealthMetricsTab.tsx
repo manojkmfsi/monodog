@@ -120,7 +120,7 @@ export default function HealthMetricsTab({
             >
               {packageData.packageHealth.packageBuildStatus}
             </span>
-            <button className="text-blue-600 hover:text-blue-500 text-sm">
+            <button className="hidden text-blue-600 hover:text-blue-500 text-sm">
               View Logs
             </button>
           </div>
@@ -178,7 +178,7 @@ export default function HealthMetricsTab({
             >
               {packageData.packageHealth.packageLintStatus}
             </span>
-            <button className="text-blue-600 hover:text-blue-500 text-sm">
+            <button className="hidden text-blue-600 hover:text-blue-500 text-sm">
               View Issues
             </button>
           </div>

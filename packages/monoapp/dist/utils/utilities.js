@@ -36,6 +36,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.resolveWorkspaceGlobs = resolveWorkspaceGlobs;
+exports.getWorkspacesFromRoot = getWorkspacesFromRoot;
+exports.parsePackageInfo = parsePackageInfo;
 exports.scanMonorepo = scanMonorepo;
 exports.generateMonorepoStats = generateMonorepoStats;
 exports.findCircularDependencies = findCircularDependencies;
@@ -115,7 +118,7 @@ function scanMonorepo(rootDir) {
             const fullPackagePath = path_1.default.join(rootDir, workspacePath);
             // The package name would be read from the package.json inside this path
             const packageName = path_1.default.basename(fullPackagePath);
-            console.log(`   - Scanning path: ${workspacePath} (Package: ${packageName})`);
+            console.log(`- Scanning path: ${workspacePath} (Package: ${packageName})`);
             const packageInfo = parsePackageInfo(fullPackagePath, packageName);
             if (packageInfo) {
                 packages.push(packageInfo);

@@ -8,8 +8,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "echo \"Configuration package build success (no code compilation)\"",
-    "test:coverage": "jest --coverage"
+    "build": "echo \"Configuration package build success (no code compilation)\""
   },
   "files": [
     "base.json",

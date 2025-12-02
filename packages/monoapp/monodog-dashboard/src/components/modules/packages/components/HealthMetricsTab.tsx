@@ -127,7 +127,7 @@ export default function HealthMetricsTab({
         </div>
 
         {/* Test Coverage */}
-        <div className="bg-white border rounded-lg p-6">
+        <div className="hidden bg-white border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-medium text-gray-900">Test Coverage</h4>
             <div
@@ -246,7 +246,7 @@ export default function HealthMetricsTab({
                   {packageData.packageHealth.packageBuildStatus}
                 </span>
               </div>
-              <div className="flex justify-between">
+              <div className="hidden flex justify-between">
                 <span className="text-gray-600">Test Coverage:</span>
                 <span className="font-medium">
                   {packageData.packageHealth.packageTestCoverage}%

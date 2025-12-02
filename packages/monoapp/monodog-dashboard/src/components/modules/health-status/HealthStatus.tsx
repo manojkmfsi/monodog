@@ -519,7 +519,7 @@ export default function HealthStatus() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Build Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="hidden px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Test Coverage
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -608,7 +608,7 @@ export default function HealthStatus() {
                   </td>
 
                   {/* test coverage */}
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="hidden px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <BeakerIcon className="w-4 h-4 text-gray-400 mr-1" />
                       <span className="text-sm text-gray-900">-</span>
@@ -680,9 +680,6 @@ export default function HealthStatus() {
                     <div className="flex space-x-2">
                       <button className="text-blue-600 hover:text-blue-900">
                         Details
-                      </button>
-                      <button className="text-green-600 hover:text-green-900">
-                        Fix
                       </button>
                     </div>
                   </td>

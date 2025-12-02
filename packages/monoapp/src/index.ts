@@ -688,16 +688,22 @@ export function startServer(
           } catch (error) {
             return {
               packageName: pkg.name,
-              health: null,
+              health: {
+                "buildStatus": "",
+                "testCoverage": 0,
+                "lintStatus": "",
+                "securityAudit": "",
+                "overallScore": 0
+              },
               isHealthy: false,
-              error: 'Failed to fetch health metrics',
+              error: 'Failed to fetch health metrics1',
             };
           }
           PORT;
         })
       );
       res.json({
-        packages: healthMetrics,
+        packages: healthMetrics.filter(h => !h.error),
         summary: {
           total: packages.length,
           healthy: healthMetrics.filter(h => h.isHealthy).length,

@@ -19,7 +19,7 @@ import { appConfig } from './config-loader';
 const args = process.argv.slice(2);
 
 // Default settings
-let rootPath = path.resolve(appConfig.workspace.root_dir ?? process.cwd()); // Default to the current working directory ?(inside node modules)
+let rootPath = path.resolve(process.cwd()); // Default to the current working directory ?(inside node modules)
 const host = appConfig.server.host ?? 'localhost'; //Default host
 
 console.log('rp1', rootPath);
@@ -50,7 +50,7 @@ console.log('npm --workspace @monodog/monoapp run serve');
 process.exit(0);
 
 /**
- * Copies an installed NPM package from node_modules into the local install_path workspace directory.
+ * Copies an installed NPM package from node_modules into the local install_path directory.
  */
 function copyPackageToWorkspace(rootDir: string): void {
   // 1. Get package name from arguments
@@ -70,14 +70,13 @@ function copyPackageToWorkspace(rootDir: string): void {
   const folderName = packageName.replace('@', '').replace('/', '-');
   const destinationPath = path.join(
     rootDir,
-    appConfig.workspace.install_path,
     folderName
   );
 
   console.log(`\n--- Monorepo Workspace Conversion ---`);
   console.log(`Target Package: ${packageName}`);
   console.log(
-    `New Workspace:  ${appConfig.workspace.install_path}/${folderName}`
+    `Target folder:  ${folderName}`
   );
   console.log(`-----------------------------------`);
 
@@ -102,7 +101,7 @@ function copyPackageToWorkspace(rootDir: string): void {
     process.exit(1);
   }
 
-  // 3. Handle Destination existence: Delete if found to allow clean re-setup
+  // 3. Handle Destination existence: Skip if found to acontinue setup
   if (fs.existsSync(destinationPath)) {
     console.log(
       `\n⚠️ Warning: Destination directory already exists at ${destinationPath}.`
@@ -111,14 +110,7 @@ function copyPackageToWorkspace(rootDir: string): void {
     process.exit(0);
   }
 
-  // Ensure the 'install_path' directory exists
-  const packagesDir = path.join(rootDir, appConfig.workspace.install_path);
-  if (!fs.existsSync(packagesDir)) {
-    fs.mkdirSync(packagesDir, { recursive: true });
-    console.log(
-      `Created ${appConfig.workspace.install_path} directory: ${packagesDir}`
-    );
-  }
+
 
   // 4. Perform the copy operation
   try {

@@ -61,7 +61,7 @@ model DependencyInfo {
   status      String  @default("")
   latest      String?
   outdated    Boolean @default(false)
-  package     Package @relation(fields: [packageName], references: [name])
+  package     Package @relation(fields: [packageName], references: [name], onDelete: Cascade)
 
   @@unique([name, packageName]) // Composite unique constraint
 }
@@ -73,7 +73,7 @@ model Commit {
   date        DateTime?
   type        String
   packageName String
-  package     Package   @relation(fields: [packageName], references: [name])
+  package     Package   @relation(fields: [packageName], references: [name], onDelete: Cascade)
 }
 
 model HealthStatus {
@@ -107,7 +107,7 @@ model PackageHealth {
   packageDependencies  String    // Changed from dependencies to packageDependencies
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
-  package              Package   @relation(fields: [packageName], references: [name])
+  package              Package   @relation(fields: [packageName], references: [name], onDelete: Cascade)
 
   @@map("package_health")
 }

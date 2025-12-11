@@ -1,5 +1,5 @@
 {
-  "name": "@manojk/monodog",
+  "name": "@manojkmfsi/monodog",
   "version": "1.1.0",
   "description": "Self-hosted monorepo package manager dashboard",
   "private": true,

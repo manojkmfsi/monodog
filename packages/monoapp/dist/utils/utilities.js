@@ -49,6 +49,7 @@ exports.calculatePackageHealth = calculatePackageHealth;
 // import { Package } from '@prisma/client';
 const fs = __importStar(require("fs"));
 const path_1 = __importDefault(require("path"));
+const config_loader_1 = require("../config-loader");
 /**
  * Resolves simple workspace globs (like 'packages/*', 'apps/*') into actual package directory paths.
  * Note: This implementation only handles the 'folder/*' pattern and is not a full glob resolver.
@@ -106,10 +107,16 @@ function getWorkspacesFromRoot(rootDir) {
 function scanMonorepo(rootDir) {
     const packages = [];
     console.log('rootDir:', rootDir);
-    // Attempt to detect workspaces from the root package.json
-    const detectedWorkspacesGlobs = getWorkspacesFromRoot(rootDir);
-    if (detectedWorkspacesGlobs) {
-        console.log(`\n✅ Detected Monorepo Workspaces Globs: ${detectedWorkspacesGlobs.join(', ')}`);
+    const workspacesGlobs = config_loader_1.appConfig.workspaces;
+    // Use provided workspaces globs if given, otherwise attempt to detect from root package.json
+    const detectedWorkspacesGlobs = workspacesGlobs ?? getWorkspacesFromRoot(rootDir);
+    if (detectedWorkspacesGlobs && detectedWorkspacesGlobs.length > 0) {
+        if (workspacesGlobs) {
+            console.log(`\n✅ Using provided workspaces globs: ${detectedWorkspacesGlobs.join(', ')}`);
+        }
+        else {
+            console.log(`\n✅ Detected Monorepo Workspaces Globs: ${detectedWorkspacesGlobs.join(', ')}`);
+        }
         // 1. Resolve the globs into concrete package directory paths
         const resolvedPackagePaths = resolveWorkspaceGlobs(rootDir, detectedWorkspacesGlobs);
         console.log(`[DEBUG] Resolved package directories (Total ${resolvedPackagePaths.length}):`);
@@ -124,6 +131,9 @@ function scanMonorepo(rootDir) {
                 packages.push(packageInfo);
             }
         }
+    }
+    else {
+        console.warn('\n⚠️ No workspace globs provided or detected. Returning empty package list.');
     }
     return packages;
 }

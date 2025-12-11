@@ -1,6 +1,7 @@
 // import { Package } from '@prisma/client';
 import * as fs from 'fs';
 import path from 'path';
+import { appConfig } from '../config-loader';
 
 export interface PackageInfo {
   name: string;
@@ -112,12 +113,16 @@ export function getWorkspacesFromRoot(rootDir: string): string[] | undefined {
 function scanMonorepo(rootDir: string): PackageInfo[] {
   const packages: PackageInfo[] = [];
   console.log('rootDir:', rootDir);
+  const workspacesGlobs = appConfig.workspaces;
+  // Use provided workspaces globs if given, otherwise attempt to detect from root package.json
+  const detectedWorkspacesGlobs = workspacesGlobs ?? getWorkspacesFromRoot(rootDir);
 
-  // Attempt to detect workspaces from the root package.json
-  const detectedWorkspacesGlobs = getWorkspacesFromRoot(rootDir);
-
-  if (detectedWorkspacesGlobs) {
-    console.log(`\n✅ Detected Monorepo Workspaces Globs: ${detectedWorkspacesGlobs.join(', ')}`);
+  if (detectedWorkspacesGlobs && detectedWorkspacesGlobs.length > 0) {
+    if (workspacesGlobs) {
+      console.log(`\n✅ Using provided workspaces globs: ${detectedWorkspacesGlobs.join(', ')}`);
+    } else {
+      console.log(`\n✅ Detected Monorepo Workspaces Globs: ${detectedWorkspacesGlobs.join(', ')}`);
+    }
 
     // 1. Resolve the globs into concrete package directory paths
     const resolvedPackagePaths = resolveWorkspaceGlobs(rootDir, detectedWorkspacesGlobs);
@@ -125,7 +130,6 @@ function scanMonorepo(rootDir: string): PackageInfo[] {
     console.log(`[DEBUG] Resolved package directories (Total ${resolvedPackagePaths.length}):`);
 
     // 2. Integration of the requested loop structure for package scanning
-
     for (const workspacePath of resolvedPackagePaths) {
       const fullPackagePath = path.join(rootDir, workspacePath);
       // The package name would be read from the package.json inside this path
@@ -138,6 +142,8 @@ function scanMonorepo(rootDir: string): PackageInfo[] {
         packages.push(packageInfo);
       }
     }
+  } else {
+    console.warn('\n⚠️ No workspace globs provided or detected. Returning empty package list.');
   }
 
   return packages;

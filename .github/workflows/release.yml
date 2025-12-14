@@ -70,7 +70,7 @@ jobs:
       - name: Semantic Release and npm release
         run: |
           cd packages/monoapp
-          npx semantic-release
+          npx semantic-release --force
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

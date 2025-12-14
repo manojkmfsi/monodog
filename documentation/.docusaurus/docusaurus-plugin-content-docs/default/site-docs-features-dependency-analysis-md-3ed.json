@@ -1,0 +1,28 @@
+{
+  "id": "features/dependency-analysis",
+  "title": "Dependency Analysis",
+  "description": "Examine and graph dependencies among the packages in your monorepo.",
+  "source": "@site/docs/features/dependency-analysis.md",
+  "sourceDirName": "features",
+  "slug": "/features/dependency-analysis",
+  "permalink": "/features/dependency-analysis",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/features/dependency-analysis.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 4,
+  "frontMatter": {
+    "sidebar_position": 4,
+    "title": "Dependency Analysis"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Health Monitoring",
+    "permalink": "/features/health-monitoring"
+  },
+  "next": {
+    "title": "Git Integration",
+    "permalink": "/features/git-integration"
+  }
+}

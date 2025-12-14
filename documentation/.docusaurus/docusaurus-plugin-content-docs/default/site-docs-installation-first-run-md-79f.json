@@ -1,0 +1,28 @@
+{
+  "id": "installation/first-run",
+  "title": "First Run",
+  "description": "Once the installation and configuration are done, it's the moment to run Monodog for the first time.",
+  "source": "@site/docs/installation/first-run.md",
+  "sourceDirName": "installation",
+  "slug": "/installation/first-run",
+  "permalink": "/installation/first-run",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/installation/first-run.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 4,
+  "frontMatter": {
+    "sidebar_position": 4,
+    "title": "First Run"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Configure Monorepo",
+    "permalink": "/installation/configure-monorepo"
+  },
+  "next": {
+    "title": "CI/CD",
+    "permalink": "/upcoming-features/CICD"
+  }
+}

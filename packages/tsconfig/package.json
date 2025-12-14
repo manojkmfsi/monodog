@@ -1,6 +1,6 @@
 {
-  "name": "@lakinmindfire/tsconfig",
-  "version": "0.0.0",
+  "name": "@manojk/tsconfig",
+  "version": "0.0.2",
   "description": "Shared TypeScript configurations for the Monorepo Dashboard.",
   "main": "base.json",
   "license": "MIT",

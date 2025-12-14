@@ -1,5 +1,5 @@
 {
-  "name": "@lakinmindfire/eslint-config",
+  "name": "@manojk/eslint-config",
   "version": "0.0.0",
   "description": "Shared ESLint configuration for the Monorepo Dashboard.",
   "main": "index.js",

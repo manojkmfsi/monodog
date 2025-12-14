@@ -1,23 +1,36 @@
 # MonoDog
 
-The dashboard will provide visual management and monitoring capabilities for packages in monorepos using pnpm, turbo, or Nx. It will be distributed as an npm package installable in any monorepo to auto-generate a web UI for package oversight.
+Monodog delivers centralized visual management and monitoring capabilities for packages across monorepos using pnpm. Distributed as an easy-to-install npm package, it auto-generates a dedicated web user interface (UI) to provide comprehensive oversight of your package ecosystem.
 
 ## Why MonoDog
 
-The Monorepo Dashboard addresses the complexity of managing many interconnected packages. It automates critical, error-prone tasks like semantic versioning and CI/CD, while providing immediate visual feedback on dependencies and package health. This optimization leads to faster development cycles and more reliable releases.
+The Monorepo Dashboard addresses the complexity of managing many interconnected packages. It automates critical, error-prone tasks, while providing immediate visual feedback on dependencies and package health. This optimization leads to faster development cycles and more reliable releases.
 
 ## Installation
 
-### Install Package
+Install dependencies:
 
-```bash
-# npm
-npm install @lakinmindfire/monodog
+    pnpm install --ignore-scripts
 
-# pnpm
-pnpm add @lakinmindfire/monodog
-```
+Build Setup:
+
+    pnpm run build
+
+Run monoapp workspace using serve script:
+
+    npm --workspace @mindfiredigital/monodog run serve
+
+### Install Package in Monorepo
+
+Install monodog in a monorepo workspace root:
+
+    pnpm install --save-dev @mindfiredigital/monodog -w
+
+Run app using serve script:
+
+    cd ./mindfiredigital-monodog/ && npm run serve
 
 ## License
 
 Licensed under the MIT License, Copyright © Mindfire Solutions
+

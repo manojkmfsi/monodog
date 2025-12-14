@@ -20,7 +20,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 20
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -30,9 +30,6 @@ jobs:
       - name: "Install dependencies and build"
         run: pnpm install --ignore-scripts
 
-      - name: Generate Prisma Client
-        run: npx prisma generate
-        
       - name: "Create build"
         run: pnpm run build
 

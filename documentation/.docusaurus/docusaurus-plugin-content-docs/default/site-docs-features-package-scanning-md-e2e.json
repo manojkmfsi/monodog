@@ -1,0 +1,28 @@
+{
+  "id": "features/package-scanning",
+  "title": "Package Scanning",
+  "description": "Monodog's package scanning feature automatically finds and analyzes all packages in your monorepo.",
+  "source": "@site/docs/features/package-scanning.md",
+  "sourceDirName": "features",
+  "slug": "/features/package-scanning",
+  "permalink": "/features/package-scanning",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/features/package-scanning.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1,
+    "title": "Package Scanning"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Config Endpoint",
+    "permalink": "/api-reference/config"
+  },
+  "next": {
+    "title": "Health Monitoring",
+    "permalink": "/features/health-monitoring"
+  }
+}

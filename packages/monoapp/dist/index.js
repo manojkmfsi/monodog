@@ -1363,7 +1363,7 @@ function serveDashboard(rootPath, port, host) {
     console.log('Serving static files from:', staticPath);
     app.use(express_1.default.static(staticPath));
     // Start the server
-    const PORT = parseInt(port ? port.toString() : '3999');
+    const PORT = parseInt(port ? port.toString() : '8999');
     app.listen(PORT, host, () => {
         console.log(`App listening on ${host}:${port}`);
         console.log('Press Ctrl+C to quit.');

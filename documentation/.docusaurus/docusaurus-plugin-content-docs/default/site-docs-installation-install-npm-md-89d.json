@@ -1,0 +1,28 @@
+{
+  "id": "installation/install-npm",
+  "title": "NPM Installation",
+  "description": "This guide covers all the ways to install Monodog in your monorepo.",
+  "source": "@site/docs/installation/install-npm.md",
+  "sourceDirName": "installation",
+  "slug": "/installation/install-npm",
+  "permalink": "/installation/install-npm",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/installation/install-npm.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1,
+    "title": "NPM Installation"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Quick Start",
+    "permalink": "/getting-started/quick-start"
+  },
+  "next": {
+    "title": "Configure Monorepo",
+    "permalink": "/installation/configure-monorepo"
+  }
+}

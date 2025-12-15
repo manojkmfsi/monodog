@@ -58,16 +58,5 @@
     "*.{json,md,yaml,yml}": [
       "prettier --write"
     ]
-  },
-  "release": {
-    "repositoryUrl": "https://github.com/manojkmfsi/monodog.git",
-    "branches": [
-      "main",
-      "next",
-      {
-        "name": "beta",
-        "prerelease": true
-      }
-    ]
   }
 }

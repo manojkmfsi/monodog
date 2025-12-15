@@ -56,7 +56,8 @@ jobs:
     needs: build
     permissions:
       contents: write
-      packages: write
+      issues: write
+      pull-requests: write
     # ----------------------------------------------------------------------
     # CRITICAL: Set the working directory for all 'run' steps to the package folder.
     # This ensures 'npm install' and 'npx semantic-release' operate only on 'monoapp'.

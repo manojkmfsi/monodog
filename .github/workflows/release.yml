@@ -53,11 +53,15 @@ jobs:
   create-github-release:
     name: Create GitHub release document and publish to npm
     runs-on: ubuntu-latest
-    needs: build
+    # needs: build
     permissions:
       contents: write
       issues: write
       pull-requests: write
+      packages: write
+      actions: write
+
+
     # ----------------------------------------------------------------------
     # CRITICAL: Set the working directory for all 'run' steps to the package folder.
     # This ensures 'npm install' and 'npx semantic-release' operate only on 'monoapp'.

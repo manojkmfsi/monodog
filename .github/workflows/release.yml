@@ -100,11 +100,10 @@ jobs:
         # This will confirm if the token and scope configuration are correct.
         run: cat $NPM_CONFIG_USERCONFIG
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Run semantic-release
         # Run the core semantic-release CLI command
         run: |
-           npm set "//registry.npmjs.org/:_authToken" "${{ secrets.NPM_TOKEN }}"
            export SKIP_POSTINSTALL=true && npm run semantic-release --dry-run
 
       # - name: Setup pnpm
@@ -128,5 +127,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # NPM_TOKEN is used for publishing to the npm registry
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           SKIP_POSTINSTALL: true
 

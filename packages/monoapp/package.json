@@ -1,6 +1,6 @@
 {
   "name": "@manojkmfsi/monoapp",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "App for monodog monorepo",
   "license": "MIT",
   "bin": {
@@ -23,9 +23,8 @@
     "migrate:reset": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate reset --force",
     "serve": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n')  node dist/serve.js",
     "semantic-release": "semantic-release",
-      "postinstall_command": "npm run generate && npm run migrate:reset && pnpm monoapp-setup @monodog/monoapp --root $INIT_CWD",
-
-  "postinstall": "node -e \"if (process.env.SKIP_POSTINSTALL) process.exit(0)\" && npm run postinstall_command"
+    "postinstall_command": "npm run generate && npm run migrate:reset && pnpm monoapp-setup @monodog/monoapp --root $INIT_CWD",
+    "postinstall": "node -e \"if (process.env.SKIP_POSTINSTALL) process.exit(0)\" && npm run postinstall_command"
   },
   "dependencies": {
     "@prisma/client": "^5.7.0",
@@ -49,7 +48,6 @@
     "ts-node": "^10.0.0",
     "tsx": "^4.6.0",
     "typescript": "^5.3.8"
-
   },
   "release": {
     "repositoryUrl": "https://github.com/manojkmfsi/monodog.git",

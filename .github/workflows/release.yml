@@ -14,13 +14,7 @@ jobs:
         contents: write # Required to create release tags and update the changelog
         issues: write   # Required to close issues/PRs linked in the changelog
         pull-requests: write # Required for creating release pull requests (if configured)
-    # ----------------------------------------------------------------------
-    # CRITICAL: Set the working directory for all 'run' steps to the package folder.
-    # This ensures 'npm install' and 'npx semantic-release' operate only on 'monoapp'.
-    # ----------------------------------------------------------------------
-    defaults:
-      run:
-        working-directory: packages/monoapp
+
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v3
@@ -63,6 +57,13 @@ jobs:
     permissions:
       contents: write
       packages: write
+    # ----------------------------------------------------------------------
+    # CRITICAL: Set the working directory for all 'run' steps to the package folder.
+    # This ensures 'npm install' and 'npx semantic-release' operate only on 'monoapp'.
+    # ----------------------------------------------------------------------
+    defaults:
+      run:
+        working-directory: packages/monoapp
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

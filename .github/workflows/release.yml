@@ -69,7 +69,7 @@ jobs:
     # defaults:
     #   run:
     #     working-directory: packages/monoapp
-      steps:
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:

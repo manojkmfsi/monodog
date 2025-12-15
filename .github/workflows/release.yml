@@ -106,24 +106,8 @@ jobs:
       - name: Run semantic-release
         # Run the core semantic-release CLI command
         run: |
-           export SKIP_POSTINSTALL=true && npm run semantic-release
+           npm run semantic-release
 
-      # - name: Setup pnpm
-      #   uses: pnpm/action-setup@v2
-      #   with:
-      #     version: 8
-
-      # - name: "Install dependencies"
-      #   run: pnpm install --ignore-scripts
-
-      # # - name: Semantic Release and npm release
-      # #   run: |
-      # #     cd packages/monoapp
-      # #     npx semantic-release
-      # - name: Release packages
-      #   run: |
-      #     cd packages/monoapp
-      #     pnpm exec semantic-release
         env:
           # GITHUB_TOKEN is used for GitHub releases/tags/comments
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

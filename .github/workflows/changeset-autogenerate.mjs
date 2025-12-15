@@ -6,12 +6,10 @@ const commitMessage = execSync('git log -1 --format=%s').toString().trim();
 
 // Define valid scopes
 const validScopes = [
-  'core',
-  'react',
-  'angular',
-  'vue',
-  'svelte',
-  'web-component',
+  'monoapp',
+  'backend',
+  'ci-status',
+  'monorepo-scanner'
 ];
 
 // Define regex patterns
@@ -52,9 +50,7 @@ if (packageScope) {
 
   // Determine the full package name based on scope
   const packageName =
-    packageScope === 'core'
-      ? '@mindfiredigital/pivothead'
-      : `@mindfiredigital/pivothead-${packageScope}`;
+ `@manojkmfsi/monodog-${packageScope}`;
 
   // Generate changeset content
   const changesetContent = `---

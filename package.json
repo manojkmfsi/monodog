@@ -24,10 +24,11 @@
     "clean": "turbo run clean && rm -rf node_modules/.cache",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "release": "semantic-release",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "publish-packages": "changeset publish"
+    "publish-packages": "changeset publish",
+    "changeset:autogenerate": "node .github/changeset-autogenerate.mjs",
+    "release": "changeset publish"
   },
   "dependencies": {
     "@prisma/client": "^5.7.0",

@@ -50,7 +50,7 @@ if (packageScope) {
 
   // Determine the full package name based on scope
   const packageName =
- `@manojkmfsi/monodog-${packageScope}`;
+ `@manojkmfsi/${packageScope}`;
 
   // Generate changeset content
   const changesetContent = `---

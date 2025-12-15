@@ -84,6 +84,16 @@ jobs:
         run: |
           export SKIP_POSTINSTALL=true && npm install --ignore-scripts
 
+      - name: Verify Environment and Authentication (Debug)
+        # This step verifies that the 'npm' command can run successfully in the environment
+        run: |
+          echo "Current working directory:" && pwd
+          echo "Testing NPM access (whoami):"
+          npm whoami
+        env:
+          # If publishing, this token is required for the NPM authentication check
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
       - name: Run semantic-release
         # Run the core semantic-release CLI command
         run: export SKIP_POSTINSTALL=true && npm run semantic-release

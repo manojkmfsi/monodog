@@ -11,10 +11,9 @@ jobs:
     name: "@mindfiredigital/monodog Build, Lint, and Test"
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      packages: write
-      pull-requests: write
-      actions: write
+        contents: write # Required to create release tags and update the changelog
+        issues: write   # Required to close issues/PRs linked in the changelog
+        pull-requests: write # Required for creating release pull requests (if configured)
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v3
@@ -64,24 +63,35 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '22'
+          node-version: '20'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      - name: Install Dependencies
+        # Install all dependencies including semantic-release and its plugins
+        run: |
+          # Use your preferred package manager (npm, yarn, pnpm)
+          # If you are using a monorepo, you might need specific commands here (e.g., lerna bootstrap, or just npm install if dependencies are hoisted)
+          npm clean-install
 
-      - name: "Install dependencies"
-        run: pnpm install --ignore-scripts
+      - name: Run semantic-release
+        # Run the core semantic-release CLI command
+        run: npx semantic-release
 
-      # - name: Semantic Release and npm release
+      # - name: Setup pnpm
+      #   uses: pnpm/action-setup@v2
+      #   with:
+      #     version: 8
+
+      # - name: "Install dependencies"
+      #   run: pnpm install --ignore-scripts
+
+      # # - name: Semantic Release and npm release
+      # #   run: |
+      # #     cd packages/monoapp
+      # #     npx semantic-release
+      # - name: Release packages
       #   run: |
       #     cd packages/monoapp
-      #     npx semantic-release
-      - name: Release packages
-        run: |
-          cd packages/monoapp
-          pnpm exec semantic-release
+      #     pnpm exec semantic-release
         env:
           # GITHUB_TOKEN is used for GitHub releases/tags/comments
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

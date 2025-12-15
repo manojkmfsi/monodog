@@ -114,5 +114,5 @@ jobs:
           # NPM_TOKEN is used for publishing to the npm registry
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          # SKIP_POSTINSTALL: true
+          SKIP_POSTINSTALL: true
 

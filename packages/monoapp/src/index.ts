@@ -708,7 +708,6 @@ export function startServer(
               error: 'Failed to fetch health metrics1',
             };
           }
-          PORT;
         })
       );
       res.json({

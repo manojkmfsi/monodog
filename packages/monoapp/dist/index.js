@@ -635,7 +635,6 @@ function startServer(rootPath, port, host) {
                         error: 'Failed to fetch health metrics1',
                     };
                 }
-                PORT;
             }));
             res.json({
                 packages: healthMetrics.filter(h => !h.error),

@@ -74,10 +74,16 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js
+      - name: Setup Node.js and NPM Authentication
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: packages/monoapp/package-lock.json
+          # CRITICAL: Configure the registry and token for authentication
+          registry-url: 'https://registry.npmjs.org' # Standard NPM registry
+          # If your package name starts with a scope (e.g., @manojkmfsi/monoapp),
+          scope: '@manojkmfsi'
 
       - name: Install Dependencies
         # Install all dependencies including semantic-release and its plugins
@@ -93,7 +99,7 @@ jobs:
         env:
           # If publishing, this token is required for the NPM authentication check
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          
+
       - name: Run semantic-release
         # Run the core semantic-release CLI command
         run: export SKIP_POSTINSTALL=true && npm run semantic-release

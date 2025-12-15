@@ -111,7 +111,7 @@ jobs:
       - name: Run semantic-release
         # Run the core semantic-release CLI command
         run: |
-           npm run semantic-release --dry-run
+           export npm_config_workspaces=false && npm run semantic-release --dry-run
 
       # - name: Setup pnpm
       #   uses: pnpm/action-setup@v2

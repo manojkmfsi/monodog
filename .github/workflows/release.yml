@@ -78,8 +78,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: packages/monoapp/package-lock.json
           # CRITICAL: Configure the registry and token for authentication
           registry-url: 'https://registry.npmjs.org' # Standard NPM registry
           # If your package name starts with a scope (e.g., @manojkmfsi/monoapp),

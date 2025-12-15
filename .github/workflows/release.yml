@@ -86,7 +86,7 @@ jobs:
 
       - name: Run semantic-release
         # Run the core semantic-release CLI command
-        run: npx semantic-release
+        run: npx semantic-release --ignore-scripts
 
       # - name: Setup pnpm
       #   uses: pnpm/action-setup@v2

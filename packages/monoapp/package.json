@@ -48,7 +48,7 @@
     "typescript": "^5.3.8"
   },
   "release": {
-    "repositoryUrl": "https://github.com/manojkmfsi/monoapp.git",
+    "repositoryUrl": "https://github.com/manojkmfsi/monodog.git",
     "branches": [
       "main",
       "next",

@@ -88,19 +88,18 @@ jobs:
           scope: '@manojkmfsi'
           # CRITICAL: Force authentication for the scoped registry
           always-auth: true
+      # - name: Setup pnpm
+      #   uses: pnpm/action-setup@v2
+      #   with:
+      #     version: 8
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      # - name: "Install dependencies"
+      #   run: pnpm install --ignore-scripts
 
-      - name: "Install dependencies"
-        run: pnpm install --no-frozen-lockfile --ignore-scripts
-
-      # - name: Install Dependencies
-      #   # Install all dependencies including semantic-release and its plugins
-      #   run: |
-      #     export SKIP_POSTINSTALL=true && npm install --ignore-scripts
+      - name: Install Dependencies
+        # Install all dependencies including semantic-release and its plugins
+        run: |
+          export SKIP_POSTINSTALL=true && npm install --ignore-scripts
 
 
       - name: DEBUG- Verify .npmrc Configuration

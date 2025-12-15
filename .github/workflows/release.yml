@@ -101,9 +101,9 @@ jobs:
         id: changesets
         uses: changesets/action@v1.4.1
         with:
-          commit: 'chore(release): version packages'
-          title: 'chore(release): version packages'
-          version: node .github/changeset-version.js
+          # commit: 'chore(release): version packages'
+          # title: 'chore(release): version packages'
+          # version: node .github/changeset-version.js
           publish: npx changeset publish
       # - name: Setup pnpm
       #   uses: pnpm/action-setup@v2

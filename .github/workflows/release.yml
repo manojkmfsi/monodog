@@ -81,7 +81,7 @@ jobs:
       - name: Install Dependencies
         # Install all dependencies including semantic-release and its plugins
         run: |
-          npm install
+          npm install --ignore-scripts
 
       - name: Run semantic-release
         # Run the core semantic-release CLI command

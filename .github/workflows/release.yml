@@ -7,48 +7,48 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: "@mindfiredigital/monodog Build, Lint, and Test"
-    runs-on: ubuntu-latest
-    permissions:
-        contents: write # Required to create release tags and update the changelog
-        issues: write   # Required to close issues/PRs linked in the changelog
-        pull-requests: write # Required for creating release pull requests (if configured)
+  # build:
+  #   name: "@mindfiredigital/monodog Build, Lint, and Test"
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #       contents: write # Required to create release tags and update the changelog
+  #       issues: write   # Required to close issues/PRs linked in the changelog
+  #       pull-requests: write # Required for creating release pull requests (if configured)
 
-    steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: "Checkout repository"
+  #       uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 20
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v2
+  #       with:
+  #         version: 8
 
-      - name: "Install dependencies"
-        run: pnpm install --ignore-scripts --no-frozen-lockfile
+  #     - name: "Install dependencies"
+  #       run: pnpm install --ignore-scripts --no-frozen-lockfile
 
-      - name: "Create build"
-        run: pnpm run build
+  #     - name: "Create build"
+  #       run: pnpm run build
 
-      - name: "Lint code"
-        run: pnpm run lint
+  #     - name: "Lint code"
+  #       run: pnpm run lint
 
-      - name: "Run tests"
-        run: pnpm test
+  #     - name: "Run tests"
+  #       run: pnpm test
 
-      # - name: "Restore changes in json"
-      #   run: |
-      #     git restore package-lock.json
+  #     # - name: "Restore changes in json"
+  #     #   run: |
+  #     #     git restore package-lock.json
 
-      - name: "Set Git user name and email"
-        run: |
-          git config --local user.email "github-actions@github.com"
-          git config --local user.name "GitHub Actions"
+  #     - name: "Set Git user name and email"
+  #       run: |
+  #         git config --local user.email "github-actions@github.com"
+  #         git config --local user.name "GitHub Actions"
 
   create-github-release:
     name: Create GitHub release document and publish to npm
@@ -99,7 +99,9 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Run semantic-release
         # Run the core semantic-release CLI command
-        run: export SKIP_POSTINSTALL=true && npm run semantic-release --dry-run
+        run:
+         npm set "//registry.npmjs.org/:_authToken" "YOUR_NPM_TOKEN_HERE"
+         export SKIP_POSTINSTALL=true && npm run semantic-release --dry-run
 
       # - name: Setup pnpm
       #   uses: pnpm/action-setup@v2

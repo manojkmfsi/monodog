@@ -66,9 +66,9 @@ jobs:
     # CRITICAL: Set the working directory for all 'run' steps to the package folder.
     # This ensures 'npm install' and 'npx semantic-release' operate only on 'monoapp'.
     # ----------------------------------------------------------------------
-    defaults:
-      run:
-        working-directory: packages/monoapp
+    # defaults:
+    #   run:
+    #     working-directory: packages/monoapp
     steps:
       - name: Checkout Repository (Root)
         # Checkout must still happen at the repository root
@@ -111,7 +111,7 @@ jobs:
       - name: Run semantic-release
         # Run the core semantic-release CLI command
         run: |
-           export SKIP_POSTINSTALL=true && npm run semantic-release
+           export SKIP_POSTINSTALL=true && cd packages/monoapp/ && npm run semantic-release
 
       # - name: Setup pnpm
       #   uses: pnpm/action-setup@v2

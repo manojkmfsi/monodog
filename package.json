@@ -26,7 +26,6 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "publish-packages": "changeset publish",
     "changeset:autogenerate": "node .github/changeset-autogenerate.mjs",
     "release": "changeset publish"
   },

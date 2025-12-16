@@ -1,6 +1,6 @@
 {
   "name": "@monodog/backend",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Backend API server for monodog monorepo dashboard",
   "license": "MIT",
   "bin": {
@@ -44,5 +44,4 @@
     "tsx": "^4.6.0",
     "typescript": "^5.3.8"
   }
-
 }

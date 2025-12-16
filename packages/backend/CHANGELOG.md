@@ -1,5 +1,11 @@
 # @monodog/backend
 
+## 1.5.8
+
+### Patch Changes
+
+- 63 (#45)
+
 ## 1.5.7
 
 ### Patch Changes

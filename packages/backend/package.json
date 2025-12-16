@@ -1,13 +1,13 @@
 {
   "name": "@monodog/backend",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "Backend API server for monodog monorepo dashboard",
   "license": "MIT",
   "bin": {
     "monodog-cli": "dist/cli.js"
   },
   "scripts": {
-    "k":"tsx",
+    "k": "tsx",
     "dev": "tsx watch src/index.ts",
     "start": "tsx index.ts",
     "prepublishOnly": "pnpm run build",

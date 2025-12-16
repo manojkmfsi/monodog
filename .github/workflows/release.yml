@@ -56,7 +56,6 @@ jobs:
     # needs: build
     permissions:
       contents: write
-      issues: write
       pull-requests: write
       packages: write
       actions: write

@@ -7,6 +7,7 @@
     "monodog-cli": "dist/cli.js"
   },
   "scripts": {
+    "a":"tsx",
     "dev": "tsx watch src/index.ts",
     "start": "tsx index.ts",
     "prepublishOnly": "pnpm run build",
@@ -43,5 +44,5 @@
     "tsx": "^4.6.0",
     "typescript": "^5.3.8"
   }
-  
+
 }

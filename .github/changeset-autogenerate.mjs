@@ -64,6 +64,6 @@ if (packageScope) {
   console.log(`✅ Changeset file created for package: ${packageName}`);
 } else {
   console.log(
-    '⚠️ No valid package scope found in commit message. Valid scopes are: core, react, angular, vue, svelte, web-component'
+    '⚠️ No valid package scope found in commit message. Valid scopes are: monoapp, backend, ci-status, monorepo-scanner'
   );
 }

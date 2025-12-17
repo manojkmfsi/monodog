@@ -46,7 +46,7 @@ console.log(`\nInitializing Setup...`);
 
 copyPackageToWorkspace(rootPath);
 console.log('\n*** Run the server ***');
-console.log('npm --workspace @manojkmfsi/monoapp run serve');
+console.log('npm --workspace @manojkmfsi/monodog run serve');
 process.exit(0);
 
 /**

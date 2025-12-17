@@ -36,11 +36,11 @@ You must have the following installed to run the service:
 
 Install monoapp in a monorepo workspace root:
 
-    pnpm install --save-dev @monodog/monoapp -w
+    pnpm install --save-dev @manojkmfsi/monoapp -w
 
 Run app using serve script:
 
-    npm --workspace @monodog/monoapp run serve
+    npm --workspace @manojkmfsi/monoapp run serve
 
 ### Key API Endpoints
 

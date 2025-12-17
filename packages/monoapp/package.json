@@ -1,13 +1,13 @@
 {
   "name": "@manojkmfsi/monoapp",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "App for monodog monorepo",
   "license": "MIT",
   "bin": {
     "monoapp-setup": "dist/setup.js"
   },
   "scripts": {
-    "x":"tsx",
+    "x": "tsx",
     "dev": "tsx watch src/index.ts",
     "start": "tsx index.ts",
     "prepublishOnly": "pnpm run build",

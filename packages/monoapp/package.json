@@ -7,7 +7,7 @@
     "monoapp-setup": "dist/setup.js"
   },
   "scripts": {
-    "z":"tsx",
+    "1":"tsx",
     "dev": "tsx watch src/index.ts",
     "start": "tsx index.ts",
     "prepublishOnly": "pnpm run build",
@@ -47,16 +47,5 @@
     "ts-node": "^10.0.0",
     "tsx": "^4.6.0",
     "typescript": "^5.3.8"
-  },
-  "release": {
-    "repositoryUrl": "https://github.com/manojkmfsi/monodog.git",
-    "branches": [
-      "main",
-      "next",
-      {
-        "name": "beta",
-        "prerelease": true
-      }
-    ]
   }
 }

@@ -21,9 +21,14 @@ let packageScope = null;
 let changeType = null;
 let description = null;
 
+    // 1. Check for Major Change using the "!" subject indicator
 if (commitPatterns.major.test(commitMessage)) {
-  changeType = 'major';
-  description = commitMessage.match(commitPatterns.major)?.[1];
+  const scope = commitMessage.match(commitPatterns.major)?.[2];
+  if (validScopes.includes(scope)) {
+    changeType = 'major';
+    packageScope = scope;
+    description = commitMessage.match(commitPatterns.major)?.[3];
+  }
 } else if (commitPatterns.minor.test(commitMessage)) {
   const scope = commitMessage.match(commitPatterns.minor)?.[1];
   if (validScopes.includes(scope)) {

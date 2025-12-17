@@ -1,6 +1,6 @@
 {
-  "name": "@manojkmfsi/monoapp",
-  "version": "3.1.1",
+  "name": "@manojkmfsi/monodog",
+  "version": "1.0.0",
   "description": "App for monodog monorepo",
   "license": "MIT",
   "bin": {

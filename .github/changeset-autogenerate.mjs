@@ -6,7 +6,7 @@ const commitMessage = execSync('git log -1 --format=%s').toString().trim();
 
 // Define valid scopes
 const validScopes = [
-  'monoapp'
+  'monodog'
 ];
 
 // Define regex patterns

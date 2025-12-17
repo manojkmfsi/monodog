@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.0.2
+
+### Patch Changes
+
+- updated pkg name
+
 ## 1.0.1
 
 ### Patch Changes

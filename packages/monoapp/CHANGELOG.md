@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 2.0.1
+
+### Patch Changes
+
+- 72
+
 ## 2.0.0
 
 ### Major Changes

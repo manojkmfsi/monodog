@@ -744,7 +744,7 @@ const MonodogLandingPage = () => {
               providing real-time health monitoring and dependency-aware CI/CD.
             </p>
             <div className="hero-actions">
-              <a href="/getting-started/quick-start" className="btn-primary">
+              <a href="getting-started/quick-start" className="btn-primary">
                 Get Started &nbsp;
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

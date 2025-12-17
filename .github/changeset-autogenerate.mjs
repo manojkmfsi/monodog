@@ -1,66 +1,149 @@
+
 import { execSync } from 'child_process';
-import fs from 'fs';
+import writeChangeset from '@changesets/write';
 
-// Get the most recent commit message
-const commitMessage = execSync('git log -1 --format=%s').toString().trim();
-
-// Define valid scopes
-const validScopes = [
-  'monoapp'
-];
-
-// Define regex patterns
+// Define regex patterns based on Conventional Commits, targeting a package scope
 const commitPatterns = {
-  major: /^BREAKING CHANGE: (.+)/,
-  minor: /^feat\(([^)]+)\): (.+)/,
-  patch: /^fix\(([^)]+)\): (.+)/,
+  // NEW: Matches subject lines with the breaking change indicator "!"
+  // e.g., feat(scope)!: message
+  breaking: /^(feat|fix)\(([^)]+)\)!: (.+)/,
+
+  // Matches "feat(package-name): description" (without the "!" indicator)
+  minor: /^feat\(([^)!]+)\): (.+)/,
+
+  // Matches "fix(package-name): description" (without the "!" indicator)
+  patch: /^fix\(([^)!]+)\): (.+)/,
 };
 
-// Identify type, package, and description
-let packageScope = null;
-let changeType = null;
-let description = null;
+// BREAKING CHANGE handling (for the footer/body)
+const majorFooterPattern = /BREAKING CHANGE: (.+)/s;
+const skipPattern = /chore|ci|docs|refactor|test|style|perf/i;
+const releaseTagPattern = 'v*'; // Match any tag starting with 'v'
 
-if (commitPatterns.major.test(commitMessage)) {
-  changeType = 'major';
-  description = commitMessage.match(commitPatterns.major)?.[1];
-} else if (commitPatterns.minor.test(commitMessage)) {
-  const scope = commitMessage.match(commitPatterns.minor)?.[1];
-  if (validScopes.includes(scope)) {
-    changeType = 'minor';
-    packageScope = scope;
-    description = commitMessage.match(commitPatterns.minor)?.[2];
-  }
-} else if (commitPatterns.patch.test(commitMessage)) {
-  const scope = commitMessage.match(commitPatterns.patch)?.[1];
-  if (validScopes.includes(scope)) {
-    changeType = 'patch';
-    packageScope = scope;
-    description = commitMessage.match(commitPatterns.patch)?.[2];
+/**
+ * Gets commit messages since the last release tag.
+ * @returns {Array<{message: string, sha: string}>}
+ */
+function getCommitsSinceLastRelease() {
+  try {
+    // Find the latest tag that looks like a release tag (e.g., v1.0.0)
+    // and log the messages from that point until HEAD.
+    const latestTag = execSync(`git describe --tags --match "${releaseTagPattern}" --abbrev=0`).toString().trim();
+    if (!latestTag) {
+        console.log("No previous release tag found. Checking all history.");
+    }
+
+    // Use the latest tag to get history. If no tag, use a large depth.
+    const commitLogCommand = latestTag
+        ? `git log ${latestTag}..HEAD --pretty=format:'{"sha":"%H","message":"%s"}' --no-merges`
+        : `git log --pretty=format:'{"sha":"%H","message":"%s"}' --no-merges`;
+
+    const logOutput = execSync(commitLogCommand).toString().trim();
+
+    if (!logOutput) {
+      console.log('No new commits found since last release.');
+      return [];
+    }
+
+    // Split and parse the JSON-like commit objects
+    return logOutput.split('\n').map(line => {
+        try {
+            return JSON.parse(line);
+        } catch (e) {
+            console.warn(`Skipping malformed commit line: ${line}`);
+            return null;
+        }
+    }).filter(c => c !== null);
+
+  } catch (e) {
+    console.error(`Error fetching commits: ${e.message}`);
+    // If git describe fails (no tags), we return an empty array or handle all history
+    return [];
   }
 }
 
-// Generate and write changeset if valid package found
-if (packageScope) {
-  packageScope = packageScope.trim();
-  description = description?.trim() || 'No description provided.';
+async function main() {
+  const commits = getCommitsSinceLastRelease();
+  let generatedCount = 0;
 
-  // Determine the full package name based on scope
-  const packageName =
- `@manojkmfsi/${packageScope}`;
+  // List all packages for use in major changes without scope
+  const allPackages = ["@manojkmfsi/monoapp"];
 
-  // Generate changeset content
-  const changesetContent = `---
-  '${packageName}': ${changeType}
-  ---
-  ${description}
-  `;
+  for (const commit of commits) {
+    const fullMessage = execSync(`git show -s --format=%B ${commit.sha}`).toString().trim();
+    const subject = commit.message;
 
-  // Write to a changeset file
-  fs.writeFileSync(`.changeset/auto-${Date.now()}.md`, changesetContent);
-  console.log(`✅ Changeset file created for package: ${packageName}`);
-} else {
-  console.log(
-    '⚠️ No valid package scope found in commit message. Valid scopes are: monoapp'
-  );
+    if (skipPattern.test(subject)) {
+      console.log(`Skipping commit (CI/Chore/Docs): ${subject}`);
+      continue;
+    }
+
+    let packageScope = null;
+    let changeType = null;
+    let description = null;
+
+    // 1. Check for Major Change using the "!" subject indicator
+    if (commitPatterns.breaking.test(subject)) {
+      const match = subject.match(commitPatterns.breaking);
+      packageScope = match[2];
+      description = match[3];
+      changeType = 'major';
+    }
+
+    // 2. Check for Major Change using the BREAKING CHANGE: footer
+    else if (majorFooterPattern.test(fullMessage)) {
+      changeType = 'major';
+      description = fullMessage.match(majorFooterPattern)?.[1]?.trim() || subject;
+      // If scoped major change isn't in the subject, assume it affects all packages
+      packageScope = allPackages.join(',');
+    }
+
+    // 3. Check for Minor Change
+    else if (commitPatterns.minor.test(subject)) {
+      const match = subject.match(commitPatterns.minor);
+      packageScope = match[1];
+      description = match[2];
+      changeType = 'minor';
+    }
+
+    // 4. Check for Patch Change
+    else if (commitPatterns.patch.test(subject)) {
+      const match = subject.match(commitPatterns.patch);
+      packageScope = match[1];
+      description = match[2];
+      changeType = 'patch';
+    }
+
+    if (changeType) {
+      // Split scope if multiple packages were matched (only happens for footer major changes)
+      const packages = packageScope ? packageScope.split(',') : allPackages;
+
+      console.log(`\nFound [${changeType}] for packages: [${packages.join(', ')}] from commit: ${subject}`);
+
+      for (const pkg of packages) {
+         await writeChangeset(
+            {
+              summary: `${description} (autogenerated from ${commit.sha.substring(0, 7)})`,
+              releases: [{ name: pkg, type: changeType }],
+            },
+            // Use the commit SHA to ensure a unique filename
+            `autogen-${commit.sha.substring(0, 7)}`
+          );
+      }
+      generatedCount++;
+    } else {
+      console.log(`No release type detected for commit: ${subject}`);
+    }
+  }
+
+  if (generatedCount > 0) {
+      console.log(`\nSuccessfully generated ${generatedCount} changeset file(s).`);
+  } else {
+      console.log("\nNo new changesets generated.");
+  }
 }
+
+main().catch(err => {
+  console.error("An error occurred during changeset generation:", err);
+  process.exit(1);
+});

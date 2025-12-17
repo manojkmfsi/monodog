@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 3.0.0
+
+### Major Changes
+
+- 75
+
 ## 2.1.0
 
 ### Minor Changes

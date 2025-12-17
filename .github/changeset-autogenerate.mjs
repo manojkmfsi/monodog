@@ -6,10 +6,7 @@ const commitMessage = execSync('git log -1 --format=%s').toString().trim();
 
 // Define valid scopes
 const validScopes = [
-  'monoapp',
-  'backend',
-  'ci-status',
-  'monorepo-scanner'
+  'monoapp'
 ];
 
 // Define regex patterns
@@ -50,7 +47,7 @@ if (packageScope) {
 
   // Determine the full package name based on scope
   const packageName =
- `@monodog/${packageScope}`;
+ `@manojkmfsi/${packageScope}`;
 
   // Generate changeset content
   const changesetContent = `---
@@ -64,6 +61,6 @@ if (packageScope) {
   console.log(`✅ Changeset file created for package: ${packageName}`);
 } else {
   console.log(
-    '⚠️ No valid package scope found in commit message. Valid scopes are: monoapp, backend, ci-status, monorepo-scanner'
+    '⚠️ No valid package scope found in commit message. Valid scopes are: monoapp'
   );
 }

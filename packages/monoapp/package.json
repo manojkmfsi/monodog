@@ -7,7 +7,7 @@
     "monoapp-setup": "dist/setup.js"
   },
   "scripts": {
-    "k":"tsx",
+    "q":"tsx",
     "dev": "tsx watch src/index.ts",
     "start": "tsx index.ts",
     "prepublishOnly": "pnpm run build",

@@ -28,9 +28,8 @@
     "db:url": "node dist/get-db-url.js",
     "generate": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma generate",
     "migrate": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate dev",
-    "migrate:reset": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate reset --force",
-    "postinstall": "npm run generate && npm run migrate:reset && pnpm monoapp-setup @manojkmfsi/monodog --root $INIT_CWD"
-  },
+    "migrate:reset": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate reset --force"
+   },
   "dependencies": {
     "@prisma/client": "^5.7.0",
     "body-parser": "^1.20.2",

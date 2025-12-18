@@ -218,5 +218,4 @@ Since Monodog is operational now,
 
 Continue with:
 
-- [Dashboard Usage Guide](/usage/dashboard)
 - [API Reference](/api-reference/overview)

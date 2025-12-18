@@ -4,13 +4,20 @@
   "description": "App for monodog monorepo",
   "license": "MIT",
   "bin": {
-    "monoapp-setup": "dist/setup.js"
+    "monodog": "dist/setup.js"
   },
+  "files": [
+    "dist",
+    "prisma",
+    "src",
+    "package.json",
+    "monodog-conf.json"
+  ],
   "scripts": {
-    "2": "tsx",
-    "dev": "tsx watch src/index.ts",
+    "dev": "pnpm prisma generate && pnpm prisma migrate dev && node dist/serve.js",
+    "serve": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') node dist/serve.js",
     "start": "tsx index.ts",
-    "prepublishOnly": "pnpm run build",
+    "prepublishOnly": "pnpm build",
     "build": "rm -rf dist && tsc -p tsconfig.json",
     "test:coverage": "jest --coverage",
     "prestart": "npm run build",
@@ -22,7 +29,6 @@
     "generate": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma generate",
     "migrate": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate dev",
     "migrate:reset": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate reset --force",
-    "serve": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n')  node dist/serve.js",
     "postinstall": "npm run generate && npm run migrate:reset && pnpm monoapp-setup @manojkmfsi/monodog --root $INIT_CWD"
   },
   "dependencies": {

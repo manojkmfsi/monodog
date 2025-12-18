@@ -14,7 +14,7 @@ In your monorepo root directory, run:
 ```bash
 pnpm install --save-dev @mindfiredigital/monodog -w
 ```
-If the postinstall script does not make a folder, 'mindfiredigital-monodog', in the packages workspace, then you can try this: 
+If the postinstall script does not make a folder, 'monodog', in the packages workspace, then you can try this:
 
 ```bash
 pnpm store prune
@@ -26,7 +26,7 @@ The unreferenced packages which are not used by any project will be removed by t
 Go to the monodog directory that was created after the installation.
 
 ```bash
-cd mindfiredigital-monodog
+cd monodog
 ```
 
 Run Monodog application:
@@ -39,8 +39,8 @@ You should see output like:
 ```
 [monodog] Checking for monodog-conf.json
 Starting Monodog API server...
-Analyzing monorepo at root: 
-Serving static files from: 
+Analyzing monorepo at root:
+Serving static files from:
 App listening on 0.0.0.0:3010
 [Database] Total packages found: 15
 🚀 Backend server running on http://0.0.0.0:8999
@@ -119,7 +119,7 @@ If port 8999 is already in use, specify a different port in monodog-conf.json:
 Ensure that your monorepo structure is detected by the system:
 ```bash
 # Verify workspace configuration
-cat pnpm-workspace.yaml 
+cat pnpm-workspace.yaml
 ```
 
 ## Next Steps

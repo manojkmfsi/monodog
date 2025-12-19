@@ -1,144 +1,144 @@
 {
-  "/__docusaurus/debug-5ff": {
+  "/monodog/__docusaurus/debug-c28": {
     "__comp": "__comp---theme-debug-config-23-a-2ff",
     "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
+      "plugin": "plugin---monodog-docusaurus-debugb-38-080"
     }
   },
-  "/__docusaurus/debug/config-5ba": {
+  "/monodog/__docusaurus/debug/config-a3d": {
     "__comp": "__comp---theme-debug-config-23-a-2ff",
     "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
+      "plugin": "plugin---monodog-docusaurus-debugb-38-080"
     }
   },
-  "/__docusaurus/debug/content-a2b": {
+  "/monodog/__docusaurus/debug/content-8a9": {
     "__comp": "__comp---theme-debug-contentba-8-ce7",
     "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
+      "plugin": "plugin---monodog-docusaurus-debugb-38-080"
     },
-    "__props": "__props---docusaurus-debug-content-3-c-0-be2"
+    "__props": "__props---monodog-docusaurus-debug-content-04-b-5aa"
   },
-  "/__docusaurus/debug/globalData-c3c": {
+  "/monodog/__docusaurus/debug/globalData-943": {
     "__comp": "__comp---theme-debug-global-dataede-0fa",
     "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
+      "plugin": "plugin---monodog-docusaurus-debugb-38-080"
     }
   },
-  "/__docusaurus/debug/metadata-156": {
+  "/monodog/__docusaurus/debug/metadata-450": {
     "__comp": "__comp---theme-debug-site-metadata-68-e-3d4",
     "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
+      "plugin": "plugin---monodog-docusaurus-debugb-38-080"
     }
   },
-  "/__docusaurus/debug/registry-88c": {
+  "/monodog/__docusaurus/debug/registry-a53": {
     "__comp": "__comp---theme-debug-registry-679-501",
     "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
+      "plugin": "plugin---monodog-docusaurus-debugb-38-080"
     }
   },
-  "/__docusaurus/debug/routes-000": {
+  "/monodog/__docusaurus/debug/routes-48c": {
     "__comp": "__comp---theme-debug-routes-946-699",
     "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
+      "plugin": "plugin---monodog-docusaurus-debugb-38-080"
     }
   },
-  "/MonodogLandingPage-01e": {
+  "/monodog/MonodogLandingPage-d86": {
     "__comp": "__comp---site-src-pages-monodog-landing-page-js-846-6fd",
     "__context": {
-      "plugin": "plugin---monodog-landing-pagea-74-c9d"
+      "plugin": "plugin---monodog-monodog-landing-pagea-74-cb2"
     },
-    "config": "config---monodog-landing-page-5-e-9-ecf"
+    "config": "config---monodog-monodog-landing-page-5-e-9-e7a"
   },
-  "/-2e1": {
+  "/monodog/-d98": {
     "__comp": "__comp---site-src-pages-index-jsc-4-f-f99",
     "__context": {
-      "plugin": "plugin---monodog-landing-pagea-74-c9d"
+      "plugin": "plugin---monodog-monodog-landing-pagea-74-cb2"
     },
-    "config": "config---monodog-landing-page-5-e-9-ecf"
+    "config": "config---monodog-monodog-landing-page-5-e-9-e7a"
   },
-  "/-65c": {
+  "/monodog/-40f": {
     "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
-      "plugin": "plugin---aba-d70"
+      "plugin": "plugin---monodog-aba-1eb"
     }
   },
-  "/-34b": {
+  "/monodog/-ebd": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
-    "__props": "__props---22-d-307"
+    "__props": "__props---monodog-bad-1e7"
   },
-  "/-034": {
+  "/monodog/-744": {
     "__comp": "__comp---theme-doc-roota-94-67a"
   },
-  "/api-reference/commits-80a": {
+  "/monodog/api-reference/commits-35f": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---api-reference-commitsd-97-948"
+    "content": "content---monodog-api-reference-commitsd-97-60d"
   },
-  "/api-reference/config-7c6": {
+  "/monodog/api-reference/config-37e": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---api-reference-config-491-f27"
+    "content": "content---monodog-api-reference-config-491-e37"
   },
-  "/api-reference/health-a55": {
+  "/monodog/api-reference/health-440": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---api-reference-health-3-fa-b06"
+    "content": "content---monodog-api-reference-health-3-fa-80f"
   },
-  "/api-reference/overview-721": {
+  "/monodog/api-reference/overview-706": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---api-reference-overviewce-8-939"
+    "content": "content---monodog-api-reference-overviewce-8-fd2"
   },
-  "/api-reference/packages-9cb": {
+  "/monodog/api-reference/packages-58b": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---api-reference-packages-452-d91"
+    "content": "content---monodog-api-reference-packages-452-56e"
   },
-  "/features/dependency-analysis-f29": {
+  "/monodog/features/dependency-analysis-764": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-dependency-analysis-3-ed-dbc"
+    "content": "content---monodog-features-dependency-analysis-3-ed-c73"
   },
-  "/features/git-integration-4bb": {
+  "/monodog/features/git-integration-84e": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-git-integration-2-f-5-85d"
+    "content": "content---monodog-features-git-integration-2-f-5-c60"
   },
-  "/features/health-monitoring-ecd": {
+  "/monodog/features/health-monitoring-064": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-health-monitoring-03-b-bd8"
+    "content": "content---monodog-features-health-monitoring-03-b-904"
   },
-  "/features/package-scanning-bdd": {
+  "/monodog/features/package-scanning-f4e": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-package-scanninge-2-e-d68"
+    "content": "content---monodog-features-package-scanninge-2-e-364"
   },
-  "/getting-started/overview-204": {
+  "/monodog/getting-started/overview-ff8": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---getting-started-overview-7-a-9-b77"
+    "content": "content---monodog-getting-started-overview-7-a-9-a36"
   },
-  "/getting-started/prerequisites-8e8": {
+  "/monodog/getting-started/prerequisites-d23": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---getting-started-prerequisites-737-c01"
+    "content": "content---monodog-getting-started-prerequisites-737-78e"
   },
-  "/getting-started/quick-start-fd2": {
+  "/monodog/getting-started/quick-start-f88": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---getting-started-quick-start-588-9db"
+    "content": "content---monodog-getting-started-quick-start-588-e47"
   },
-  "/installation/configure-monorepo-7fc": {
+  "/monodog/installation/configure-monorepo-bae": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---installation-configure-monorepo-5-be-917"
+    "content": "content---monodog-installation-configure-monorepo-5-be-7be"
   },
-  "/installation/first-run-e0c": {
+  "/monodog/installation/first-run-f2d": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---installation-first-run-79-f-808"
+    "content": "content---monodog-installation-first-run-79-f-eda"
   },
-  "/installation/install-npm-701": {
+  "/monodog/installation/install-npm-65a": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---installation-install-npm-89-d-9c5"
+    "content": "content---monodog-installation-install-npm-89-d-bc4"
   },
-  "/intro-9fa": {
+  "/monodog/intro-938": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---intro-0-e-3-7b8"
+    "content": "content---monodog-intro-0-e-3-84b"
   },
-  "/upcoming-features/CICD-c72": {
+  "/monodog/upcoming-features/CICD-25c": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---upcoming-features-cicd-9-dc-a8e"
+    "content": "content---monodog-upcoming-features-cicd-9-dc-5c5"
   },
-  "/upcoming-features/version-control-c58": {
+  "/monodog/upcoming-features/version-control-18b": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---upcoming-features-version-control-41-f-fa6"
+    "content": "content---monodog-upcoming-features-version-control-41-f-6dd"
   }
 }

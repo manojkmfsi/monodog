@@ -5,7 +5,7 @@
   "source": "@site/docs/features/dependency-analysis.md",
   "sourceDirName": "features",
   "slug": "/features/dependency-analysis",
-  "permalink": "/features/dependency-analysis",
+  "permalink": "/monodog/features/dependency-analysis",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/features/dependency-analysis.md",
@@ -19,10 +19,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Health Monitoring",
-    "permalink": "/features/health-monitoring"
+    "permalink": "/monodog/features/health-monitoring"
   },
   "next": {
     "title": "Git Integration",
-    "permalink": "/features/git-integration"
+    "permalink": "/monodog/features/git-integration"
   }
 }

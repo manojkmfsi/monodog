@@ -5,7 +5,7 @@
   "source": "@site/docs/features/git-integration.md",
   "sourceDirName": "features",
   "slug": "/features/git-integration",
-  "permalink": "/features/git-integration",
+  "permalink": "/monodog/features/git-integration",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/features/git-integration.md",
@@ -19,10 +19,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Dependency Analysis",
-    "permalink": "/features/dependency-analysis"
+    "permalink": "/monodog/features/dependency-analysis"
   },
   "next": {
     "title": "Overview",
-    "permalink": "/getting-started/overview"
+    "permalink": "/monodog/getting-started/overview"
   }
 }

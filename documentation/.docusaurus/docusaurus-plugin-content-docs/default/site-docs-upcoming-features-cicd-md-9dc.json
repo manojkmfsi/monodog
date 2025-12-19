@@ -5,7 +5,7 @@
   "source": "@site/docs/upcoming-features/CICD.md",
   "sourceDirName": "upcoming-features",
   "slug": "/upcoming-features/CICD",
-  "permalink": "/upcoming-features/CICD",
+  "permalink": "/monodog/upcoming-features/CICD",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/upcoming-features/CICD.md",
@@ -19,10 +19,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "First Run",
-    "permalink": "/installation/first-run"
+    "permalink": "/monodog/installation/first-run"
   },
   "next": {
     "title": "Version Control",
-    "permalink": "/upcoming-features/version-control"
+    "permalink": "/monodog/upcoming-features/version-control"
   }
 }

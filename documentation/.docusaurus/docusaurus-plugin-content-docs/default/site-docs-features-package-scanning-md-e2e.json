@@ -5,7 +5,7 @@
   "source": "@site/docs/features/package-scanning.md",
   "sourceDirName": "features",
   "slug": "/features/package-scanning",
-  "permalink": "/features/package-scanning",
+  "permalink": "/monodog/features/package-scanning",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/features/package-scanning.md",
@@ -19,10 +19,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Config Endpoint",
-    "permalink": "/api-reference/config"
+    "permalink": "/monodog/api-reference/config"
   },
   "next": {
     "title": "Health Monitoring",
-    "permalink": "/features/health-monitoring"
+    "permalink": "/monodog/features/health-monitoring"
   }
 }

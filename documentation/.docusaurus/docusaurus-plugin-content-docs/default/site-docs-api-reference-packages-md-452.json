@@ -5,7 +5,7 @@
   "source": "@site/docs/api-reference/packages.md",
   "sourceDirName": "api-reference",
   "slug": "/api-reference/packages",
-  "permalink": "/api-reference/packages",
+  "permalink": "/monodog/api-reference/packages",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/api-reference/packages.md",
@@ -19,10 +19,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "API Overview",
-    "permalink": "/api-reference/overview"
+    "permalink": "/monodog/api-reference/overview"
   },
   "next": {
     "title": "Health Endpoint",
-    "permalink": "/api-reference/health"
+    "permalink": "/monodog/api-reference/health"
   }
 }

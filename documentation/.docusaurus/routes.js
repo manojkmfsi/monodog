@@ -3,167 +3,167 @@ import ComponentCreator from '@docusaurus/ComponentCreator';
 
 export default [
   {
-    path: '/__docusaurus/debug',
-    component: ComponentCreator('/__docusaurus/debug', '5ff'),
+    path: '/monodog/__docusaurus/debug',
+    component: ComponentCreator('/monodog/__docusaurus/debug', 'c28'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/config',
-    component: ComponentCreator('/__docusaurus/debug/config', '5ba'),
+    path: '/monodog/__docusaurus/debug/config',
+    component: ComponentCreator('/monodog/__docusaurus/debug/config', 'a3d'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/content',
-    component: ComponentCreator('/__docusaurus/debug/content', 'a2b'),
+    path: '/monodog/__docusaurus/debug/content',
+    component: ComponentCreator('/monodog/__docusaurus/debug/content', '8a9'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/globalData',
-    component: ComponentCreator('/__docusaurus/debug/globalData', 'c3c'),
+    path: '/monodog/__docusaurus/debug/globalData',
+    component: ComponentCreator('/monodog/__docusaurus/debug/globalData', '943'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/metadata',
-    component: ComponentCreator('/__docusaurus/debug/metadata', '156'),
+    path: '/monodog/__docusaurus/debug/metadata',
+    component: ComponentCreator('/monodog/__docusaurus/debug/metadata', '450'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/registry',
-    component: ComponentCreator('/__docusaurus/debug/registry', '88c'),
+    path: '/monodog/__docusaurus/debug/registry',
+    component: ComponentCreator('/monodog/__docusaurus/debug/registry', 'a53'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/routes',
-    component: ComponentCreator('/__docusaurus/debug/routes', '000'),
+    path: '/monodog/__docusaurus/debug/routes',
+    component: ComponentCreator('/monodog/__docusaurus/debug/routes', '48c'),
     exact: true
   },
   {
-    path: '/MonodogLandingPage',
-    component: ComponentCreator('/MonodogLandingPage', '01e'),
+    path: '/monodog/MonodogLandingPage',
+    component: ComponentCreator('/monodog/MonodogLandingPage', 'd86'),
     exact: true
   },
   {
-    path: '/',
-    component: ComponentCreator('/', '2e1'),
+    path: '/monodog/',
+    component: ComponentCreator('/monodog/', 'd98'),
     exact: true
   },
   {
-    path: '/',
-    component: ComponentCreator('/', '65c'),
+    path: '/monodog/',
+    component: ComponentCreator('/monodog/', '40f'),
     routes: [
       {
-        path: '/',
-        component: ComponentCreator('/', '34b'),
+        path: '/monodog/',
+        component: ComponentCreator('/monodog/', 'ebd'),
         routes: [
           {
-            path: '/',
-            component: ComponentCreator('/', '034'),
+            path: '/monodog/',
+            component: ComponentCreator('/monodog/', '744'),
             routes: [
               {
-                path: '/api-reference/commits',
-                component: ComponentCreator('/api-reference/commits', '80a'),
+                path: '/monodog/api-reference/commits',
+                component: ComponentCreator('/monodog/api-reference/commits', '35f'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/api-reference/config',
-                component: ComponentCreator('/api-reference/config', '7c6'),
+                path: '/monodog/api-reference/config',
+                component: ComponentCreator('/monodog/api-reference/config', '37e'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/api-reference/health',
-                component: ComponentCreator('/api-reference/health', 'a55'),
+                path: '/monodog/api-reference/health',
+                component: ComponentCreator('/monodog/api-reference/health', '440'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/api-reference/overview',
-                component: ComponentCreator('/api-reference/overview', '721'),
+                path: '/monodog/api-reference/overview',
+                component: ComponentCreator('/monodog/api-reference/overview', '706'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/api-reference/packages',
-                component: ComponentCreator('/api-reference/packages', '9cb'),
+                path: '/monodog/api-reference/packages',
+                component: ComponentCreator('/monodog/api-reference/packages', '58b'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/features/dependency-analysis',
-                component: ComponentCreator('/features/dependency-analysis', 'f29'),
+                path: '/monodog/features/dependency-analysis',
+                component: ComponentCreator('/monodog/features/dependency-analysis', '764'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/features/git-integration',
-                component: ComponentCreator('/features/git-integration', '4bb'),
+                path: '/monodog/features/git-integration',
+                component: ComponentCreator('/monodog/features/git-integration', '84e'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/features/health-monitoring',
-                component: ComponentCreator('/features/health-monitoring', 'ecd'),
+                path: '/monodog/features/health-monitoring',
+                component: ComponentCreator('/monodog/features/health-monitoring', '064'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/features/package-scanning',
-                component: ComponentCreator('/features/package-scanning', 'bdd'),
+                path: '/monodog/features/package-scanning',
+                component: ComponentCreator('/monodog/features/package-scanning', 'f4e'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/getting-started/overview',
-                component: ComponentCreator('/getting-started/overview', '204'),
+                path: '/monodog/getting-started/overview',
+                component: ComponentCreator('/monodog/getting-started/overview', 'ff8'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/getting-started/prerequisites',
-                component: ComponentCreator('/getting-started/prerequisites', '8e8'),
+                path: '/monodog/getting-started/prerequisites',
+                component: ComponentCreator('/monodog/getting-started/prerequisites', 'd23'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/getting-started/quick-start',
-                component: ComponentCreator('/getting-started/quick-start', 'fd2'),
+                path: '/monodog/getting-started/quick-start',
+                component: ComponentCreator('/monodog/getting-started/quick-start', 'f88'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/installation/configure-monorepo',
-                component: ComponentCreator('/installation/configure-monorepo', '7fc'),
+                path: '/monodog/installation/configure-monorepo',
+                component: ComponentCreator('/monodog/installation/configure-monorepo', 'bae'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/installation/first-run',
-                component: ComponentCreator('/installation/first-run', 'e0c'),
+                path: '/monodog/installation/first-run',
+                component: ComponentCreator('/monodog/installation/first-run', 'f2d'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/installation/install-npm',
-                component: ComponentCreator('/installation/install-npm', '701'),
+                path: '/monodog/installation/install-npm',
+                component: ComponentCreator('/monodog/installation/install-npm', '65a'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro',
-                component: ComponentCreator('/intro', '9fa'),
+                path: '/monodog/intro',
+                component: ComponentCreator('/monodog/intro', '938'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/upcoming-features/CICD',
-                component: ComponentCreator('/upcoming-features/CICD', 'c72'),
+                path: '/monodog/upcoming-features/CICD',
+                component: ComponentCreator('/monodog/upcoming-features/CICD', '25c'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/upcoming-features/version-control',
-                component: ComponentCreator('/upcoming-features/version-control', 'c58'),
+                path: '/monodog/upcoming-features/version-control',
+                component: ComponentCreator('/monodog/upcoming-features/version-control', '18b'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               }

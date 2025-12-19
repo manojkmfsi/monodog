@@ -5,7 +5,7 @@
   "source": "@site/docs/api-reference/health.md",
   "sourceDirName": "api-reference",
   "slug": "/api-reference/health",
-  "permalink": "/api-reference/health",
+  "permalink": "/monodog/api-reference/health",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/api-reference/health.md",
@@ -19,10 +19,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Packages Endpoint",
-    "permalink": "/api-reference/packages"
+    "permalink": "/monodog/api-reference/packages"
   },
   "next": {
     "title": "Commits Endpoint",
-    "permalink": "/api-reference/commits"
+    "permalink": "/monodog/api-reference/commits"
   }
 }

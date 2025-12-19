@@ -5,7 +5,7 @@
   "source": "@site/docs/getting-started/overview.md",
   "sourceDirName": "getting-started",
   "slug": "/getting-started/overview",
-  "permalink": "/getting-started/overview",
+  "permalink": "/monodog/getting-started/overview",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/getting-started/overview.md",
@@ -19,10 +19,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Git Integration",
-    "permalink": "/features/git-integration"
+    "permalink": "/monodog/features/git-integration"
   },
   "next": {
     "title": "Prerequisites",
-    "permalink": "/getting-started/prerequisites"
+    "permalink": "/monodog/getting-started/prerequisites"
   }
 }

@@ -5,7 +5,7 @@
   "source": "@site/docs/installation/first-run.md",
   "sourceDirName": "installation",
   "slug": "/installation/first-run",
-  "permalink": "/installation/first-run",
+  "permalink": "/monodog/installation/first-run",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/installation/first-run.md",
@@ -19,10 +19,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Configure Monorepo",
-    "permalink": "/installation/configure-monorepo"
+    "permalink": "/monodog/installation/configure-monorepo"
   },
   "next": {
     "title": "CI/CD",
-    "permalink": "/upcoming-features/CICD"
+    "permalink": "/monodog/upcoming-features/CICD"
   }
 }

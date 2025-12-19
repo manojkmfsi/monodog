@@ -5,7 +5,7 @@
   "source": "@site/docs/upcoming-features/version-control.md",
   "sourceDirName": "upcoming-features",
   "slug": "/upcoming-features/version-control",
-  "permalink": "/upcoming-features/version-control",
+  "permalink": "/monodog/upcoming-features/version-control",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/upcoming-features/version-control.md",
@@ -19,6 +19,6 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "CI/CD",
-    "permalink": "/upcoming-features/CICD"
+    "permalink": "/monodog/upcoming-features/CICD"
   }
 }

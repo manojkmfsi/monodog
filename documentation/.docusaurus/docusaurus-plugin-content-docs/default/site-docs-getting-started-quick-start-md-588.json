@@ -5,7 +5,7 @@
   "source": "@site/docs/getting-started/quick-start.md",
   "sourceDirName": "getting-started",
   "slug": "/getting-started/quick-start",
-  "permalink": "/getting-started/quick-start",
+  "permalink": "/monodog/getting-started/quick-start",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/monodog/tree/main/docs/docs/getting-started/quick-start.md",
@@ -19,10 +19,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Prerequisites",
-    "permalink": "/getting-started/prerequisites"
+    "permalink": "/monodog/getting-started/prerequisites"
   },
   "next": {
     "title": "NPM Installation",
-    "permalink": "/installation/install-npm"
+    "permalink": "/monodog/installation/install-npm"
   }
 }

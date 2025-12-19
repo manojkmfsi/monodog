@@ -1,103 +1,103 @@
 {
   "docusaurus-plugin-content-docs": {
     "default": {
-      "path": "/",
+      "path": "/monodog/",
       "versions": [
         {
           "name": "current",
           "label": "Next",
           "isLast": true,
-          "path": "/",
+          "path": "/monodog/",
           "mainDocId": "intro",
           "docs": [
             {
               "id": "api-reference/commits",
-              "path": "/api-reference/commits",
+              "path": "/monodog/api-reference/commits",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "api-reference/config",
-              "path": "/api-reference/config",
+              "path": "/monodog/api-reference/config",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "api-reference/health",
-              "path": "/api-reference/health",
+              "path": "/monodog/api-reference/health",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "api-reference/overview",
-              "path": "/api-reference/overview",
+              "path": "/monodog/api-reference/overview",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "api-reference/packages",
-              "path": "/api-reference/packages",
+              "path": "/monodog/api-reference/packages",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "features/dependency-analysis",
-              "path": "/features/dependency-analysis",
+              "path": "/monodog/features/dependency-analysis",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "features/git-integration",
-              "path": "/features/git-integration",
+              "path": "/monodog/features/git-integration",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "features/health-monitoring",
-              "path": "/features/health-monitoring",
+              "path": "/monodog/features/health-monitoring",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "features/package-scanning",
-              "path": "/features/package-scanning",
+              "path": "/monodog/features/package-scanning",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "getting-started/overview",
-              "path": "/getting-started/overview",
+              "path": "/monodog/getting-started/overview",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "getting-started/prerequisites",
-              "path": "/getting-started/prerequisites",
+              "path": "/monodog/getting-started/prerequisites",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "getting-started/quick-start",
-              "path": "/getting-started/quick-start",
+              "path": "/monodog/getting-started/quick-start",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "installation/configure-monorepo",
-              "path": "/installation/configure-monorepo",
+              "path": "/monodog/installation/configure-monorepo",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "installation/first-run",
-              "path": "/installation/first-run",
+              "path": "/monodog/installation/first-run",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "installation/install-npm",
-              "path": "/installation/install-npm",
+              "path": "/monodog/installation/install-npm",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "intro",
-              "path": "/intro",
+              "path": "/monodog/intro",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "upcoming-features/CICD",
-              "path": "/upcoming-features/CICD",
+              "path": "/monodog/upcoming-features/CICD",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "upcoming-features/version-control",
-              "path": "/upcoming-features/version-control",
+              "path": "/monodog/upcoming-features/version-control",
               "sidebar": "tutorialSidebar"
             }
           ],
@@ -105,7 +105,7 @@
           "sidebars": {
             "tutorialSidebar": {
               "link": {
-                "path": "/intro",
+                "path": "/monodog/intro",
                 "label": "intro"
               }
             }

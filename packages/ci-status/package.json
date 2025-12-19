@@ -6,7 +6,6 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "q":"tsx",
     "dev": "tsx watch index.ts",
     "start": "tsx index.ts",
     "build": "tsc",

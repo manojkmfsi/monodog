@@ -627,7 +627,7 @@ export function startServer(
           try {
             // Await each health check function since they return promises
             const buildStatus = await funCheckBuildStatus(pkg);
-            const testCoverage = await funCheckTestCoverage(pkg);
+            const testCoverage = 0; //await funCheckTestCoverage(pkg); // skip test coverage for now
             const lintStatus = await funCheckLintStatus(pkg);
             const securityAudit = await funCheckSecurityAudit(pkg);
             // Calculate overall health score

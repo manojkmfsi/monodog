@@ -46,7 +46,10 @@ async function storeCommits(
     try {
       await prisma.commit.upsert({
         where: {
-          hash: commit.hash,
+          hash_packageName: {
+            hash: commit.hash,
+            packageName: packageName,
+          }
         },
         update: {
           message: commit.message,

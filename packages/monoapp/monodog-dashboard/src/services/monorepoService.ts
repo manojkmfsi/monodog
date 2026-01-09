@@ -614,7 +614,7 @@ class MonorepoService {
         packageName
       );
 
-      const response = await fetch(`${API_BASE}/packages/update`, {
+      const response = await fetch(`${API_BASE}/packages/update-config`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

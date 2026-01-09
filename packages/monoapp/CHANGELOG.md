@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.0.20
+
+### Patch Changes
+
+- Restructure backend app
+
 ## 1.0.17
 
 ### Patch Changes

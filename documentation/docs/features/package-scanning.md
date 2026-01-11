@@ -5,7 +5,7 @@ title: Package Scanning
 
 # Package Scanning
 
-Monodog's package scanning feature automatically finds and analyzes all packages in your monorepo.
+Monodog first identifies your packages by looking for `"workspaces"` in `package.json` or else `"packages"` in `pnpm-workspaces.yaml`.
 
 ## Overview
 
@@ -107,7 +107,7 @@ Check your workspace configuration and included paths:
 
 ```bash
 # Verify config
-cat pnpm-workspace.yaml 
+cat pnpm-workspace.yaml
 ```
 
 ### Missing Dependencies

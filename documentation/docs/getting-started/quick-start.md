@@ -32,7 +32,7 @@ npm run serve
 
 You should see output like:
 ```
-[monodog] Checking for monodog-conf.json
+[monodog] Checking for monodog-config.json
 Starting Monodog API server...
 Analyzing monorepo at root:
 Serving static files from:
@@ -96,13 +96,13 @@ If Monodog is installed, you can explore:
 
 ### Port 3010 Already in Use
 
-If port 3010 is already in use, specify a different port in monodog-conf.json:
+If port 3010 is already in use, specify a different port in monodog-config.json:
 ```
   "dashboard": {
     "port": 3011
   }
 ```
-If port 8999 is already in use, specify a different port in monodog-conf.json:
+If port 8999 is already in use, specify a different port in monodog-config.json:
 ```
   "server": {
     "port": 8990

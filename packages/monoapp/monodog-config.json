@@ -1,7 +1,5 @@
 {
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": [],
   "database": {
     "path": "file:./monodog.db"
   },

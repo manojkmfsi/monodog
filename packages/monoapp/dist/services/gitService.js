@@ -13,25 +13,9 @@ exports.GitService = void 0;
 const child_process_1 = require("child_process");
 const util_1 = require("util");
 const path_1 = __importDefault(require("path"));
+const types_1 = require("../types");
 // Promisify the standard 'exec' function for easy async/await usage
 const execPromise = (0, util_1.promisify)(child_process_1.exec);
-/**
- * List of standard Conventional Commit types for validation.
- * Any extracted type not in this list will be set to 'other'.
- */
-const VALID_COMMIT_TYPES = [
-    'feat', // New feature
-    'fix', // Bug fix
-    'docs', // Documentation changes
-    'style', // Code style changes (formatting, etc)
-    'refactor', // Code refactoring
-    'perf', // Performance improvements
-    'test', // Adding or updating tests
-    'chore', // Maintenance tasks (e.g., build scripts, dependency updates)
-    'ci', // CI/CD changes
-    'build', // Build system changes (e.g., pnpm/npm scripts)
-    'revert', // Reverting changes
-];
 class GitService {
     constructor(repoPath = process.cwd()) {
         this.repoPath = repoPath;
@@ -51,10 +35,10 @@ class GitService {
             }
             // First, validate we're in a git repo
             await this.validateGitRepository(pathArgument);
-            console.log(`🔧 Executing Git command in: ${this.repoPath}`);
+            console.log(`Executing Git command in: ${this.repoPath}`);
             // Use a simpler git log format
             const command = `git log --pretty=format:"%H|%an|%ad|%s" --date=iso-strict ${pathArgument}`;
-            console.log(`📝 Git command: ${command}`);
+            console.log(`Git command: ${command}`);
             const { stdout, stderr } = await execPromise(command, {
                 cwd: this.repoPath,
                 maxBuffer: 1024 * 5000,
@@ -83,14 +67,14 @@ class GitService {
                     commits.push(commit);
                 }
                 catch (parseError) {
-                    console.error('❌ Failed to parse commit line:', line, parseError);
+                    console.error('Failed to parse commit line:', line, parseError);
                 }
             }
-            console.log(`✅ Successfully parsed ${commits.length} commits`);
+            console.log(`Successfully parsed ${commits.length} commits`);
             return commits;
         }
         catch (error) {
-            console.error('💥 Error in getAllCommits:', error);
+            console.error('Error in getAllCommits:', error);
             throw error;
         }
     }
@@ -113,7 +97,7 @@ class GitService {
             const typeMatch = message.match(/^(\w+)(\([^)]+\))?!?:/);
             if (typeMatch) {
                 const rawType = typeMatch[1].toLowerCase();
-                if (VALID_COMMIT_TYPES.includes(rawType)) {
+                if (types_1.VALID_COMMIT_TYPES.includes(rawType)) {
                     return rawType;
                 }
             }
@@ -131,7 +115,7 @@ class GitService {
             await execPromise('git ' + pathArgument + ' rev-parse --is-inside-work-tree', {
                 cwd: this.repoPath,
             });
-            console.log('✅ Valid git repository');
+            console.log('Valid git repository');
         }
         catch (error) {
             throw new Error('Not a git repository (or any of the parent directories)');

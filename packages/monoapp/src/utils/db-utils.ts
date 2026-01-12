@@ -127,7 +127,7 @@ async function storePackage(pkg: PackageInfo): Promise<void> {
       await storeDependencies(pkg.name, dependenciesInfo);
     }
   } catch (error) {
-    console.warn(`⚠️  Failed to store report for ${pkg.name}:`, error);
+    console.warn(` Failed to store report for ${pkg.name}:`, error);
   }
 }
 

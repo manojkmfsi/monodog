@@ -10,11 +10,11 @@ export const getCommitsByPath = async (_req: any, res: any) => {
     const decodedPath = decodeURIComponent(packagePath);
 
     console.log('🔍 Fetching commits for path:', decodedPath);
-    console.log('📁 Current working directory:', process.cwd());
+    console.log('Current working directory:', process.cwd());
 
     const commits = await getCommitsByPathService(decodedPath);
     console.log(
-      `✅ Successfully fetched ${commits.length} commits for ${decodedPath}`
+      `Successfully fetched ${commits.length} commits for ${decodedPath}`
     );
     res.json(commits);
   } catch (error: any) {

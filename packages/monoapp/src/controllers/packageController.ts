@@ -43,7 +43,7 @@ export const updatePackageConfig = async (req: any, res: any) => {
     }
 
     console.log('💾 Updating package configuration for:', packageName);
-    console.log('📁 Package path:', packagePath);
+    console.log('Package path:', packagePath);
 
     const updatedPackage = await updatePackageConfigurationService(packagePath, packageName, config);
 

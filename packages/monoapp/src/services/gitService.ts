@@ -104,11 +104,11 @@ export class GitService {
 
           commits.push(commit);
         } catch (parseError) {
-          console.error('❌ Failed to parse commit line:', line, parseError);
+          console.error('Failed to parse commit line:', line, parseError);
         }
       }
 
-      console.log(`✅ Successfully parsed ${commits.length} commits`);
+      console.log(`Successfully parsed ${commits.length} commits`);
       return commits;
     } catch (error) {
       console.error('💥 Error in getAllCommits:', error);
@@ -155,7 +155,7 @@ export class GitService {
       await execPromise('git '+pathArgument+' rev-parse --is-inside-work-tree', {
         cwd: this.repoPath,
       });
-      console.log('✅ Valid git repository');
+      console.log('Valid git repository');
     } catch (error) {
       throw new Error(
         'Not a git repository (or any of the parent directories)'

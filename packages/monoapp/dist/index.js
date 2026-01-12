@@ -29,9 +29,6 @@ function validatePort(port) {
 // Global error handler
 const errorHandler = (err, req, res, _next) => {
     const status = err.status || err.statusCode || 500;
-    const message = process.env.NODE_ENV === 'production'
-        ? 'Internal server error'
-        : err.message;
     console.error('[ERROR]', {
         status,
         method: req.method,
@@ -100,8 +97,8 @@ function startServer(rootPath) {
         // Global error handler (must be last)
         app.use(errorHandler);
         const server = app.listen(validatedPort, host, () => {
-            console.log(`🚀 Backend server running on http://${host}:${validatedPort}`);
-            console.log(`📊 API endpoints available:`);
+            console.log(`Backend server running on http://${host}:${validatedPort}`);
+            console.log(`API endpoints available:`);
             console.log(`   - GET  /api/health`);
             console.log(`   - GET  /api/packages/refresh`);
             console.log(`   - GET  /api/packages`);
@@ -208,7 +205,7 @@ function serveDashboard(rootPath) {
         // Global error handler
         app.use(errorHandler);
         const server = app.listen(validatedPort, host, () => {
-            console.log(`✅ Dashboard listening on http://${host}:${validatedPort}`);
+            console.log(`Dashboard listening on http://${host}:${validatedPort}`);
             console.log('Press Ctrl+C to quit.');
         });
         server.on('error', (err) => {

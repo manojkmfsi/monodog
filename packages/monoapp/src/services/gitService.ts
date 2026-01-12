@@ -66,10 +66,10 @@ export class GitService {
       // First, validate we're in a git repo
       await this.validateGitRepository(pathArgument);
 
-      console.log(`🔧 Executing Git command in: ${this.repoPath}`);
+      console.log(`Executing Git command in: ${this.repoPath}`);
       // Use a simpler git log format
       const command = `git log --pretty=format:"%H|%an|%ad|%s" --date=iso-strict ${pathArgument}`;
-      console.log(`📝 Git command: ${command}`);
+      console.log(`Git command: ${command}`);
 
       const { stdout, stderr } = await execPromise(command, {
         cwd: this.repoPath,
@@ -81,7 +81,7 @@ export class GitService {
       }
 
       if (!stdout.trim()) {
-        console.log('📭 No commits found for path:', pathFilter);
+        console.log('No commits found for path:', pathFilter);
         return [];
       }
 
@@ -111,7 +111,7 @@ export class GitService {
       console.log(`Successfully parsed ${commits.length} commits`);
       return commits;
     } catch (error) {
-      console.error('💥 Error in getAllCommits:', error);
+      console.error('Error in getAllCommits:', error);
       throw error;
     }
   }

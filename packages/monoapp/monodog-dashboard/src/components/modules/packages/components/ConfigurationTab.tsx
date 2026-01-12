@@ -67,7 +67,7 @@ export default function ConfigurationTab({
     setSaveMessage('');
 
     try {
-      console.log('💾 Saving package configuration...');
+      console.log('Saving package configuration...');
 
       // Use the MonorepoService to update the package configuration
       const result = await monorepoService.updatePackageConfiguration(

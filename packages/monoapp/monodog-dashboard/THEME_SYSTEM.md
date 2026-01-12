@@ -216,7 +216,7 @@ All components are designed mobile-first with progressive enhancement for larger
 - Proper focus management with custom focus rings
 - Tab order consideration in component design
 
-## 🔄 Migration Benefits
+## Migration Benefits
 
 ### Before Migration
 
@@ -247,7 +247,7 @@ All components are designed mobile-first with progressive enhancement for larger
 4. **Performance**: Optimized for fast loading and rendering
 5. **Developer Experience**: Simple to use and understand
 
-## 📊 Usage Statistics
+## Usage Statistics
 
 ### Theme Adoption
 

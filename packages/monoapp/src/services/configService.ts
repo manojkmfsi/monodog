@@ -123,7 +123,7 @@ async function scanConfigFiles(rootDir: string): Promise<any[]> {
     });
   }
 
-  console.log(`🔍 Scanning for config files in: ${rootDir}`);
+  console.log(`Scanning for config files in: ${rootDir}`);
 
   // Start scanning from root
   scanDirectory(rootDir);
@@ -228,7 +228,7 @@ export const updateConfigFileService = async (id: string, rootDir: string, conte
     id.startsWith('/') ? id.slice(1) : id
   );
 
-  console.log('💾 Saving file:', filePath);
+  console.log('Saving file:', filePath);
   console.log('Root directory:', rootDir);
 
   // Security check: ensure the file is within the project directory
@@ -346,7 +346,7 @@ export const updatePackageConfigurationService = async (packagePath: string, pac
   if (newConfig.peerDependencies)
     updateData.peerDependencies = JSON.stringify(newConfig.peerDependencies);
 
-  console.log('📝 Updating database with:', updateData);
+  console.log('Updating database with:', updateData);
 
   const updatedPackage = await prisma.package.update({
     where: { name: packageName },

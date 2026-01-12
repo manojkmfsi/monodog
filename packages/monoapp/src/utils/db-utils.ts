@@ -31,7 +31,7 @@ async function storeCommits(
   packageName: string,
   commits: Commit[]
 ): Promise<void> {
-  console.log('💾 Storing commits for:' + packageName);
+  console.log('Storing commits for:' + packageName);
   // Create or update dependencies
   for (const commit of commits) {
     try {
@@ -173,7 +173,7 @@ async function storeDependencies(
   packageName: string,
   dependencies: DependencyInfo[]
 ): Promise<void> {
-  console.log('💾 Storing Dependencies for:' + packageName);
+  console.log('Storing Dependencies for:' + packageName);
   // Create or update dependencies
   for (const dep of dependencies) {
     try {

@@ -63,7 +63,7 @@ export class MonorepoScanner {
         return cached;
       }
 
-      console.log('🔍 Starting monorepo scan...');
+      console.log('Starting monorepo scan...');
 
       // Scan all packages
       const packages = scanMonorepo(this.rootDir);

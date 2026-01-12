@@ -123,7 +123,7 @@ export function startServer(
 
     const server = app.listen(validatedPort, host, () => {
       console.log(`Backend server running on http://${host}:${validatedPort}`);
-      console.log(`📊 API endpoints available:`);
+      console.log(`API endpoints available:`);
       console.log(`   - GET  /api/health`);
       console.log(`   - GET  /api/packages/refresh`);
       console.log(`   - GET  /api/packages`);

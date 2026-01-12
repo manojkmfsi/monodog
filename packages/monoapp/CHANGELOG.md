@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.0.23
+
+### Patch Changes
+
+- Added types for backend nodejs
+
 ## 1.0.22
 
 ### Patch Changes

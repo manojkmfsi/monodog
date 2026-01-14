@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.0.24
+
+### Patch Changes
+
+- added separate folder for middleware, kebab case filename
+
 ## 1.0.23
 
 ### Patch Changes

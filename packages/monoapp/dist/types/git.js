@@ -5,6 +5,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VALID_COMMIT_TYPES = void 0;
 /**
+ * Interface representing a single commit object with key metadata.
+ */
+// export interface GitCommit {
+//   hash: string;
+//   author: string;
+//   packageName: string;
+//   date: Date;
+//   message: string;
+//   type: string;
+// }
+/**
  * List of standard Conventional Commit types for validation.
  * Any extracted type not in this list will be set to 'other'.
  */

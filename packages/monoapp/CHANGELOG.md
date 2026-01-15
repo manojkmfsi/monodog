@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.0.25
+
+### Patch Changes
+
+- Added morgan and split prisma schema
+
 ## 1.0.24
 
 ### Patch Changes

@@ -28,7 +28,7 @@ export function createHelmetMiddleware(apiUrl: string) {
  */
 export function createApiCorsMiddleware(dashboardUrl: string) {
   const corsOptions: CorsOptions = {
-    origin: process.env.CORS_ORIGIN || dashboardUrl,
+    origin: dashboardUrl,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -67,15 +67,15 @@ export function buildApiUrl(
   port: number
 ): string {
   const apiHost = host === '0.0.0.0' ? 'localhost' : host;
-  return process.env.API_URL || `http://${apiHost}:${port}`;
+  return  `http://${apiHost}:${port}`;
 }
 
 /**
  * Build dashboard URL based on config
  */
 export function buildDashboardUrl(config: MonodogConfig): string {
-  const dashboardHost = config.dashboard.host === '0.0.0.0' 
-    ? 'localhost' 
+  const dashboardHost = config.dashboard.host === '0.0.0.0'
+    ? 'localhost'
     : config.dashboard.host;
   return `http://${dashboardHost}:${config.dashboard.port}`;
 }

@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.4
+
+### Patch Changes
+
+- fixes
+
 ## 1.1.3
 
 ### Patch Changes

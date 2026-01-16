@@ -19,6 +19,7 @@ import {
   buildApiUrl,
   buildDashboardUrl,
 } from './security';
+import { setupSwaggerDocs } from './swagger-middleware';
 
 import packageRouter from '../routes/package-routes';
 import commitRouter from '../routes/commit-routes';
@@ -73,6 +74,9 @@ function createApp(rootPath: string): Express {
 
   // HTTP request logging with Morgan
   app.use(httpLogger);
+
+  // Setup Swagger documentation
+  setupSwaggerDocs(app);
 
   // Routes
   app.use('/api/packages', packageRouter);

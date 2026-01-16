@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.1
+
+### Patch Changes
+
+- updated docs
+
 ## 1.1.0
 
 ### Minor Changes

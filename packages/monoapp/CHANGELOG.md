@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.0
+
+### Minor Changes
+
+- Added Swagger doc, updated req type for resfresh
+
 ## 1.0.25
 
 ### Patch Changes

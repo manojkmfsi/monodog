@@ -214,12 +214,12 @@ export const getPackageDetailService = async (name: string) => {
     : [];
 
   // Get additional package information
-  const reports = (await generateReports()) as unknown as PackageReport[] | undefined;
-  const packageReport = reports?.find((r: PackageReport) => r.package?.name === name);
+  // const reports = (await generateReports()) as unknown as PackageReport[] | undefined;
+  // const packageReport = reports?.find((r: PackageReport) => r.package?.name === name);
 
   const result: PackageDetail = {
     ...transformedPkg,
-    report: packageReport,
+    // report: packageReport,
     ciStatus: await ciStatusManager.getPackageStatus(name),
   };
 

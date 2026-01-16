@@ -3,10 +3,15 @@
   "version": "1.0.19",
   "description": "App for monodog monorepo",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mindfiredigital/MonoDog",
+    "directory": "package/"
+  },
   "bin": {
     "monodog": "dist/setup.js"
   },
-   "scripts": {
+  "scripts": {
     "dev": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') tsx watch src/serve.ts --dev --debug",
     "serve": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') tsx dist/serve.js",
     "prepublishOnly": "pnpm build",

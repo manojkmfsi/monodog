@@ -111,13 +111,13 @@ export function startServer(rootPath: string): void {
       console.log(SUCCESS_SERVER_START(host, validatedPort));
       AppLogger.info('API endpoints available:', {
         endpoints: [
-          'GET  /api/health',
-          'GET  /api/packages/refresh',
+          'POST /api/packages/refresh',
           'GET  /api/packages',
           'GET  /api/packages/:name',
           'PUT  /api/packages/update-config',
           'GET  /api/commits/:packagePath',
           'GET  /api/health/packages',
+          'POST /api/health/refresh',
           'PUT  /api/config/files/:id',
           'GET  /api/config/files',
         ],

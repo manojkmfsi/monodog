@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.2
+
+### Patch Changes
+
+- Updated logging - replace console logs with morgan
+
 ## 1.1.1
 
 ### Patch Changes

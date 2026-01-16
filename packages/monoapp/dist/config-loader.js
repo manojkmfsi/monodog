@@ -83,11 +83,11 @@ function createConfigFileIfMissing(rootPath) {
             path: 'file:./monodog.db', // SQLite database file path, relative to prisma schema location
         },
         dashboard: {
-            host: '0.0.0.0',
+            host: 'localhost',
             port: '3010',
         },
         server: {
-            host: '0.0.0.0', // Default host for the API server
+            host: 'localhost', // Default host for the API server
             port: 8999, // Default port for the API server
         },
     };

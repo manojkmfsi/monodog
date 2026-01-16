@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.5
+
+### Patch Changes
+
+- upload dashboard dist
+
 ## 1.1.4
 
 ### Patch Changes

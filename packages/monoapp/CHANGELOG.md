@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.7
+
+### Patch Changes
+
+- hide maintainers
+
 ## 1.1.6
 
 ### Patch Changes

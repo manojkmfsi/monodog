@@ -13,20 +13,19 @@ const logger_1 = require("./logger");
 const config_loader_1 = require("../config-loader");
 const error_handler_1 = require("./error-handler");
 const security_1 = require("./security");
+const swagger_middleware_1 = require("./swagger-middleware");
 const package_routes_1 = __importDefault(require("../routes/package-routes"));
 const commit_routes_1 = __importDefault(require("../routes/commit-routes"));
 const health_routes_1 = __importDefault(require("../routes/health-routes"));
 const config_routes_1 = __importDefault(require("../routes/config-routes"));
-// Security constants
-const PORT_MIN = 1024;
-const PORT_MAX = 65535;
+const constants_1 = require("../constants");
 /**
  * Validate port number
  */
 function validatePort(port) {
     const portNum = typeof port === 'string' ? parseInt(port, 10) : port;
-    if (isNaN(portNum) || portNum < PORT_MIN || portNum > PORT_MAX) {
-        throw new Error(`Port must be between ${PORT_MIN} and ${PORT_MAX}`);
+    if (isNaN(portNum) || portNum < constants_1.PORT_MIN || portNum > constants_1.PORT_MAX) {
+        throw new Error((0, constants_1.PORT_VALIDATION_ERROR_MESSAGE)(constants_1.PORT_MIN, constants_1.PORT_MAX));
     }
     return portNum;
 }
@@ -45,9 +44,11 @@ function createApp(rootPath) {
     app.use((0, security_1.createHelmetMiddleware)(apiUrl));
     app.use((0, security_1.createApiCorsMiddleware)(dashboardUrl));
     // Body parser
-    app.use((0, body_parser_1.json)({ limit: '1mb' }));
+    app.use((0, body_parser_1.json)({ limit: constants_1.BODY_PARSER_LIMIT }));
     // HTTP request logging with Morgan
     app.use(logger_1.httpLogger);
+    // Setup Swagger documentation
+    (0, swagger_middleware_1.setupSwaggerDocs)(app);
     // Routes
     app.use('/api/packages', package_routes_1.default);
     app.use('/api/commits/', commit_routes_1.default);
@@ -71,7 +72,7 @@ function startServer(rootPath) {
         logger_1.AppLogger.info(`Analyzing monorepo at root: ${rootPath}`);
         const app = createApp(rootPath);
         const server = app.listen(validatedPort, host, () => {
-            console.log(`Backend server listening on http://${host}:${validatedPort}`);
+            console.log((0, constants_1.SUCCESS_SERVER_START)(host, validatedPort));
             logger_1.AppLogger.info('API endpoints available:', {
                 endpoints: [
                     'GET  /api/health',
@@ -88,11 +89,11 @@ function startServer(rootPath) {
         });
         server.on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
-                logger_1.AppLogger.error(`Port ${validatedPort} is already in use. Please specify a different port.`, err);
+                logger_1.AppLogger.error((0, constants_1.ERROR_PORT_IN_USE)(validatedPort), err);
                 process.exit(1);
             }
             else if (err.code === 'EACCES') {
-                logger_1.AppLogger.error(`Permission denied to listen on port ${validatedPort}. Use a port above 1024.`, err);
+                logger_1.AppLogger.error((0, constants_1.ERROR_PERMISSION_DENIED)(validatedPort), err);
                 process.exit(1);
             }
             else {
@@ -102,9 +103,9 @@ function startServer(rootPath) {
         });
         // Graceful shutdown
         process.on('SIGTERM', () => {
-            logger_1.AppLogger.info('SIGTERM signal received: closing HTTP server');
+            logger_1.AppLogger.info(constants_1.MESSAGE_GRACEFUL_SHUTDOWN);
             server.close(() => {
-                logger_1.AppLogger.info('HTTP server closed');
+                logger_1.AppLogger.info(constants_1.MESSAGE_SERVER_CLOSED);
                 process.exit(0);
             });
         });

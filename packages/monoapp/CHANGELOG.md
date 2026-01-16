@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.6
+
+### Patch Changes
+
+- updated package.json
+
 ## 1.1.5
 
 ### Patch Changes

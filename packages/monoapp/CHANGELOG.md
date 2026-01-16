@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.3
+
+### Patch Changes
+
+- comment console log in dashboard
+
 ## 1.1.2
 
 ### Patch Changes

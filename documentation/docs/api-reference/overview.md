@@ -19,6 +19,7 @@ http://localhost:8999/api
 - `GET /packages` - List all packages
 - `GET /packages/{NAME}` - Get package details
 - `POST /packages/refresh` - Refresh package data
+- `PUT /packages/update-config` - Update package configuration
 
 ### Health
 - `GET /health/packages` - Get health metrics for all packages

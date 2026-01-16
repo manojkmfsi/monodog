@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.9.2">
 <title data-rh="true">API Overview | Monodog</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://manojkmfsi.github.io/monodog/api-reference/overview"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="API Overview | Monodog"><meta data-rh="true" name="description" content="Monodog has a complete REST API that lets developers access all monorepo data using the HTTP protocol."><meta data-rh="true" property="og:description" content="Monodog has a complete REST API that lets developers access all monorepo data using the HTTP protocol."><link data-rh="true" rel="icon" href="/monodog/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://manojkmfsi.github.io/monodog/api-reference/overview"><link data-rh="true" rel="alternate" href="https://manojkmfsi.github.io/monodog/api-reference/overview" hreflang="en"><link data-rh="true" rel="alternate" href="https://manojkmfsi.github.io/monodog/api-reference/overview" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"API Overview","item":"https://manojkmfsi.github.io/monodog/api-reference/overview"}]}</script><link rel="stylesheet" href="/monodog/assets/css/styles.3802b79d.css">
-<script src="/monodog/assets/js/runtime~main.3e56f433.js" defer="defer"></script>
+<script src="/monodog/assets/js/runtime~main.09d3ee17.js" defer="defer"></script>
 <script src="/monodog/assets/js/main.8f323004.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -19,8 +19,8 @@
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="packages">Packages<a href="#packages" class="hash-link" aria-label="Direct link to Packages" title="Direct link to Packages" translate="no">​</a></h3>
 <ul>
 <li class=""><code>GET /packages</code> - List all packages</li>
-<li class=""><code>GET /packages/{name}</code> - Get package details</li>
-<li class=""><code>GET /packages/refresh</code> - Refresh package data</li>
+<li class=""><code>GET /packages/{NAME}</code> - Get package details</li>
+<li class=""><code>POST /packages/refresh</code> - Refresh package data</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="health">Health<a href="#health" class="hash-link" aria-label="Direct link to Health" title="Direct link to Health" translate="no">​</a></h3>
 <ul>
@@ -29,11 +29,12 @@
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commits">Commits<a href="#commits" class="hash-link" aria-label="Direct link to Commits" title="Direct link to Commits" translate="no">​</a></h3>
 <ul>
-<li class=""><code>GET /commits/{packagePath}</code> - Get commit history</li>
+<li class=""><code>GET /commits/{PACKAGE_PATH}</code> - Get commit history</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="config">Config<a href="#config" class="hash-link" aria-label="Direct link to Config" title="Direct link to Config" translate="no">​</a></h3>
 <ul>
 <li class=""><code>GET /config/files</code> - Get configuration files</li>
+<li class=""><code>PUT /config/files/{ID}</code> - Get configuration files</li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h2>
 <ul>

@@ -152,7 +152,7 @@ Response:
 }
 ```
 
-# Update Package Configuration
+## Update Package Configuration
 
 ```bash
 PUT /api/packages/update-config
@@ -202,10 +202,11 @@ Response:
 }
 ```
 
+
 ## Refresh Packages
 
 ```bash
-GET /api/packages/refresh
+POST /api/packages/refresh
 ```
 Response:
 ```json

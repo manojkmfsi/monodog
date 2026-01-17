@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.8
+
+### Patch Changes
+
+- remove src from package
+
 ## 1.1.7
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.9
+
+### Patch Changes
+
+- remove turbo
+
 ## 1.1.8
 
 ### Patch Changes

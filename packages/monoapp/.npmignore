@@ -1,5 +1,6 @@
-/prisma/*.db
+/prisma/schema/*.db
 /monodog-dashboard/*
 !/monodog-dashboard/dist
+/src
 *__tests__*
 jest.config.js

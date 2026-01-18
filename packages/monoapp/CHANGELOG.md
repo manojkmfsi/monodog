@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.10
+
+### Patch Changes
+
+- Remove config from prod
+
 ## 1.1.9
 
 ### Patch Changes

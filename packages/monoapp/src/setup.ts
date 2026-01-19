@@ -39,6 +39,22 @@ fs.cpSync(packageRoot, destinationPath, {
 // 2. Fix package.json (standalone app)
 fixPackageJson(destinationPath);
 
+function ensureWorkspace(rootDir: string) {
+  const wsPath = path.join(rootDir, 'pnpm-workspace.yaml');
+  if (!fs.existsSync(wsPath)) {console.log('pnpm-workspace.yaml does not exist'); return;}
+
+  const content = fs.readFileSync(wsPath, 'utf8');
+  if (content.includes('monodog')) return;
+
+  const updated = content.replace(
+    /packages:\s*\n/,
+    `packages:\n  - monodog\n`
+  );
+
+  fs.writeFileSync(wsPath, updated);
+}
+// 3. Install deps
+ensureWorkspace(process.cwd());
 execSync('pnpm install', { stdio: 'inherit' });
 execSync('pnpm --filter monodog-app  migrate:reset', { stdio: 'inherit' });
 

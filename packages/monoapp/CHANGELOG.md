@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.15
+
+### Patch Changes
+
+- undo last version
+
 ## 1.1.14
 
 ### Patch Changes

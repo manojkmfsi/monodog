@@ -52,7 +52,7 @@ if (packageScope) {
 
   // Determine the full package name based on scope
   const packageName =
- `@mindfiredigital/${packageScope}`;
+ `@manojkmfsi/${packageScope}`;
 
   // Generate changeset content
   const changesetContent = `---

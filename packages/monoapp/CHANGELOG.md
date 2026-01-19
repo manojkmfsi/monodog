@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.12
+
+### Patch Changes
+
+- updated Frontend icon
+
 ## 1.1.11
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.14
+
+### Patch Changes
+
+- do not update pnpm-workspace
+
 ## 1.1.13
 
 ### Patch Changes

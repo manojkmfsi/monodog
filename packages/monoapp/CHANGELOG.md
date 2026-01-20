@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.16
+
+### Patch Changes
+
+- updated baseurl
+
 ## 1.1.15
 
 ### Patch Changes

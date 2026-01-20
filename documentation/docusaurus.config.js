@@ -8,7 +8,7 @@ const config = {
   favicon: 'img/favicon.ico',
 
   url: 'https://manojkmfsi.github.io',
-  baseUrl: '/MonoDog',
+  baseUrl: '/monodog',
 
   organizationName: 'mindfiredigital',
   projectName: 'MonoDog',

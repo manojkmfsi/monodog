@@ -43,7 +43,7 @@ Monodog provides a REST API for access to all its features. It is already integr
 Install Monodog in your monorepo:
 
 ```bash
-pnpm install --save-dev @mindfiredigital/monodog -w
+pnpm dlx @mindfiredigital/monodog
 ```
 Go to the monodog directory that was created after the installation.
 

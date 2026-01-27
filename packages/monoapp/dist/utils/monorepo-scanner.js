@@ -224,7 +224,6 @@ class MonorepoScanner {
             if (audit && audit.advisories) {
                 for (const key in audit.advisories) {
                     const advisory = audit.advisories[key];
-                    // console.log(advisory.findings);
                     for (const k in advisory.findings) {
                         if (advisory.findings[k].paths && Array.isArray(advisory.findings[k].paths)) {
                             for (const pathStr of advisory.findings[k].paths) {
@@ -269,7 +268,6 @@ class MonorepoScanner {
                     throw new Error(`Failed to parse audit JSON: ${parseError}`);
                 }
             }
-            // Handle actual execution failures (e.g., pnpm not found, timeout)
             throw new Error(`pnpm audit failed: ${error.message}`);
         }
     }

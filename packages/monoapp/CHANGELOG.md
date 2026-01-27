@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.18
+
+### Patch Changes
+
+- remove heroicon dependency
+
 ## 1.1.17
 
 ### Patch Changes

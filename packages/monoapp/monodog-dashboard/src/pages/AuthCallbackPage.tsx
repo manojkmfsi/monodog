@@ -74,20 +74,24 @@ export function AuthCallbackPage() {
   }, [navigate]);
 
   return (
-    <div className="auth-callback-container">
-      <div className="auth-callback-content">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-700 p-5">
+      <div className="bg-white rounded-xl shadow-2xl max-w-sm text-center p-10">
         {isProcessing ? (
           <>
-            <div className="spinner"></div>
-            <h2>Completing Authentication...</h2>
-            <p>Please wait while we verify your GitHub account.</p>
+            {/* Spinner */}
+            <div className="w-10 h-10 border-4 border-gray-200 border-t-indigo-500 rounded-full animate-spin mx-auto my-5"></div>
+            <h2 className="text-2xl font-bold text-gray-900 mt-5 mb-2">Completing Authentication...</h2>
+            <p className="text-gray-700 text-sm leading-relaxed">Please wait while we verify your GitHub account.</p>
           </>
         ) : error ? (
           <>
-            <div className="error-icon">⚠️</div>
-            <h2>Authentication Failed</h2>
-            <p>{error}</p>
-            <button onClick={() => navigate('/login')} className="btn-primary">
+            <div className="text-5xl mb-5">⚠️</div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Authentication Failed</h2>
+            <p className="text-gray-700 text-sm leading-relaxed mb-5">{error}</p>
+            <button
+              onClick={() => navigate('/login')}
+              className="inline-block px-6 py-3 bg-primary-500 text-white rounded-lg font-semibold text-sm cursor-pointer transition-all duration-300 hover:bg-primary-600 hover:-translate-y-0.5 hover:shadow-lg"
+            >
               Return to Login
             </button>
           </>

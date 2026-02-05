@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../services/auth-context';
-import '../styles/auth.css';
 
 export function LoginPage() {
   const { login, isLoading, error } = useAuth();
@@ -12,25 +11,31 @@ export function LoginPage() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>MonoDog</h1>
-          <p>Monorepo Analytics & Management</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-700 p-5">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-br from-primary-500 to-primary-700 text-white p-8 text-center">
+          <h1 className="text-4xl font-bold m-0">MonoDog</h1>
+          <p className="text-sm opacity-90 font-medium mt-2 m-0">Monorepo Analytics & Management</p>
         </div>
 
-        <div className="login-content">
-          <h2>Sign in to your account</h2>
+        {/* Content */}
+        <div className="p-10">
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Sign in to your account</h2>
 
-          {error && <div className="login-error">{error}</div>}
+          {error && (
+            <div className="bg-red-100 text-red-700 px-4 py-3 rounded-lg mb-5 text-sm border-l-4 border-red-700">
+              {error}
+            </div>
+          )}
 
           <button
             onClick={handleLoginClick}
             disabled={isLoading || isInitiating}
-            className="github-login-btn"
+            className="w-full flex items-center justify-center gap-3 px-5 py-3 bg-primary-600 text-white rounded-lg font-semibold text-base cursor-pointer transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:enabled:bg-primary-700 hover:enabled:-translate-y-0.5 hover:enabled:shadow-lg mb-8"
           >
             <svg
-              className="github-icon"
+              className="w-5 h-5"
               viewBox="0 0 24 24"
               fill="currentColor"
             >
@@ -39,43 +44,49 @@ export function LoginPage() {
             Continue with GitHub
           </button>
 
-          <div className="login-divider">
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-8 text-gray-400 text-xs font-semibold uppercase tracking-widest">
+            <div className="flex-1 h-px bg-gray-200"></div>
             <span>GitHub OAuth Authentication</span>
+            <div className="flex-1 h-px bg-gray-200"></div>
           </div>
 
-          <div className="login-info">
-            <h3>Why GitHub OAuth?</h3>
-            <ul>
-              <li>
-                <strong>Secure:</strong> No passwords stored, GitHub handles authentication
+          {/* Info Box */}
+          <div className="bg-gray-50 rounded-lg p-5 mb-5">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Why GitHub OAuth?</h3>
+            <ul className="m-0 p-0 list-none space-y-2">
+              <li className="text-sm text-gray-700 leading-relaxed">
+                <strong className="text-gray-900">Secure:</strong> No passwords stored, GitHub handles authentication
               </li>
-              <li>
-                <strong>Permissions:</strong> Your permissions are automatically synced from GitHub
+              <li className="text-sm text-gray-700 leading-relaxed">
+                <strong className="text-gray-900">Permissions:</strong> Your permissions are automatically synced from GitHub
               </li>
-              <li>
-                <strong>Single Source of Truth:</strong> GitHub remains your authority
+              <li className="text-sm text-gray-700 leading-relaxed">
+                <strong className="text-gray-900">Single Source of Truth:</strong> GitHub remains your authority
               </li>
             </ul>
           </div>
 
-          <div className="login-scopes">
-            <h4>Requested Permissions</h4>
-            <ul>
-              <li>
-                <code>read:user</code> - Read your profile information
+          {/* Scopes Box */}
+          <div className="bg-primary-50 rounded-lg p-5 border-l-4 border-primary-500">
+            <h4 className="text-xs font-semibold text-gray-900 mb-3 uppercase tracking-wide">Requested Permissions</h4>
+            <ul className="m-0 p-0 list-none space-y-2">
+              <li className="text-sm text-gray-700">
+                <code className="bg-white text-primary-500 px-1.5 py-0.5 rounded text-xs font-semibold">read:user</code> - Read your profile information
               </li>
-              <li>
-                <code>user:email</code> - Access your email address
+              <li className="text-sm text-gray-700">
+                <code className="bg-white text-primary-500 px-1.5 py-0.5 rounded text-xs font-semibold">user:email</code> - Access your email address
               </li>
-              <li>
-                <code>repo</code> - Access your repositories (required for private repos)
+              <li className="text-sm text-gray-700">
+                <code className="bg-white text-primary-500 px-1.5 py-0.5 rounded text-xs font-semibold">repo</code> - Access your repositories (required for private repos)
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="login-footer">
-          <p>
+        {/* Footer */}
+        <div className="bg-gray-50 px-10 py-5 border-t border-gray-200 text-center">
+          <p className="text-xs text-gray-500 leading-relaxed m-0">
             By signing in, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>

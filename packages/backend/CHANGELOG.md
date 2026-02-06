@@ -1,5 +1,23 @@
 # @monodog/backend
 
+## 1.5.9
+
+### Patch Changes
+
+- [#144](https://github.com/manojkmfsi/monodog/pull/144) [`9371ba3`](https://github.com/manojkmfsi/monodog/commit/9371ba3ac32678c8b6cc9d33132fb99bec031492) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - nm n,m nm, m m
+
+- [#144](https://github.com/manojkmfsi/monodog/pull/144) [`9371ba3`](https://github.com/manojkmfsi/monodog/commit/9371ba3ac32678c8b6cc9d33132fb99bec031492) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - vbbjbjnjnjn
+
+- [#144](https://github.com/manojkmfsi/monodog/pull/144) [`9371ba3`](https://github.com/manojkmfsi/monodog/commit/9371ba3ac32678c8b6cc9d33132fb99bec031492) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - nmnmnmnmnmnnmm
+
+- [#144](https://github.com/manojkmfsi/monodog/pull/144) [`9371ba3`](https://github.com/manojkmfsi/monodog/commit/9371ba3ac32678c8b6cc9d33132fb99bec031492) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - vgghgjk,mlkmlk
+
+- [#144](https://github.com/manojkmfsi/monodog/pull/144) [`edfa6e2`](https://github.com/manojkmfsi/monodog/commit/edfa6e2ecdebfae5297f16941e7ae06f4f73ae01) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - dfdfdfdfdfdfd
+
+- Updated dependencies [[`338fbc1`](https://github.com/manojkmfsi/monodog/commit/338fbc1b1d3148c2c0f3fd170eb8f5c59ba26c10), [`f12be2f`](https://github.com/manojkmfsi/monodog/commit/f12be2f7957addf81a9e07e357910e743e9a32a5)]:
+  - @monodog/ci-status@1.1.6
+  - @monodog/monorepo-scanner@1.0.10
+
 ## 1.5.8
 
 ### Patch Changes

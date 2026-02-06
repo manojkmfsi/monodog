@@ -1,5 +1,11 @@
 # @monodog/backend
 
+## 1.5.10
+
+### Patch Changes
+
+- [#146](https://github.com/manojkmfsi/monodog/pull/146) [`2ad5445`](https://github.com/manojkmfsi/monodog/commit/2ad5445d3e1ee748b7de152475d5aa82296f9102) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - n,kkmkjkjlkjlkm,
+
 ## 1.5.9
 
 ### Patch Changes

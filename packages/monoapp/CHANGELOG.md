@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.21
+
+### Patch Changes
+
+- [#150](https://github.com/manojkmfsi/monodog/pull/150) [`2546521`](https://github.com/manojkmfsi/monodog/commit/2546521b07923a673b1d908d3524a46a0e608502) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - jlknjkjlkjlkjlkl
+
 ## 1.1.20
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@monodog/monorepo-scanner",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Monorepo scanner for analyzing packages, dependencies, and health",
   "main": "dist/index.js",
   "license": "MIT",

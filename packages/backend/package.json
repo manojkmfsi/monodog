@@ -1,6 +1,6 @@
 {
   "name": "@monodog/backend",
-  "version": "1.5.14",
+  "version": "1.5.15",
   "description": "Backend API server for monodog monorepo dashboard",
   "private": false,
   "license": "MIT",
@@ -23,9 +23,9 @@
     "serve": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') node dist/cli.js --serve --root ../../"
   },
   "dependencies": {
-    "@monodog/ci-status": "1.1.10",
-    "@monodog/monorepo-scanner": "1.0.12",
-    "@monodog/utils": "1.0.3",
+    "@monodog/ci-status": "1.1.11",
+    "@monodog/monorepo-scanner": "1.0.13",
+    "@monodog/utils": "1.0.4",
     "@prisma/client": "^5.7.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",

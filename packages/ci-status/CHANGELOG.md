@@ -1,5 +1,18 @@
 # @monodog/ci-status
 
+## 1.1.11
+
+### Patch Changes
+
+- [#156](https://github.com/manojkmfsi/monodog/pull/156) [`3df96f6`](https://github.com/manojkmfsi/monodog/commit/3df96f699f8c8e7dd71f305565ca75cdac92e107) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - fhgghjgkkhhj
+
+- [#156](https://github.com/manojkmfsi/monodog/pull/156) [`3df96f6`](https://github.com/manojkmfsi/monodog/commit/3df96f699f8c8e7dd71f305565ca75cdac92e107) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - vvcxvcvcbvcvv
+
+- [#156](https://github.com/manojkmfsi/monodog/pull/156) [`3df96f6`](https://github.com/manojkmfsi/monodog/commit/3df96f699f8c8e7dd71f305565ca75cdac92e107) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - cddcxcvxcvcvfdvdv
+
+- Updated dependencies [[`3df96f6`](https://github.com/manojkmfsi/monodog/commit/3df96f699f8c8e7dd71f305565ca75cdac92e107)]:
+  - @monodog/utils@1.0.4
+
 ## 1.1.10
 
 ### Patch Changes

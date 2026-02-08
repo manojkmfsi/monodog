@@ -4,11 +4,16 @@
     "@changesets/changelog-github",
     { "repo": "manojkmfsi/monodog" }
   ],
-  "commit": false,
+  "commit": true,
+  "commitMessage": "chore(release): apply changesets [skip ci]",
   "fixed": [],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": [],
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  }
 }

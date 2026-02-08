@@ -1,0 +1,150 @@
+/**
+ * Release Manager Styles
+ */
+
+.release-manager-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.release-step {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Progress indicator */
+.progress-bar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.progress-bar-item {
+  flex: 1;
+  height: 0.5rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s ease;
+}
+
+.progress-bar-item.active {
+  @apply bg-primary-500;
+}
+
+.progress-bar-item.inactive {
+  @apply bg-gray-300;
+}
+
+/* Package selector list */
+.package-list {
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.package-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.package-item:hover {
+  background-color: #f9fafb;
+}
+
+.package-item.selected {
+  background-color: #f0fdf4;
+}
+
+/* Version bump selection */
+.bump-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.bump-option {
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.bump-option:hover {
+  border-color: #d1d5db;
+}
+
+.bump-option.selected {
+  @apply border-primary-600 bg-primary-50 text-primary-700;
+}
+
+/* Validation checks */
+.validation-check {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.check-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.check-icon.passed {
+  @apply bg-green-500;
+}
+
+.check-icon.failed {
+  @apply bg-red-500;
+}
+
+/* Confirmation page */
+.confirmation-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  margin: 0 auto;
+  @apply bg-green-100;
+}
+
+.confirmation-icon svg {
+  @apply text-green-600;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .bump-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .release-step {
+    padding: 1rem;
+  }
+}

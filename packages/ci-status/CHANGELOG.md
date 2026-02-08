@@ -1,5 +1,11 @@
 # @monodog/ci-status
 
+## 1.1.13
+
+### Patch Changes
+
+- [#160](https://github.com/manojkmfsi/monodog/pull/160) [`318cc9d`](https://github.com/manojkmfsi/monodog/commit/318cc9d01ed1c7436fe30c673cb1c1be48f3b0c5) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - csscdcdcdssxs
+
 ## 1.1.12
 
 ### Patch Changes

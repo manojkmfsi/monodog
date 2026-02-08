@@ -1,5 +1,14 @@
 # @monodog/backend
 
+## 1.5.16
+
+### Patch Changes
+
+- [#158](https://github.com/manojkmfsi/monodog/pull/158) [`50cb7a8`](https://github.com/manojkmfsi/monodog/commit/50cb7a849f174c3ad9958ca16a282daab0211a12) Thanks [@manojkmfsi](https://github.com/manojkmfsi)! - fdsddsfdfdf
+
+- Updated dependencies [[`50cb7a8`](https://github.com/manojkmfsi/monodog/commit/50cb7a849f174c3ad9958ca16a282daab0211a12), [`50cb7a8`](https://github.com/manojkmfsi/monodog/commit/50cb7a849f174c3ad9958ca16a282daab0211a12)]:
+  - @monodog/ci-status@1.1.12
+
 ## 1.5.15
 
 ### Patch Changes

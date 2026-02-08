@@ -55,6 +55,13 @@ export const routes: RouteConfig[] = [
     description: 'Package publishing and versioning',
   },
   {
+    path: '/release',
+    name: 'release',
+    component: 'ReleaseManager',
+    title: 'Release Manager',
+    description: 'Comprehensive release management with Changesets',
+  },
+  {
     path: '/ci',
     name: 'ci',
     component: 'CIIntegration',

@@ -1,6 +1,6 @@
 /**
  * Release Manager Component
- * 
+ *
  * Comprehensive UI-driven version control and package publishing for monorepos using Changesets.
  * Allows users to:
  * - Select packages and version bumps
@@ -67,7 +67,7 @@ export default function ReleaseManager() {
       setLoading(true);
       const apiUrl = (window as any).ENV?.API_URL ?? 'http://localhost:8999';
       const API_BASE = `${apiUrl}/api`;
-      
+
       // Get auth token from localStorage
       const token = localStorage.getItem('monodog_session_token');
       const headers = {
@@ -99,6 +99,10 @@ export default function ReleaseManager() {
       if (changesetsRes.ok) {
         const changesetsData = await changesetsRes.json();
         setExistingChangesets(changesetsData.changesets || []);
+      } else {
+        if (changesetsRes.status === 401 || changesetsRes.status === 403) {
+          window.location.href = '/login';
+        }
       }
 
       setError(null);
@@ -138,7 +142,7 @@ export default function ReleaseManager() {
       setLoading(true);
       const apiUrl = (window as any).ENV?.API_URL ?? 'http://localhost:8999';
       const API_BASE = `${apiUrl}/api`;
-      
+
       // Get auth token from localStorage
       const token = localStorage.getItem('monodog_session_token');
       const headers = {
@@ -164,7 +168,7 @@ export default function ReleaseManager() {
       }
 
       const result = await response.json();
-      
+
       // Ensure the result has the expected structure
       const validationData: ValidationResult = {
         isValid: result.isValid ?? true,
@@ -177,7 +181,7 @@ export default function ReleaseManager() {
           versionAvailable: true,
         },
       };
-      
+
       setValidationResult(validationData);
       setCurrentStep('validate');
       setError(null);
@@ -195,7 +199,7 @@ export default function ReleaseManager() {
       setLoading(true);
       const apiUrl = (window as any).ENV?.API_URL ?? 'http://localhost:8999';
       const API_BASE = `${apiUrl}/api`;
-      
+
       // Get auth token from localStorage
       const token = localStorage.getItem('monodog_session_token');
       const headers = {

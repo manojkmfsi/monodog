@@ -1,5 +1,14 @@
 # @monodog/ci-status
 
+## 1.2.5
+
+### Patch Changes
+
+- [`a05d755`](https://github.com/manojkmfsi/monodog/commit/a05d755a3d8e7eda67c8f8927c50e3b32b7f5d86) - cddfdsfesfdwadwa
+
+- Updated dependencies [[`08519f2`](https://github.com/manojkmfsi/monodog/commit/08519f2b4261167f0635bc31f22d55447a2cbb28)]:
+  - @monodog/utils@1.0.7
+
 ## 1.2.4
 
 ### Patch Changes

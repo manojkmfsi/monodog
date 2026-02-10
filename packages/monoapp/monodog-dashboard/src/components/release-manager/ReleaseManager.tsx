@@ -57,6 +57,12 @@ export default function ReleaseManager() {
   const [allPackages, setAllPackages] = useState<any[]>([]);
   const [existingChangesets, setExistingChangesets] = useState<any[]>([]);
 
+  // Debug: Log permission state
+  useEffect(() => {
+    console.log('[ReleaseManager] hasPermission function available:', typeof hasPermission);
+    console.log('[ReleaseManager] canCreateChangeset check:', hasPermission('write'));
+  }, [hasPermission]);
+
   // Fetch workspace packages on mount
   useEffect(() => {
     fetchWorkspaceData();
@@ -196,6 +202,12 @@ export default function ReleaseManager() {
 
   const handlePublishConfirmed = async () => {
     try {
+      // Check permission before publishing
+      if (!hasPermission('maintain')) {
+        setError('You do not have permission to publish packages. Required: maintain permission');
+        return;
+      }
+
       setLoading(true);
       const apiUrl = (window as any).ENV?.API_URL ?? 'http://localhost:8999';
       const API_BASE = `${apiUrl}/api`;
@@ -273,6 +285,10 @@ export default function ReleaseManager() {
     return <ErrorState error={error} onRetry={fetchWorkspaceData} />;
   }
 
+  // Check if user has required permissions
+  const canCreateChangeset = hasPermission('write');
+  const canPublish = hasPermission('maintain');
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -287,6 +303,16 @@ export default function ReleaseManager() {
           Step {['select', 'bump', 'preview', 'validate', 'confirm'].indexOf(currentStep) + 1} of 5
         </div>
       </div>
+
+      {/* Permission Check */}
+      {!canCreateChangeset && (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-yellow-700 font-medium">⚠️ Limited Access</p>
+          <p className="text-yellow-600 text-sm mt-1">
+            You do not have write permission to create and publish changesets. Contact your repository administrator to request access.
+          </p>
+        </div>
+      )}
 
       {/* Error Alert */}
       {error && (
@@ -309,7 +335,16 @@ export default function ReleaseManager() {
       )}
 
       {/* Step Content */}
-      {currentStep === 'select' && (
+      {currentStep === 'select' && !canCreateChangeset && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700 font-medium">🚫 Access Denied</p>
+          <p className="text-red-600 text-sm mt-1">
+            You do not have write permission to create changesets. Contact your repository administrator.
+          </p>
+        </div>
+      )}
+
+      {currentStep === 'select' && canCreateChangeset && (
         <PackageSelector
           packages={allPackages}
           onConfirm={handlePackagesSelected}
@@ -317,7 +352,7 @@ export default function ReleaseManager() {
         />
       )}
 
-      {currentStep === 'bump' && (
+      {currentStep === 'bump' && canCreateChangeset && (
         <VersionBumpSelector
           packages={selectedPackages}
           onConfirm={handleVersionBumpsConfirmed}
@@ -325,17 +360,25 @@ export default function ReleaseManager() {
         />
       )}
 
-      {currentStep === 'preview' && (
+      {currentStep === 'preview' && canCreateChangeset && (
         <ChangesetPreview
           packages={selectedPackages}
           existingChangesets={existingChangesets}
           onConfirm={handlePreviewConfirmed}
-          onBack={() => setCurrentStep('bump')}
+          onBack={() => setCurrentStep('select')}
           loading={loading}
         />
       )}
 
-      {currentStep === 'validate' && validationResult && (
+      {currentStep === 'validate' && !canPublish && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700 font-medium">🚫 Access Denied</p>
+          <p className="text-red-600 text-sm mt-1">
+            You do not have maintain permission to publish changesets. Contact your repository administrator.
+          </p>
+        </div>
+      )}
+      {currentStep === 'validate' && canPublish && validationResult && (
         <ReleaseValidation
           validation={validationResult}
           packages={selectedPackages}

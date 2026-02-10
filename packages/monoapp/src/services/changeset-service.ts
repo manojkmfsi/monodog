@@ -9,6 +9,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { AppLogger } from '../middleware/logger';
 import { getPackagesService } from './package-service';
+import { getRepositoryInfoFromGit } from '../utils/utilities';
 
 const execPromise = promisify(exec);
 
@@ -155,7 +156,8 @@ export async function generateChangeset(
   rootPath: string,
   packages: string[],
   bumps: Array<{ package: string; bumpType: VersionBump }>,
-  summary: string
+  summary: string,
+  createdBy?: string
 ): Promise<{ success: boolean; message: string; changeset?: string }> {
   try {
     // Validate input
@@ -194,7 +196,7 @@ export async function generateChangeset(
     // Write changeset file
     await fs.writeFile(changesetPath, content, 'utf-8');
 
-    AppLogger.info(`Changeset created: ${changesetName}`);
+    AppLogger.info(`Changeset created: ${changesetName} by user: ${createdBy || 'unknown'}`);
     return {
       success: true,
       message: 'Changeset created successfully',
@@ -227,9 +229,12 @@ export async function isWorkingTreeClean(rootPath: string): Promise<boolean> {
  * Trigger CI pipeline for publishing
  */
 export async function triggerPublishPipeline(
-  rootPath: string
+  rootPath: string,
+  publishedBy?: string
 ): Promise<{ success: boolean; message: string; result?: any }> {
   try {
+    AppLogger.info(`Publishing workflow triggered by user: ${publishedBy || 'unknown'}`);
+
     // Check if publish workflow exists
     const publishWorkflowPath = path.join(
       rootPath,
@@ -286,47 +291,7 @@ export async function triggerPublishPipeline(
       // Continue anyway - changesets might already be committed
     }
 
-    // Trigger the workflow via GitHub API if we have a token
-    try {
-      const githubToken = process.env.GITHUB_TOKEN;
-      if (githubToken) {
-        // Get repo info from package.json or git remote
-        const { stdout: remoteUrl } = await execPromise('git remote get-url origin', {
-          cwd: rootPath,
-        });
 
-        // Parse GitHub repo from URL (e.g., git@github.com:user/repo.git)
-        const repoMatch = remoteUrl.match(/github\.com[:/]([^/]+)\/(.+?)(\.git)?$/);
-        if (repoMatch) {
-          const [, owner, repo] = repoMatch;
-          const repoName = repo.replace(/\.git$/, '');
-
-          // Trigger the workflow
-          const response = await fetch(
-            `https://api.github.com/repos/${owner}/${repoName}/actions/workflows/release.yml/dispatches`,
-            {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${githubToken}`,
-                Accept: 'application/vnd.github.v3+json',
-              },
-              body: JSON.stringify({
-                ref: 'main',
-              }),
-            }
-          );
-
-          if (response.ok) {
-            AppLogger.info('GitHub workflow triggered successfully');
-          } else {
-            AppLogger.warn(`Failed to trigger workflow: ${response.statusText}`);
-          }
-        }
-      }
-    } catch (workflowError) {
-      AppLogger.warn(`Failed to trigger workflow: ${workflowError}`);
-      // Still return success as the changeset was created
-    }
 
     AppLogger.info('Publish pipeline initiated');
     return {

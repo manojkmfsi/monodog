@@ -19,8 +19,9 @@ import {
   authenticationMiddleware,
   getSessionFromRequest,
 } from '../middleware/auth-middleware';
-import { startCacheCleanup } from '../services/permission-service';
+import { getUserRepositoryPermission, startCacheCleanup } from '../services/permission-service';
 import { AppLogger } from '../middleware/logger';
+import { getRepositoryInfoFromGit } from '../utils/utilities';
 
 const router = Router();
 
@@ -182,13 +183,41 @@ router.get('/callback', async (req: Request, res: Response) => {
     AppLogger.debug('Retrieving authenticated user information');
     const user = await getAuthenticatedUser(tokenResponse.access_token);
 
-    // Create session
+    // Fetch user's repository permission
+    let permission = null;
+    try {
+      AppLogger.debug(`Fetching repository permission for user ${user.login}`);
+
+      // Extract repository info from git remote
+      const repoInfo = await getRepositoryInfoFromGit();
+
+      if (!repoInfo) {
+        AppLogger.warn('Could not extract repository info from git remote - permission fetch skipped');
+      } else {
+        const { owner, repo } = repoInfo;
+        permission = await getUserRepositoryPermission(
+          tokenResponse.access_token,
+          user.id,
+          user.login,
+          owner,
+          repo
+        );
+        AppLogger.info(`User ${user.login} has ${permission.permission} permission on ${owner}/${repo}`);
+      }
+    } catch (permError) {
+      AppLogger.error(`Failed to fetch repository permission: ${permError}`);
+      // Continue without permission - will be checked on protected routes
+      permission = null;
+    }
+
+    // Create session with permission
     const session: AuthSession = {
       accessToken: tokenResponse.access_token,
       expiresIn: 3600, // 1 hour default
       expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
       user,
       scopes: tokenResponse.scope.split(','),
+      permission, // Include fetched permission in session
     };
 
     // Store session and get token
@@ -200,7 +229,7 @@ router.get('/callback', async (req: Request, res: Response) => {
     // Clear state
     clearState(state as string);
 
-    AppLogger.info(`User authenticated: ${user.login}`);
+    AppLogger.info(`User authenticated: ${user.login} with permission: ${permission?.permission || 'unknown'}`);
 
     res.json({
       success: true,
@@ -213,6 +242,10 @@ router.get('/callback', async (req: Request, res: Response) => {
         name: user.name,
         avatar_url: user.avatar_url,
       },
+      permission: permission ? {
+        level: permission.permission,
+        role: permission.role,
+      } : null,
     });
   } catch (error) {
     AppLogger.error(`OAuth callback failed: ${error}`);
@@ -254,6 +287,7 @@ router.get('/me', authenticationMiddleware, (req: Request, res: Response) => {
       },
       scopes: session.scopes,
       expiresAt: session.expiresAt,
+      permission: session.permission || null,
     });
   } catch (error) {
     AppLogger.error(`Failed to get user session: ${error}`);

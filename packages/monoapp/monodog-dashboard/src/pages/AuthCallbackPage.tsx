@@ -51,7 +51,7 @@ export function AuthCallbackPage() {
         // Use the auth context to handle the session
         const authContext = (window as any).__authContext;
         if (authContext && authContext.handleOAuthCallback) {
-          const success = await authContext.handleOAuthCallback(data.sessionToken);
+          const success = await authContext.handleOAuthCallback(data.sessionToken, data.permission);
           if (success) {
             // Redirect to the app
             const redirectUrl = data.redirectUrl || '/';

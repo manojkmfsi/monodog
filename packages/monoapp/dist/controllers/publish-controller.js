@@ -7,6 +7,7 @@ exports.createChangeset = createChangeset;
 exports.checkPublishStatus = checkPublishStatus;
 exports.triggerPublish = triggerPublish;
 const logger_1 = require("../middleware/logger");
+const auth_middleware_1 = require("../middleware/auth-middleware");
 const changeset_service_1 = require("../services/changeset-service");
 /**
  * Get all workspace packages
@@ -80,17 +81,34 @@ async function previewPublish(req, res) {
         // Perform validation checks
         const errors = [];
         const warnings = [];
+        // Get authenticated user
+        const session = (0, auth_middleware_1.getSessionFromRequest)(req);
+        const authUser = req.user;
+        const userPermission = req.permission.permission || 'read';
         // Check 1: Working tree clean
         const workingTreeClean = isClean;
         if (!workingTreeClean) {
             errors.push('Working tree has uncommitted changes');
         }
-        // Check 2: User permissions (simplified - always true for now)
-        const permissions = true;
+        // Check 2: User permissions
+        const permissionHierarchy = {
+            admin: 4,
+            maintain: 3,
+            write: 2,
+            read: 1,
+            none: 0,
+        };
+        const userLevel = permissionHierarchy[userPermission] || 0;
+        const requiredLevel = permissionHierarchy['write'] || 0;
+        const permissions = userLevel >= requiredLevel;
+        if (!permissions) {
+            errors.push(`Insufficient permissions. Required: write, Got: ${userPermission}`);
+        }
         // Check 3: CI passing (simplified - always true for now)
         const ciPassing = true;
         // Check 4: Version available on npm (simplified - always true for now)
         const versionAvailable = true;
+        logger_1.AppLogger.info(`Publishing preview for user: ${authUser?.login} (permission: ${userPermission})`);
         const isValid = errors.length === 0;
         res.json({
             success: true,
@@ -126,6 +144,8 @@ async function previewPublish(req, res) {
 async function createChangeset(req, res) {
     try {
         const { packages: selectedPackageNames, bumps, summary } = req.body;
+        const authUser = req.user;
+        const userPermission = req.permission.permission || 'read';
         if (!selectedPackageNames || !Array.isArray(selectedPackageNames)) {
             res.status(400).json({
                 success: false,
@@ -142,9 +162,29 @@ async function createChangeset(req, res) {
             });
             return;
         }
+        // Check permissions
+        const permissionHierarchy = {
+            admin: 4,
+            maintain: 3,
+            write: 2,
+            read: 1,
+            none: 0,
+        };
+        const userLevel = permissionHierarchy[userPermission] || 0;
+        const requiredLevel = permissionHierarchy['write'] || 0;
+        if (userLevel < requiredLevel) {
+            logger_1.AppLogger.warn(`User ${authUser?.login} attempted to create changeset without write permission`);
+            res.status(403).json({
+                success: false,
+                error: 'Forbidden',
+                message: `This action requires write permission. You have: ${userPermission}`,
+            });
+            return;
+        }
         const rootPath = req.app.locals.rootPath;
+        logger_1.AppLogger.info(`Creating changeset for user: ${authUser?.login} (permission: ${userPermission})`);
         // Generate the changeset
-        const result = await (0, changeset_service_1.generateChangeset)(rootPath, selectedPackageNames, bumps || [], summary);
+        const result = await (0, changeset_service_1.generateChangeset)(rootPath, selectedPackageNames, bumps || [], summary, authUser?.login);
         if (!result.success) {
             res.status(400).json({
                 success: false,
@@ -202,6 +242,27 @@ async function checkPublishStatus(req, res) {
 async function triggerPublish(req, res) {
     try {
         const rootPath = req.app.locals.rootPath;
+        const authUser = req.user;
+        const userPermission = req.permission.permission || 'read';
+        // Check permissions
+        const permissionHierarchy = {
+            admin: 4,
+            maintain: 3,
+            write: 2,
+            read: 1,
+            none: 0,
+        };
+        const userLevel = permissionHierarchy[userPermission] || 0;
+        const requiredLevel = permissionHierarchy['maintain'] || 0;
+        if (userLevel < requiredLevel) {
+            logger_1.AppLogger.warn(`User ${authUser?.login} attempted to trigger publish without maintain permission`);
+            res.status(403).json({
+                success: false,
+                error: 'Forbidden',
+                message: `This action requires maintain permission. You have: ${userPermission}`,
+            });
+            return;
+        }
         // Check if working tree is clean
         const isClean = true; //await isWorkingTreeClean(rootPath);
         if (!isClean) {
@@ -222,8 +283,9 @@ async function triggerPublish(req, res) {
             });
             return;
         }
-        // Trigger publish pipeline
-        const result = await (0, changeset_service_1.triggerPublishPipeline)(rootPath);
+        logger_1.AppLogger.info(`Triggering publish for user: ${authUser?.login} (permission: ${userPermission})`);
+        // Trigger publish pipeline with user context
+        const result = await (0, changeset_service_1.triggerPublishPipeline)(rootPath, authUser?.login);
         if (!result.success) {
             res.status(500).json({
                 success: false,

@@ -27,6 +27,7 @@ export interface AuthSession {
   user: GitHubUser;
   scopes: string[];
   expiresAt: number;
+  permission?: any; // User's repository permission level
 }
 
 export interface AuthContextType {
@@ -38,6 +39,8 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   checkSession: () => Promise<boolean>;
   refreshSession: () => Promise<boolean>;
+  hasPermission: (requiredPermission: string) => boolean;
+  permission: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -113,7 +116,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
    * Handle OAuth callback and store session
    */
   const handleOAuthCallback = useCallback(
-    async (sessionToken: string) => {
+    async (sessionToken: string, permissionData?: any) => {
       try {
         setIsLoading(true);
         setError(null);
@@ -139,18 +142,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
           expiresAt: userData.expiresAt,
         };
 
-        // Store session
+        // Store session with permission
+        const sessionData = {
+          user: userData.user,
+          scopes: userData.scopes || [],
+          permission: permissionData || userData.permission,
+          expiresAt: userData.expiresAt,
+        };
         localStorage.setItem(SESSION_TOKEN_KEY, sessionToken);
-        localStorage.setItem(
-          SESSION_DATA_KEY,
-          JSON.stringify({
-            user: userData.user,
-            scopes: userData.scopes || [],
-            expiresAt: userData.expiresAt,
-          })
-        );
+        localStorage.setItem(SESSION_DATA_KEY, JSON.stringify(sessionData));
 
-        setSession(newSession);
+        // Set session with permission
+        const sessionWithPermission = {
+          ...newSession,
+          ...sessionData,
+        } as any;
+        setSession(sessionWithPermission);
         return true;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Auth failed';
@@ -289,6 +296,53 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => clearInterval(interval);
   }, [session, checkSession]);
 
+  /**
+   * Check if user has required permission
+   */
+  const hasPermission = useCallback((requiredPermission: string): boolean => {
+    if (!session) {
+      console.warn('[Auth] No session available for permission check');
+      return false;
+    }
+
+    const permissionHierarchy: Record<string, number> = {
+      admin: 4,
+      maintain: 3,
+      write: 2,
+      read: 1,
+      none: 0,
+    };
+
+    // Get user's permission from session or default to 'read'
+    // Permission can be in multiple formats:
+    // 1. String: 'write', 'admin', etc.
+    // 2. OAuth response object: { level: "write", role: "Collaborator" }
+    // 3. CachedPermission object: { permission: "write", role: "Collaborator", userId, username, owner, repo, cachedAt, ttl }
+    let userPermissionString = 'read';
+    const sessionPermission = (session as any)?.permission;
+
+    if (typeof sessionPermission === 'string') {
+      // Format 1: Direct string
+      userPermissionString = sessionPermission;
+    } else if (sessionPermission && typeof sessionPermission === 'object') {
+      // Format 2: Check for 'level' property (OAuth response format)
+      if (sessionPermission.level) {
+        userPermissionString = sessionPermission.level;
+      }
+      // Format 3: Check for 'permission' property (CachedPermission format)
+      else if (sessionPermission.permission) {
+        userPermissionString = sessionPermission.permission;
+      }
+    }
+
+    const userLevel = permissionHierarchy[userPermissionString] || 0;
+    const requiredLevel = permissionHierarchy[requiredPermission] || 0;
+
+    console.debug(`[Auth] Permission check: user=${userPermissionString}(${userLevel}) required=${requiredPermission}(${requiredLevel}) result=${userLevel >= requiredLevel}`);
+
+    return userLevel >= requiredLevel;
+  }, [session]);
+
   const value: AuthContextType = {
     session,
     isAuthenticated: !!session,
@@ -298,6 +352,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logout,
     checkSession,
     refreshSession,
+    hasPermission,
+    permission: (() => {
+      const perm = (session as any)?.permission;
+      if (!perm) return null;
+      // Handle both OAuth format { level, role } and CachedPermission format { permission, role, ... }
+      return perm.level || perm.permission || null;
+    })(),
   };
 
   // Expose handleOAuthCallback for use in callback page

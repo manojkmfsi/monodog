@@ -7,7 +7,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const github_oauth_service_1 = require("../services/github-oauth-service");
 const auth_middleware_1 = require("../middleware/auth-middleware");
+const permission_service_1 = require("../services/permission-service");
 const logger_1 = require("../middleware/logger");
+const utilities_1 = require("../utils/utilities");
 const router = (0, express_1.Router)();
 // OAuth configuration (should come from environment variables)
 // const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '';
@@ -138,13 +140,34 @@ router.get('/callback', async (req, res) => {
         // Get user information
         logger_1.AppLogger.debug('Retrieving authenticated user information');
         const user = await (0, github_oauth_service_1.getAuthenticatedUser)(tokenResponse.access_token);
-        // Create session
+        // Fetch user's repository permission
+        let permission = null;
+        try {
+            logger_1.AppLogger.debug(`Fetching repository permission for user ${user.login}`);
+            // Extract repository info from git remote
+            const repoInfo = await (0, utilities_1.getRepositoryInfoFromGit)();
+            if (!repoInfo) {
+                logger_1.AppLogger.warn('Could not extract repository info from git remote - permission fetch skipped');
+            }
+            else {
+                const { owner, repo } = repoInfo;
+                permission = await (0, permission_service_1.getUserRepositoryPermission)(tokenResponse.access_token, user.id, user.login, owner, repo);
+                logger_1.AppLogger.info(`User ${user.login} has ${permission.permission} permission on ${owner}/${repo}`);
+            }
+        }
+        catch (permError) {
+            logger_1.AppLogger.error(`Failed to fetch repository permission: ${permError}`);
+            // Continue without permission - will be checked on protected routes
+            permission = null;
+        }
+        // Create session with permission
         const session = {
             accessToken: tokenResponse.access_token,
             expiresIn: 3600, // 1 hour default
             expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
             user,
             scopes: tokenResponse.scope.split(','),
+            permission, // Include fetched permission in session
         };
         // Store session and get token
         const sessionToken = (0, auth_middleware_1.storeSession)(session);
@@ -152,7 +175,7 @@ router.get('/callback', async (req, res) => {
         const redirectUrl = getRedirectUrl(state) || '/';
         // Clear state
         clearState(state);
-        logger_1.AppLogger.info(`User authenticated: ${user.login}`);
+        logger_1.AppLogger.info(`User authenticated: ${user.login} with permission: ${permission?.permission || 'unknown'}`);
         res.json({
             success: true,
             message: 'Authentication successful',
@@ -164,6 +187,10 @@ router.get('/callback', async (req, res) => {
                 name: user.name,
                 avatar_url: user.avatar_url,
             },
+            permission: permission ? {
+                level: permission.permission,
+                role: permission.role,
+            } : null,
         });
     }
     catch (error) {
@@ -203,6 +230,7 @@ router.get('/me', auth_middleware_1.authenticationMiddleware, (req, res) => {
             },
             scopes: session.scopes,
             expiresAt: session.expiresAt,
+            permission: session.permission || null,
         });
     }
     catch (error) {

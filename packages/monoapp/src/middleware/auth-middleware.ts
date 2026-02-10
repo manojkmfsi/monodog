@@ -100,9 +100,31 @@ export function authenticationMiddleware(
     return;
   }
 
-  // Attach session to request
+  // Attach session and user info to request
   (req as any).session = session;
-  AppLogger.debug(`Authenticated request from user: ${session.user.login}`);
+  (req as any).user = {
+    login: session.user.login,
+    id: session.user.id,
+  };
+
+  // Attach permission from session (if available)
+  if (session.permission) {
+    (req as any).permission = session.permission;
+  } else {
+    // Default to 'read' if no permission fetched
+    (req as any).permission = {
+      permission: 'read',
+      role: 'Denied',
+      userId: session.user.id,
+      username: session.user.login,
+      owner: '',
+      repo: '',
+      cachedAt: Date.now(),
+      ttl: 0,
+    };
+  }
+
+  AppLogger.debug(`Authenticated request from user: ${session.user.login} with permission: ${(req as any).permission?.permission || 'unknown'}`);
   next();
 }
 
@@ -140,12 +162,14 @@ export function repositoryPermissionMiddleware(requiredPermission: string) {
       none: 0,
     };
 
-    const userLevel = permissionHierarchy[permission.permission] || 0;
+    // Handle both string and object formats for permission
+    const userPermissionString = typeof permission === 'string' ? permission : (permission.permission || 'none');
+    const userLevel = permissionHierarchy[userPermissionString] || 0;
     const requiredLevel = permissionHierarchy[requiredPermission] || 0;
 
     if (userLevel < requiredLevel) {
       AppLogger.warn(
-        `User ${session.user.login} lacks permission for action requiring ${requiredPermission}`
+        `User ${session.user.login} lacks permission for action requiring ${requiredPermission} (has ${userPermissionString})`
       );
       res.status(403).json({
         error: 'Forbidden',

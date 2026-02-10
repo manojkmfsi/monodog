@@ -47,6 +47,7 @@ export interface AuthSession {
   expiresAt: number;
   user: GitHubUser;
   scopes: string[];
+  permission?: CachedPermission | null; // User's repository permission (optional until fetched)
 }
 
 /**

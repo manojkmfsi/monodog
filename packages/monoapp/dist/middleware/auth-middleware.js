@@ -90,9 +90,30 @@ function authenticationMiddleware(req, res, next) {
         });
         return;
     }
-    // Attach session to request
+    // Attach session and user info to request
     req.session = session;
-    logger_1.AppLogger.debug(`Authenticated request from user: ${session.user.login}`);
+    req.user = {
+        login: session.user.login,
+        id: session.user.id,
+    };
+    // Attach permission from session (if available)
+    if (session.permission) {
+        req.permission = session.permission;
+    }
+    else {
+        // Default to 'read' if no permission fetched
+        req.permission = {
+            permission: 'read',
+            role: 'Denied',
+            userId: session.user.id,
+            username: session.user.login,
+            owner: '',
+            repo: '',
+            cachedAt: Date.now(),
+            ttl: 0,
+        };
+    }
+    logger_1.AppLogger.debug(`Authenticated request from user: ${session.user.login} with permission: ${req.permission?.permission || 'unknown'}`);
     next();
 }
 /**
@@ -124,10 +145,12 @@ function repositoryPermissionMiddleware(requiredPermission) {
             read: 1,
             none: 0,
         };
-        const userLevel = permissionHierarchy[permission.permission] || 0;
+        // Handle both string and object formats for permission
+        const userPermissionString = typeof permission === 'string' ? permission : (permission.permission || 'none');
+        const userLevel = permissionHierarchy[userPermissionString] || 0;
         const requiredLevel = permissionHierarchy[requiredPermission] || 0;
         if (userLevel < requiredLevel) {
-            logger_1.AppLogger.warn(`User ${session.user.login} lacks permission for action requiring ${requiredPermission}`);
+            logger_1.AppLogger.warn(`User ${session.user.login} lacks permission for action requiring ${requiredPermission} (has ${userPermissionString})`);
             res.status(403).json({
                 error: 'Forbidden',
                 message: `This action requires ${requiredPermission} permission`,

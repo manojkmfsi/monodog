@@ -120,7 +120,7 @@ async function validateChangeset(rootPath, packages, summary) {
 /**
  * Generate a new changeset
  */
-async function generateChangeset(rootPath, packages, bumps, summary) {
+async function generateChangeset(rootPath, packages, bumps, summary, createdBy) {
     try {
         // Validate input
         const validation = await validateChangeset(rootPath, packages, summary);
@@ -154,7 +154,7 @@ async function generateChangeset(rootPath, packages, bumps, summary) {
         content += summary;
         // Write changeset file
         await promises_1.default.writeFile(changesetPath, content, 'utf-8');
-        logger_1.AppLogger.info(`Changeset created: ${changesetName}`);
+        logger_1.AppLogger.info(`Changeset created: ${changesetName} by user: ${createdBy || 'unknown'}`);
         return {
             success: true,
             message: 'Changeset created successfully',
@@ -186,8 +186,9 @@ async function isWorkingTreeClean(rootPath) {
 /**
  * Trigger CI pipeline for publishing
  */
-async function triggerPublishPipeline(rootPath) {
+async function triggerPublishPipeline(rootPath, publishedBy) {
     try {
+        logger_1.AppLogger.info(`Publishing workflow triggered by user: ${publishedBy || 'unknown'}`);
         // Check if publish workflow exists
         const publishWorkflowPath = path_1.default.join(rootPath, '.github', 'workflows', 'release.yml');
         try {
@@ -227,43 +228,6 @@ async function triggerPublishPipeline(rootPath) {
         catch (gitError) {
             logger_1.AppLogger.warn(`Git operations failed: ${gitError}`);
             // Continue anyway - changesets might already be committed
-        }
-        // Trigger the workflow via GitHub API if we have a token
-        try {
-            const githubToken = process.env.GITHUB_TOKEN;
-            if (githubToken) {
-                // Get repo info from package.json or git remote
-                const { stdout: remoteUrl } = await execPromise('git remote get-url origin', {
-                    cwd: rootPath,
-                });
-                // Parse GitHub repo from URL (e.g., git@github.com:user/repo.git)
-                const repoMatch = remoteUrl.match(/github\.com[:/]([^/]+)\/(.+?)(\.git)?$/);
-                if (repoMatch) {
-                    const [, owner, repo] = repoMatch;
-                    const repoName = repo.replace(/\.git$/, '');
-                    // Trigger the workflow
-                    const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/actions/workflows/release.yml/dispatches`, {
-                        method: 'POST',
-                        headers: {
-                            Authorization: `Bearer ${githubToken}`,
-                            Accept: 'application/vnd.github.v3+json',
-                        },
-                        body: JSON.stringify({
-                            ref: 'main',
-                        }),
-                    });
-                    if (response.ok) {
-                        logger_1.AppLogger.info('GitHub workflow triggered successfully');
-                    }
-                    else {
-                        logger_1.AppLogger.warn(`Failed to trigger workflow: ${response.statusText}`);
-                    }
-                }
-            }
-        }
-        catch (workflowError) {
-            logger_1.AppLogger.warn(`Failed to trigger workflow: ${workflowError}`);
-            // Still return success as the changeset was created
         }
         logger_1.AppLogger.info('Publish pipeline initiated');
         return {

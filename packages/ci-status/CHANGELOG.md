@@ -1,5 +1,11 @@
 # @monodog/ci-status
 
+## 1.2.4
+
+### Patch Changes
+
+- [`c33e459`](https://github.com/manojkmfsi/monodog/commit/c33e4590022aa8c342ad7d9680224d12be8ab597) - drdtjjnvnbvnb
+
 ## 1.2.3
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @monodog/backend
 
+## 1.5.23
+
+### Patch Changes
+
+- Updated dependencies [[`679da98`](https://github.com/manojkmfsi/monodog/commit/679da9879651463439fb2691c7c35948fe02de13), [`1c93eda`](https://github.com/manojkmfsi/monodog/commit/1c93eda755bdc7221a7213b0d02d33b21acfc40c)]:
+  - @monodog/utils@1.0.6
+  - @monodog/ci-status@1.2.3
+  - @monodog/monorepo-scanner@1.0.15
+
 ## 1.5.22
 
 ### Patch Changes

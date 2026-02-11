@@ -11,7 +11,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-700 p-5">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br p-5">
       <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-br from-primary-500 to-primary-700 text-white p-8 text-center">
@@ -49,22 +49,6 @@ export function LoginPage() {
             <div className="flex-1 h-px bg-gray-200"></div>
             <span>GitHub OAuth Authentication</span>
             <div className="flex-1 h-px bg-gray-200"></div>
-          </div>
-
-          {/* Info Box */}
-          <div className="bg-gray-50 rounded-lg p-5 mb-5">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Why GitHub OAuth?</h3>
-            <ul className="m-0 p-0 list-none space-y-2">
-              <li className="text-sm text-gray-700 leading-relaxed">
-                <strong className="text-gray-900">Secure:</strong> No passwords stored, GitHub handles authentication
-              </li>
-              <li className="text-sm text-gray-700 leading-relaxed">
-                <strong className="text-gray-900">Permissions:</strong> Your permissions are automatically synced from GitHub
-              </li>
-              <li className="text-sm text-gray-700 leading-relaxed">
-                <strong className="text-gray-900">Single Source of Truth:</strong> GitHub remains your authority
-              </li>
-            </ul>
           </div>
 
           {/* Scopes Box */}

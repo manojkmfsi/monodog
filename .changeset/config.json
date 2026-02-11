@@ -5,7 +5,7 @@
     { "repo": "manojkmfsi/monodog" }
   ],
   "commit": true,
-  "commitMessage": "chore(release): apply changesets [skip ci]",
+  "commitMessage": "chore(release): apply changesets",
   "fixed": [],
   "linked": [],
   "access": "public",

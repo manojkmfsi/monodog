@@ -8,6 +8,7 @@ import {
   CpuChipIcon,
   Cog6ToothIcon,
 } from '../../icons/heroicons';
+import { useAuth } from '../../services/auth-context';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon },
@@ -26,6 +27,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
+    const { session } = useAuth();
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -82,16 +84,16 @@ export default function Layout({ children }: LayoutProps) {
             </div> */}
           </div>
           {/* User info */}
-          <div className="hidden flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <div className="flex flex-col items-end text-sm">
-              <span className="font-medium text-primary-700">John Doe</span>
-              <span className="text-neutral-500">Admin</span>
+              <span className="font-medium text-primary-700">{session.user.login}</span>
+              <span className="text-neutral-500">{session.permission.role}</span>
             </div>
-            <img
+            {/* <img
               src=""
               alt="User Avatar"
               className="h-8 w-8 rounded-full border border-neutral-200"
-            />
+            /> */}
           </div>
         </header>
 

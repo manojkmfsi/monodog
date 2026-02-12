@@ -1,5 +1,12 @@
 # @monodog/backend
 
+## 1.5.29
+
+### Patch Changes
+
+- Updated dependencies [[`30b21e1`](https://github.com/manojkmfsi/monodog/commit/30b21e117e78a9d0f608acbbf7f6790a3134a8ba)]:
+  - @monodog/ci-status@1.2.9
+
 ## 1.5.28
 
 ### Patch Changes

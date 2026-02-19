@@ -1,5 +1,12 @@
 # @monodog/monorepo-scanner
 
+## 1.0.21
+
+### Patch Changes
+
+- Updated dependencies [[`1d90924`](https://github.com/manojkmfsi/monodog/commit/1d909242a549f46d28c247d1c81d749ad7ff7bd5), [`039eace`](https://github.com/manojkmfsi/monodog/commit/039eace49a2731d1b4ecf157e20e0f3e2115c0c1)]:
+  - @monodog/utils@1.0.12
+
 ## 1.0.20
 
 ### Patch Changes

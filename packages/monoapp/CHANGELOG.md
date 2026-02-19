@@ -1,5 +1,13 @@
 # @manojkmfsi/monoapp
 
+## 1.1.24
+
+### Patch Changes
+
+- [`fab5078`](https://github.com/manojkmfsi/monodog/commit/fab50783c8ffda7e791e0451072056ee2b92703d) - joijijijijijjjo
+
+- [`f1de12e`](https://github.com/manojkmfsi/monodog/commit/f1de12ee71b8228689834fb65e34d16692e48c46) - dsdsvdvdsvdscsdcssdd
+
 ## 1.1.23
 
 ### Patch Changes

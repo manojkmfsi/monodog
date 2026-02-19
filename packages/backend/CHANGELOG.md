@@ -1,5 +1,18 @@
 # @monodog/backend
 
+## 1.5.37
+
+### Patch Changes
+
+- [`c7d7e68`](https://github.com/manojkmfsi/monodog/commit/c7d7e689298efa412c999683a2f07c950a9f3fd7) - dsdsffdsfdsfdsfssfddsf
+
+- [`eea2585`](https://github.com/manojkmfsi/monodog/commit/eea2585aee3e861328c84073f424a5d94f27d206) - ddsfdsfdsfdsffds
+
+- Updated dependencies [[`c7d7e68`](https://github.com/manojkmfsi/monodog/commit/c7d7e689298efa412c999683a2f07c950a9f3fd7), [`eea2585`](https://github.com/manojkmfsi/monodog/commit/eea2585aee3e861328c84073f424a5d94f27d206), [`afb00e7`](https://github.com/manojkmfsi/monodog/commit/afb00e70c327a7406e81cf8159ae49885f8e3551)]:
+  - @monodog/ci-status@1.2.17
+  - @monodog/utils@1.0.13
+  - @monodog/monorepo-scanner@1.0.22
+
 ## 1.5.36
 
 ### Patch Changes

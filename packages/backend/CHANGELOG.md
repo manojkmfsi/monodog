@@ -1,5 +1,26 @@
 # @monodog/backend
 
+## 1.5.35
+
+### Patch Changes
+
+- [`7c8f167`](https://github.com/manojkmfsi/monodog/commit/7c8f167f9455360a744dbc0ea3b0fb0982501388) - jijijijijkkkkll
+
+- [`fab5078`](https://github.com/manojkmfsi/monodog/commit/fab50783c8ffda7e791e0451072056ee2b92703d) - joijijijijijjjo
+
+- [`7971793`](https://github.com/manojkmfsi/monodog/commit/79717935d25619897f585a773354a22ee89e54eb) - ddsdsdsdadsadsads
+
+- [`323994d`](https://github.com/manojkmfsi/monodog/commit/323994dabd2859f21909cf7b976327adbc999ea1) - dsdfdsfdfdgdfgg
+
+- [`e01c739`](https://github.com/manojkmfsi/monodog/commit/e01c739dd827840851c2d94cb07427474372b220) - jljlkjlkjlknlknlknlknkl
+
+- [`3b71737`](https://github.com/manojkmfsi/monodog/commit/3b71737a4aa34155619f77e52551cb87b73c754f) - dguhjlhkhhgfgfdtyu.ki
+
+- Updated dependencies [[`7c8f167`](https://github.com/manojkmfsi/monodog/commit/7c8f167f9455360a744dbc0ea3b0fb0982501388), [`fab5078`](https://github.com/manojkmfsi/monodog/commit/fab50783c8ffda7e791e0451072056ee2b92703d), [`f1de12e`](https://github.com/manojkmfsi/monodog/commit/f1de12ee71b8228689834fb65e34d16692e48c46), [`a924fd1`](https://github.com/manojkmfsi/monodog/commit/a924fd1387d471b9e4bdd89a569d3172c30d95dc)]:
+  - @monodog/ci-status@1.2.15
+  - @monodog/utils@1.0.11
+  - @monodog/monorepo-scanner@1.0.20
+
 ## 1.5.34
 
 ### Patch Changes

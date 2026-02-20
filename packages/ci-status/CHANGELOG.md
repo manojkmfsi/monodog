@@ -1,5 +1,15 @@
 # @monodog/ci-status
 
+## 1.2.20
+
+### Patch Changes
+
+- [`7e1dac9`](https://github.com/manojkmfsi/monodog/commit/7e1dac9f48ee10465286910b90db62b72e016ea4) - rdrrrdgrdgdgdgdg
+
+- [`62e31b7`](https://github.com/manojkmfsi/monodog/commit/62e31b7cc36f22d27b747cfa7765c9c1df88b8a6) - sdcdscdscdscscsxzczxcxzcxzc
+
+- [`03d9d94`](https://github.com/manojkmfsi/monodog/commit/03d9d949b9828919872eddb4ad6b92cc3477b28d) - fzfkuljlhgjfkghlkbj,n.m
+
 ## 1.2.19
 
 ### Patch Changes

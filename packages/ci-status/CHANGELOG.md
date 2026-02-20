@@ -1,5 +1,26 @@
 # @monodog/ci-status
 
+## 1.2.21
+
+### Patch Changes
+
+- [`10f621b`](https://github.com/manojkmfsi/monodog/commit/10f621b4fa08d92d7f604bfcbd0f74c1904e410a) - vggjnkmm.m.mmmm/m/./.
+
+- [`347360e`](https://github.com/manojkmfsi/monodog/commit/347360e6694d3f0f641424fc935f084d61aa9375) - fdfdxfcxfcccvbv
+
+- [`09c05ef`](https://github.com/manojkmfsi/monodog/commit/09c05ef82a26398ca083edba6bad9f0ab70882fa) - xzfdxvcbvbbvnbvnb
+
+- [`ae30ea6`](https://github.com/manojkmfsi/monodog/commit/ae30ea636a7c5c154ba0d435a208cb9611b7b8a6) - fxgfcggcxvcvcvb
+
+- [`c84c29f`](https://github.com/manojkmfsi/monodog/commit/c84c29f682294720a07e62fd5309094837c9773b) - gfxfdxfdxfdxcvkjl,
+
+- [`364625f`](https://github.com/manojkmfsi/monodog/commit/364625f8aa875211aacca9450107612c8b5b3cbe) - jnhknknn,n.,,,.,m
+
+- [`517a06c`](https://github.com/manojkmfsi/monodog/commit/517a06c527446d8d2931ef7983d2dbf76b1421c2) - xfxcnvcnbcvxfdfcbv
+
+- Updated dependencies [[`347360e`](https://github.com/manojkmfsi/monodog/commit/347360e6694d3f0f641424fc935f084d61aa9375)]:
+  - @monodog/utils@1.0.14
+
 ## 1.2.20
 
 ### Patch Changes

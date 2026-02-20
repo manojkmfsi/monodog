@@ -1,5 +1,17 @@
 # @monodog/ci-status
 
+## 1.2.22
+
+### Patch Changes
+
+- [`512913d`](https://github.com/manojkmfsi/monodog/commit/512913d074be86ec8f1092394036a832e0002fb8) - cdsdzcvcxcvcxcxzczczx
+
+- [`17578ed`](https://github.com/manojkmfsi/monodog/commit/17578eda95fcff352fef1fc65c6c545ea28f4a16) - dcsdxvcxvxcvxvcx
+
+- [`0006062`](https://github.com/manojkmfsi/monodog/commit/0006062774d1f1ec7bb99eedb9e0bd192a18fd16) - vfxdzxxbvcmvjhyg
+
+- [`f431c43`](https://github.com/manojkmfsi/monodog/commit/f431c43952082f88465c03ad9a642ad3c242b3d2) - zcxbvcnbcvffdxvf
+
 ## 1.2.21
 
 ### Patch Changes

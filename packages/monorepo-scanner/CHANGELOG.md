@@ -1,5 +1,11 @@
 # @monodog/monorepo-scanner
 
+## 1.0.23
+
+### Patch Changes
+
+- [`03d9d94`](https://github.com/manojkmfsi/monodog/commit/03d9d949b9828919872eddb4ad6b92cc3477b28d) - fzfkuljlhgjfkghlkbj,n.m
+
 ## 1.0.22
 
 ### Patch Changes

@@ -190,6 +190,8 @@ router.get('/callback', async (req, res) => {
             permission: permission ? {
                 level: permission.permission,
                 role: permission.role,
+                owner: permission.owner,
+                repo: permission.repo,
             } : null,
         });
     }

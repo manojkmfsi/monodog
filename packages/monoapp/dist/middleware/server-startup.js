@@ -21,6 +21,7 @@ const config_routes_1 = __importDefault(require("../routes/config-routes"));
 const auth_routes_1 = __importDefault(require("../routes/auth-routes"));
 const permission_routes_1 = __importDefault(require("../routes/permission-routes"));
 const publish_routes_1 = __importDefault(require("../routes/publish-routes"));
+const pipeline_routes_1 = require("../routes/pipeline-routes");
 const constants_1 = require("../constants");
 const auth_middleware_1 = require("./auth-middleware");
 const permission_service_1 = require("../services/permission-service");
@@ -58,6 +59,9 @@ function createApp(rootPath) {
     (0, auth_middleware_1.initializeAuthentication)();
     // Start permission cache cleanup
     (0, permission_service_1.startCacheCleanup)();
+    // Create a router for pipeline routes
+    const router = express_1.default.Router();
+    (0, pipeline_routes_1.setupPipelineRoutes)(router);
     // Routes
     app.use('/api/auth', auth_routes_1.default);
     app.use('/api/permissions', permission_routes_1.default);
@@ -66,6 +70,7 @@ function createApp(rootPath) {
     app.use('/api/health/', health_routes_1.default);
     app.use('/api/config/', config_routes_1.default);
     app.use('/api/publish', publish_routes_1.default);
+    app.use('/api', router); // Pipeline routes
     // 404 handler
     app.use('*', error_handler_1.notFoundHandler);
     // Global error handler (must be last)
@@ -118,6 +123,20 @@ function startServer(rootPath) {
                     'POST /api/publish/preview',
                     'POST /api/publish/changesets',
                     'POST /api/publish/trigger',
+                    // Pipeline endpoints
+                    'GET  /api/pipelines',
+                    'GET  /api/pipelines/:pipelineId',
+                    'GET  /api/pipelines/package/:owner/:repo/:packageName',
+                    'PUT  /api/pipelines/:pipelineId/status',
+                    'GET  /api/workflows/:owner/:repo',
+                    'GET  /api/workflows/:owner/:repo/runs',
+                    'GET  /api/runs/:runId/jobs',
+                    'GET  /api/jobs/:jobId/logs',
+                    'POST /api/workflows/:workflowId/trigger',
+                    'POST /api/workflows/:workflowId/dispatch',
+                    'GET  /api/audit-logs',
+                    'GET  /api/metrics',
+                    'GET  /api/rate-limit',
                 ],
             });
         });

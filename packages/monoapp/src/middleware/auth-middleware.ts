@@ -106,6 +106,7 @@ export function authenticationMiddleware(
     login: session.user.login,
     id: session.user.id,
   };
+  (req as any).accessToken = session.accessToken;
 
   // Attach permission from session (if available)
   if (session.permission) {

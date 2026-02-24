@@ -60,6 +60,7 @@ export const routes: RouteConfig[] = [
     component: 'ReleaseManager',
     title: 'Release Manager',
     description: 'Comprehensive release management with Changesets',
+    protected: true,
   },
   {
     path: '/ci',
@@ -67,6 +68,14 @@ export const routes: RouteConfig[] = [
     component: 'CIIntegration',
     title: 'CI/CD',
     description: 'Continuous integration and deployment',
+  },
+  {
+    path: '/pipeline',
+    name: 'pipeline',
+    component: 'Pipeline',
+    title: 'Release Pipeline',
+    description: 'Real-time release pipeline monitoring and management',
+    protected: true,
   },
   {
     path: '/config',

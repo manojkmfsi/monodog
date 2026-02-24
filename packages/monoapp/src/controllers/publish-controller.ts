@@ -1,18 +1,18 @@
 import { Request, Response } from 'express';
 import { AppLogger } from '../middleware/logger';
-import { getSessionFromRequest } from '../middleware/auth-middleware';
 import {
   getWorkspacePackages,
   getExistingChangesets,
   calculateNewVersions,
   generateChangeset,
-  validateChangeset,
   isWorkingTreeClean,
   triggerPublishPipeline,
   type VersionBump,
   type Package,
 } from '../services/changeset-service';
-
+import * as pipelineService from '../services/pipeline-service';
+import { getRepositoryInfoFromGit } from '../utils/utilities';
+import { listWorkflows } from '../services/github-actions-service';
 /**
  * Get all workspace packages
  */
@@ -89,7 +89,7 @@ export async function previewPublish(req: Request, res: Response) {
     const newVersions = calculateNewVersions(selectedPackages, bumps || []);
 
     // Check if working tree is clean
-    const isClean = true;//await isWorkingTreeClean(rootPath);
+    const isClean = await isWorkingTreeClean(rootPath);
 
     // Get existing changesets
     const changesets = await getExistingChangesets(rootPath);
@@ -98,7 +98,6 @@ export async function previewPublish(req: Request, res: Response) {
     const errors: string[] = [];
     const warnings: string[] = [];
     // Get authenticated user
-    const session = getSessionFromRequest(req);
     const authUser = (req as any).user;
     const userPermission = (req as any).permission.permission || 'read';
 
@@ -253,7 +252,7 @@ export async function checkPublishStatus(req: Request, res: Response) {
     const rootPath = req.app.locals.rootPath;
 
     // Check if working tree is clean
-    const isClean = true; //await isWorkingTreeClean(rootPath);
+    const isClean = await isWorkingTreeClean(rootPath);
 
     // Get existing changesets
     const changesets = await getExistingChangesets(rootPath);
@@ -284,7 +283,8 @@ export async function triggerPublish(req: Request, res: Response) {
     const rootPath = req.app.locals.rootPath;
     const authUser = (req as any).user;
     const userPermission = (req as any).permission.permission || 'read';
-
+    const { packages: selectedPackages } = req.body;
+    const selectedPackageNames = selectedPackages?.map((pkg: Record<string, string|string[]>) => pkg.name) || [];
     // Check permissions
     const permissionHierarchy: Record<string, number> = {
       admin: 4,
@@ -306,7 +306,7 @@ export async function triggerPublish(req: Request, res: Response) {
     }
 
     // Check if working tree is clean
-    const isClean = true; //await isWorkingTreeClean(rootPath);
+    const isClean = await isWorkingTreeClean(rootPath);
     if (!isClean) {
       res.status(400).json({
         success: false,
@@ -329,8 +329,8 @@ export async function triggerPublish(req: Request, res: Response) {
 
     AppLogger.info(`Triggering publish for user: ${authUser?.login} (permission: ${userPermission})`);
 
-    // Trigger publish pipeline with user context
-    const result = await triggerPublishPipeline(rootPath, authUser?.login);
+    // Trigger publish pipeline with user context and package info
+    const result = await triggerPublishPipeline(rootPath, authUser?.login, selectedPackages);
 
     if (!result.success) {
       res.status(500).json({
@@ -339,6 +339,88 @@ export async function triggerPublish(req: Request, res: Response) {
         message: result.message,
       });
       return;
+    }
+
+    // Create pipeline records in database for each package
+    AppLogger.info(`Checking if should create pipelines: selectedPackageNames=${JSON.stringify(selectedPackageNames)}, isArray=${Array.isArray(selectedPackageNames)}`);
+
+    if (selectedPackages && Array.isArray(selectedPackages)) {
+      AppLogger.info(`Creating pipelines for ${selectedPackages.length} packages`);
+      try {
+        const repoInfo = await getRepositoryInfoFromGit();
+
+        if (!repoInfo) {
+          AppLogger.warn('Could not extract repository info from git remote - permission fetch skipped');
+        } else {
+
+          const { owner, repo } = repoInfo;
+
+          const timestamp = new Date().toISOString();
+          AppLogger.info(`Extracted GitHub: owner=${owner}, repo=${repo}`);
+
+          // Fetch the actual workflow ID from GitHub
+          const accessToken = (req as any).accessToken;
+          let realWorkflowId = '1'; // Fallback to '1' if fetch fails
+          let workflowPath = 'release.yml'; // Default path for reference
+
+          if (accessToken) {
+            try {
+              AppLogger.info(`Fetching workflows for ${owner}/${repo}`);
+              const workflowsResponse = await listWorkflows(owner, repo, accessToken);
+
+              // Find the main deployment/release workflow (could be named "Release", "Deployment Workflow", etc.)
+              const releaseWorkflow = workflowsResponse.workflows.find(
+                (workflow) =>
+                  workflow.name === 'Release' ||
+                  workflow.name === 'Deployment Workflow' ||
+                  workflow.name.toLowerCase().includes('release') ||
+                  workflow.name.toLowerCase().includes('deployment')
+              );
+
+              if (releaseWorkflow) {
+                realWorkflowId = String(releaseWorkflow.id);
+                workflowPath = String(releaseWorkflow.path);
+                AppLogger.info(`Found Release workflow with ID: ${realWorkflowId} (name: ${releaseWorkflow.name})`);
+              } else {
+                AppLogger.warn(`Release workflow not found. Available workflows: ${workflowsResponse.workflows.map(w => `${w.name}(${w.id})`).join(', ')}`);
+              }
+            } catch (workflowFetchError) {
+              AppLogger.warn(`Failed to fetch workflows: ${workflowFetchError}. Using fallback ID 1`);
+            }
+          } else {
+            AppLogger.warn('No access token available to fetch workflows');
+          }
+
+          for (const pkg of selectedPackages) {
+            try {
+              AppLogger.info(`Creating pipeline for package: ${pkg.name}`);
+              await pipelineService.createOrUpdatePipeline({
+                releaseVersion: pkg.newVersion,
+                packageName: pkg.name,
+                owner,
+                repo,
+                workflowId: realWorkflowId,
+                workflowName: 'Release',
+                workflowPath: workflowPath,
+                triggerType: 'manual',
+                triggeredBy: authUser?.login || 'unknown',
+                triggeredAt: timestamp,
+                currentStatus: 'queued',
+                currentConclusion: null,
+                lastRunId: undefined,
+              });
+              AppLogger.info(`Created pipeline record for package: ${pkg.name}`);
+            } catch (pipelineError) {
+              AppLogger.warn(`Failed to create pipeline for ${pkg.name}: ${pipelineError}`);
+              // Don't fail the whole request if pipeline creation fails
+            }
+          }
+        }
+      } catch (configError) {
+        AppLogger.error(`Failed to read package.json for pipeline creation: ${configError}`);
+      }
+    } else {
+      AppLogger.warn(`Skipping pipeline creation: selectedPackageNames is ${selectedPackageNames}`);
     }
 
     res.json({

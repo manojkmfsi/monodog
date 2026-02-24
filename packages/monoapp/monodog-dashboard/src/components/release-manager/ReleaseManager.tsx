@@ -57,12 +57,6 @@ export default function ReleaseManager() {
   const [allPackages, setAllPackages] = useState<any[]>([]);
   const [existingChangesets, setExistingChangesets] = useState<any[]>([]);
 
-  // Debug: Log permission state
-  useEffect(() => {
-    console.log('[ReleaseManager] hasPermission function available:', typeof hasPermission);
-    console.log('[ReleaseManager] canCreateChangeset check:', hasPermission('write'));
-  }, [hasPermission]);
-
   // Fetch workspace packages on mount
   useEffect(() => {
     fetchWorkspaceData();
@@ -242,7 +236,7 @@ export default function ReleaseManager() {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          packages: selectedPackages.map(p => p.name),
+          packages: selectedPackages,
         }),
       });
 

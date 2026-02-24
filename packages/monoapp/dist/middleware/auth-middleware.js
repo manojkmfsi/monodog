@@ -96,6 +96,7 @@ function authenticationMiddleware(req, res, next) {
         login: session.user.login,
         id: session.user.id,
     };
+    req.accessToken = session.accessToken;
     // Attach permission from session (if available)
     if (session.permission) {
         req.permission = session.permission;

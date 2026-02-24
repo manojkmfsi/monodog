@@ -245,6 +245,8 @@ router.get('/callback', async (req: Request, res: Response) => {
       permission: permission ? {
         level: permission.permission,
         role: permission.role,
+        owner: permission.owner,
+        repo: permission.repo,
       } : null,
     });
   } catch (error) {
@@ -264,7 +266,6 @@ router.get('/callback', async (req: Request, res: Response) => {
 router.get('/me', authenticationMiddleware, (req: Request, res: Response) => {
   try {
     const session = getSessionFromRequest(req);
-
     if (!session) {
       res.status(401).json({
         error: 'Unauthorized',

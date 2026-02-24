@@ -28,6 +28,7 @@ import configRouter from '../routes/config-routes';
 import authRouter from '../routes/auth-routes';
 import permissionRouter from '../routes/permission-routes';
 import publishRouter from '../routes/publish-routes';
+import { setupPipelineRoutes } from '../routes/pipeline-routes';
 import {
   PORT_MIN,
   PORT_MAX,
@@ -91,6 +92,10 @@ function createApp(rootPath: string): Express {
   // Start permission cache cleanup
   startCacheCleanup();
 
+  // Create a router for pipeline routes
+  const router = express.Router();
+  setupPipelineRoutes(router);
+
   // Routes
   app.use('/api/auth', authRouter);
   app.use('/api/permissions', permissionRouter);
@@ -99,6 +104,7 @@ function createApp(rootPath: string): Express {
   app.use('/api/health/', healthRouter);
   app.use('/api/config/', configRouter);
   app.use('/api/publish', publishRouter);
+  app.use('/api', router); // Pipeline routes
 
   // 404 handler
   app.use('*', notFoundHandler);
@@ -158,6 +164,20 @@ export function startServer(rootPath: string): void {
           'POST /api/publish/preview',
           'POST /api/publish/changesets',
           'POST /api/publish/trigger',
+          // Pipeline endpoints
+          'GET  /api/pipelines',
+          'GET  /api/pipelines/:pipelineId',
+          'GET  /api/pipelines/package/:owner/:repo/:packageName',
+          'PUT  /api/pipelines/:pipelineId/status',
+          'GET  /api/workflows/:owner/:repo',
+          'GET  /api/workflows/:owner/:repo/runs',
+          'GET  /api/runs/:runId/jobs',
+          'GET  /api/jobs/:jobId/logs',
+          'POST /api/workflows/:workflowId/trigger',
+          'POST /api/workflows/:workflowId/dispatch',
+          'GET  /api/audit-logs',
+          'GET  /api/metrics',
+          'GET  /api/rate-limit',
         ],
       });
     });

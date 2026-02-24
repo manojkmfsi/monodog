@@ -7,7 +7,9 @@ import {
   CloudArrowUpIcon,
   CpuChipIcon,
   Cog6ToothIcon,
-} from '../../icons/heroicons';
+  RocketLaunchIcon,
+  LogoutIcon,
+} from '../../icons/index';
 import { useAuth } from '../../services/auth-context';
 
 const navigation = [
@@ -16,8 +18,9 @@ const navigation = [
   { name: 'Dependencies', href: '/dependencies', icon: ChartBarIcon },
   { name: 'Health Status', href: '/health', icon: HeartIcon },
   { name: 'Release', href: '/release', icon: CloudArrowUpIcon },
-  // { name: 'Publish Control', href: '/publish', icon: CloudArrowUpIcon },
-  // { name: 'CI/CD', href: '/ci', icon: CpuChipIcon },
+  { name: 'Release Pipeline', href: '/pipeline', icon: RocketLaunchIcon },
+  { name: 'Publish Control', href: '/publish', icon: CloudArrowUpIcon },
+  { name: 'CI/CD', href: '/ci', icon: CpuChipIcon },
   { name: 'Configuration', href: '/config', icon: Cog6ToothIcon },
 ];
 
@@ -27,7 +30,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
-    const { session } = useAuth();
+    const { session, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -86,8 +89,12 @@ export default function Layout({ children }: LayoutProps) {
           {/* User info */}
           <div className="flex items-center gap-3">
             <div className="flex flex-col items-end text-sm">
-              <span className="font-medium text-primary-700">{session.user.login}</span>
-              <span className="text-neutral-500">{session.permission.role}</span>
+              {session && <span className="font-medium text-primary-700">{session.user.login}</span>}
+
+              {session && <span className="text-neutral-500">{session.permission.role}</span>}
+            </div>
+            <div className="flex flex-col items-end text-sm">
+              <button className="font-medium" onClick={logout} title="Logout"><LogoutIcon></LogoutIcon></button>
             </div>
             {/* <img
               src=""

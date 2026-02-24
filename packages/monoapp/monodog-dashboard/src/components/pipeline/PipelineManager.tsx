@@ -1,0 +1,719 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { ExclamationCircleIcon, CheckCircleIcon, ClockIcon, XCircleIcon } from '../../icons/index';
+import LogViewer from './LogViewer';
+import WorkflowRunsList from './WorkflowRunsList';
+import WorkflowTrigger from './WorkflowTrigger';
+import { useAuth } from '../../services/auth-context';
+import { monorepoService } from '../../services/monorepoService';
+import { getSessionPermission } from './utils/pipeline.utils'
+
+const apiUrl = (window as any).ENV?.API_URL;
+
+interface Job {
+  id: number;
+  gitHubJobId: number;
+  name: string;
+  status: string;
+  conclusion: string | null;
+  htmlUrl: string;
+  startedAt: string | null;
+  completedAt: string | null;
+}
+
+interface Pipeline {
+  id: string;
+  releaseVersion: string;
+  packageName: string;
+  workflowName: string;
+  currentStatus: string;
+  currentConclusion?: string | null;
+  workflowId: string;
+  workflowPath?: string;
+  lastRunId: string | null;
+  workflowRuns: any[];
+}
+
+interface PipelineManagerProps {
+  packageName?: string;
+  onNavigate?: (path: string) => void;
+}
+
+/**
+ * Parse GitHub Actions logs and split them into hierarchical steps
+ * Detects levels based on indentation and group markers
+ */
+interface HierarchicalStep {
+  name: string;
+  logs: string[];
+  level: number;
+  children?: HierarchicalStep[];
+  startIndex: number;
+}
+
+function parseStepsFromLogs(rawLogs: string): HierarchicalStep[] {
+  const lines = rawLogs.split('\n');
+  const steps: HierarchicalStep[] = [];
+  let currentStep: HierarchicalStep | null = null;
+  const stepStack: HierarchicalStep[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmedLine = line.trim();
+
+    // Detect level from indentation
+    const leadingSpaces = line.match(/^(\s*)/)?.[1].length || 0;
+    const level = Math.floor(leadingSpaces / 2); // Every 2 spaces = 1 level
+
+    // GitHub Actions group markers: ##[group]Step Name / ##[endgroup]
+    if (line.includes('##[group]')) {
+      // Extract new step name
+      const groupMatch = line.match(/##\[group\](.*?)(?:##\[endgroup\]|$)/);
+      const stepName = groupMatch ? groupMatch[1].trim() : `Step ${steps.length + 1}`;
+
+      const newStep: HierarchicalStep = {
+        name: stepName,
+        logs: [],
+        level: level,
+        children: [],
+        startIndex: i,
+      };
+
+      // Find correct parent based on level
+      while (stepStack.length > 0 && stepStack[stepStack.length - 1].level >= newStep.level) {
+        stepStack.pop();
+      }
+
+      // Add to parent or root
+      if (stepStack.length > 0) {
+        const parent = stepStack[stepStack.length - 1];
+        if (!parent.children) parent.children = [];
+        parent.children.push(newStep);
+      } else {
+        steps.push(newStep);
+      }
+
+      stepStack.push(newStep);
+      currentStep = newStep;
+    } else if (line.includes('##[endgroup]')) {
+      // End of group - don't add this line to logs
+      continue;
+    } else if (trimmedLine) {
+      // Regular log line (non-empty)
+      if (currentStep) {
+        currentStep.logs.push(line);
+      }
+    }
+  }
+
+  return steps;
+}
+
+function getStatusIcon(status: string, conclusion: string | null, isUpdating: boolean = false) {
+  if (isUpdating) {
+    return <ClockIcon className="h-6 w-6 text-yellow-500 animate-spin" />;
+  }
+  if (status === 'completed') {
+    if (conclusion === 'success') {
+      return <CheckCircleIcon className="h-6 w-6 text-green-600" />;
+    } else if (conclusion === 'failure') {
+      return <ExclamationCircleIcon className="h-6 w-6 text-red-600" />;
+    } else if (conclusion === 'cancelled') {
+      return <XCircleIcon className="h-6 w-6 text-gray-600" />;
+    } else if (conclusion === 'skipped') {
+      return <ClockIcon className="h-6 w-6 text-gray-600" />;
+    }
+  }
+  if (status === 'in_progress' || status === 'queued') {
+    return <ClockIcon className="h-6 w-6 text-blue-600" />;
+  }
+  return <ClockIcon className="h-6 w-6 text-gray-600" />;
+}
+
+export default function PipelineManager({
+  packageName,
+  onNavigate,
+}: PipelineManagerProps) {
+  const [pipelines, setPipelines] = useState<Pipeline[]>([]);
+  const [selectedPipeline, setSelectedPipeline] = useState<Pipeline | null>(null);
+  const [selectedRun, setSelectedRun] = useState<number | null>(null);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [jobLogs, setJobLogs] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updatingPipelines, setUpdatingPipelines] = useState<Set<string>>(new Set());
+  const { hasPermission } = useAuth();
+
+  // Infinite scroll state
+  const [pipelineOffset, setPipelineOffset] = useState(0);
+  const [pipelineLoadingMore, setPipelineLoadingMore] = useState(false);
+  const [jobOffset, setJobOffset] = useState(0);
+  const [jobLoadingMore, setJobLoadingMore] = useState(false);
+  const pipelinePageSize = 10;
+  const runsPageSize = 20;
+  const jobPageSize = 20;
+
+  const { owner, repo } = useMemo(() => getSessionPermission() || {}, []);
+
+  // Fetch all pipelines on initial load (only once)
+  useEffect(() => {
+    const fetchPipelinesOnce = async () => {
+      try {
+        const url = `${apiUrl}/api/pipelines`;
+
+        const token = localStorage.getItem('monodog_session_token');
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        };
+
+        const response = await fetch(url, { headers });
+
+        if (response.status === 401 || response.status === 403) {
+          window.location.href = '/login';
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch pipelines: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setPipelines(data);
+
+        if (data.length > 0 && !selectedPipeline) {
+          setSelectedPipeline(data[0]);
+        }
+        setLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+        setLoading(false);
+      }
+    };
+
+    fetchPipelinesOnce();
+        const interval = setInterval(fetchPipelinesOnce, 5000);
+
+    return () => clearInterval(interval);
+  }, [selectedPipeline, owner, repo, packageName]);
+
+  // Poll all non success pipeline for status updates
+  useEffect(() => {
+    // if (!selectedPipeline) return;
+
+    const pollPipelineStatus = async () => {
+      try {
+        const token = localStorage.getItem('monodog_session_token');
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        };
+
+        // Fetch the most recent workflow run for the selected pipeline
+        pipelines.forEach(async (pipeline)=>{
+
+        if (pipeline.workflowId && pipeline.currentStatus !== 'completed' && !updatingPipelines.has(pipeline.workflowId)) {
+
+          const runsUrl = `${apiUrl}/api/workflows/${owner}/${repo}?workflow_id=${pipeline.workflowId}&per_page=${runsPageSize}&page=1`;
+          const runsResponse = await fetch(runsUrl, { headers });
+
+          if (runsResponse.ok) {
+            const runsData = await runsResponse.json();
+            const latestRun = runsData.workflow_runs?.[0] || runsData.runs?.[0];
+
+            if (latestRun) {
+              // Check if status or conclusion has changed
+              const statusChanged = latestRun.status !== pipeline.currentStatus;
+              const conclusionChanged = latestRun.conclusion !== pipeline.currentConclusion;
+
+              if (statusChanged || conclusionChanged) {
+                // Mark as updating
+                setUpdatingPipelines(prev => new Set(prev).add(pipeline.workflowId));
+
+                try {
+                  // Update pipeline status in the database
+                  const updateResponse = await fetch(
+                    `${apiUrl}/api/pipelines/${pipeline.id}/status`,
+                    {
+                      method: 'PUT',
+                      headers,
+                      body: JSON.stringify({
+                        currentStatus: latestRun.status,
+                        currentConclusion: latestRun.conclusion || null,
+                        lastRunId: latestRun.id,
+                      }),
+                    }
+                  );
+
+                  // Update the selected pipeline with new status
+                  const updatedPipeline = {
+                    ...pipeline,
+                    currentStatus: latestRun.status,
+                    currentConclusion: latestRun.conclusion || null,
+                    lastRunId: latestRun.id,
+                  };
+                console.log(updatedPipeline)
+                  if(updatedPipeline.currentStatus == 'completed'){
+                      const updatedPackages = await monorepoService.refreshPackages();
+                  }
+                      // setSelectedPipeline(updatedPipeline);
+
+                  // Also update in the pipelines list
+                  setPipelines(prevPipelines =>
+                    prevPipelines.map(p =>
+                      p.id === pipeline.id ? updatedPipeline : p
+                    )
+                  );
+                } catch (updateError) {
+                  console.warn('Failed to update pipeline status:', updateError);
+                } finally {
+                  // Remove updating flag
+                  setUpdatingPipelines(prev => {
+                    const updated = new Set(prev);
+                    updated.delete(pipeline.workflowId);
+                    return updated;
+                  });
+                }
+              }
+            }
+          }
+        }
+
+        })
+
+      } catch (err) {
+        console.warn('Failed to poll pipeline status:', err);
+      }
+    };
+
+    // Poll immediately, then every 10 seconds
+    pollPipelineStatus();
+    const interval = setInterval(pollPipelineStatus, 10000);
+
+    return () => clearInterval(interval);
+  }, [selectedPipeline,pipelines, owner, repo]);
+
+  // Fetch jobs for selected run
+  useEffect(() => {
+    if (!selectedRun || !selectedPipeline) return;
+
+    const fetchJobs = async () => {
+      try {
+        const token = localStorage.getItem('monodog_session_token');
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        };
+
+        const response = await fetch(
+          `${apiUrl}/api/workflows/${owner}/${repo}/runs/${selectedRun}`,
+          { headers }
+        );
+
+        if (response.status === 401 || response.status === 403) {
+          window.location.href = '/login';
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch jobs: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setJobs(data.jobs || []);
+
+        // Auto-select first job
+        // if (data.jobs && data.jobs.length > 0 && !selectedJob) {
+        //   setSelectedJob(data.jobs[0]);
+        // }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      }
+    };
+
+    const interval = setInterval(fetchJobs, 5000);
+    fetchJobs();
+
+    return () => clearInterval(interval);
+  }, [selectedRun, owner, repo]);
+
+  // Fetch logs for selected job
+  useEffect(() => {
+    if (!selectedJob || !selectedPipeline) return;
+
+    const fetchLogs = async () => {
+      try {
+        const token = localStorage.getItem('monodog_session_token');
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        };
+
+        const response = await fetch(
+          `${apiUrl}/api/workflows/${owner}/${repo}/jobs/${selectedJob.gitHubJobId}/logs`,
+          { headers }
+        );
+
+        if (response.status === 401 || response.status === 403) {
+          if (response.status === 403) {
+            setError('Access denied: You do not have admin rights to view logs for this repository');
+          } else {
+            setError('Session expired. Please log in again.');
+            window.location.href = '/login';
+          }
+          return;
+        }
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const errorDetails = errorData.details || errorData.error || response.statusText;
+
+          // Check for specific error patterns
+          if (errorDetails.includes('403') || errorDetails.includes('admin')) {
+            setError('Admin access required: Repository logs require admin permissions. Contact your repository administrator.');
+          } else if (errorDetails.includes('404') || errorDetails.includes('not found')) {
+            setError('Job logs not found. The job may have been cleaned up or the job ID may be invalid.');
+          } else {
+            setError(`Failed to fetch logs: ${errorDetails}`);
+          }
+          return;
+        }
+
+        const data = await response.json();
+
+        // Check if logs are empty
+        if (data.meta && data.meta.isEmpty) {
+          setJobLogs('');
+          setError('No logs available for this job yet. The job may still be running or logs have been cleaned up.');
+        } else {
+          setJobLogs(data.logs || data);
+          setError(null);
+        }
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Failed to fetch logs';
+        setError(`Error loading logs: ${errorMsg}`);
+      }
+    };
+
+    // Fetch logs on selection
+    fetchLogs();
+
+    // Poll for updated logs if job is still running
+    if (selectedJob.status !== 'completed') {
+      const interval = setInterval(fetchLogs, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedJob, owner, repo]);
+
+  const handleSelectJob = (job: Job) => {
+    setSelectedJob(job);
+    setJobLogs(null);
+  };
+
+  // Handle infinite scroll for pipelines list
+  const handlePipelinesScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const element = e.currentTarget;
+    const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
+
+    if (isNearBottom && !pipelineLoadingMore && pipelines.length >= pipelinePageSize) {
+      loadMorePipelines();
+    }
+  };
+
+  const loadMorePipelines = async () => {
+    if (pipelineLoadingMore) return;
+
+    setPipelineLoadingMore(true);
+    try {
+      const url = `${apiUrl}/api/pipelines?offset=${pipelineOffset + pipelinePageSize}&limit=${pipelinePageSize}`;
+
+      const token = localStorage.getItem('monodog_session_token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+      };
+
+      const response = await fetch(url, { headers });
+      if (!response.ok) throw new Error('Failed to fetch more pipelines');
+
+      const newPipelines = await response.json();
+      setPipelines(prev => [...prev, ...newPipelines]);
+      setPipelineOffset(prev => prev + pipelinePageSize);
+    } catch (err) {
+      console.error('Error loading more pipelines:', err);
+    } finally {
+      setPipelineLoadingMore(false);
+    }
+  };
+
+  // Handle infinite scroll for jobs list
+  const handleJobsScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const element = e.currentTarget;
+    const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
+
+    if (isNearBottom && !jobLoadingMore && jobs.length >= jobPageSize && selectedRun) {
+      loadMoreJobs();
+    }
+  };
+
+  const loadMoreJobs = async () => {
+    if (jobLoadingMore || !selectedRun) return;
+
+    setJobLoadingMore(true);
+    try {
+      const token = localStorage.getItem('monodog_session_token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+      };
+
+      const response = await fetch(
+        `${apiUrl}/api/workflows/${owner}/${repo}/runs/${selectedRun}?page=${Math.floor(jobOffset / jobPageSize) + 2}`,
+        { headers }
+      );
+
+      if (!response.ok) throw new Error('Failed to fetch more jobs');
+
+      const data = await response.json();
+      const newJobs = (data.jobs || []).map((job: any) => ({
+        id: job.id,
+        gitHubJobId: job.id,
+        name: job.name,
+        status: job.status,
+        conclusion: job.conclusion || null,
+        htmlUrl: job.html_url,
+        startedAt: job.started_at,
+        completedAt: job.completed_at,
+      }));
+
+      setJobs(prev => [...prev, ...newJobs]);
+      setJobOffset(prev => prev + jobPageSize);
+    } catch (err) {
+      console.error('Error loading more jobs:', err);
+    } finally {
+      setJobLoadingMore(false);
+    }
+  };
+
+  const handleSelectRun = (runId: number) => {
+    setSelectedRun(runId);
+    setSelectedJob(null);
+    setJobs([]);
+    setJobOffset(0);
+  };
+
+  // Remove unused currentRun variable - it's no longer needed
+
+  if (loading && pipelines.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin">
+          <ClockIcon className="h-8 w-8 text-blue-600" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[50vh] overflow-hidden">
+      {/* Pipelines List */}
+      <div className="lg:col-span-1 overflow-y-auto border-r border-gray-200" onScroll={handlePipelinesScroll}>
+        <div className="p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900">Pipelines</h3>
+            {selectedPipeline && hasPermission('maintain') && (
+              <WorkflowTrigger
+                owner={owner}
+                repo={repo}
+                workflowId={selectedPipeline.workflowPath || selectedPipeline.workflowId}
+                // pipelineId={selectedPipeline.id}
+              />
+            )}
+          </div>
+
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-xs text-red-700">{error}</p>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            {pipelines.length === 0 ? (
+              <p className="text-sm text-gray-500">No pipelines found</p>
+            ) : (
+              <>
+                {pipelines.map((pipeline) => (
+                  <button
+                    key={pipeline.id}
+                    onClick={() => {
+                      setSelectedPipeline(pipeline);
+                      setSelectedRun(null);
+                      setJobs([]);
+                    }}
+                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                      selectedPipeline?.id === pipeline.id
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-start gap-2">
+                      {getStatusIcon(pipeline.currentStatus, pipeline.currentConclusion || null, updatingPipelines.has(pipeline.id))}
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm text-gray-900 truncate">
+                          {pipeline.packageName}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          v{pipeline.releaseVersion}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {pipeline.workflowName}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+                {pipelineLoadingMore && (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin">
+                      <ClockIcon className="h-5 w-5 text-blue-600" />
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Workflow Runs List */}
+      <div className="lg:col-span-1 overflow-y-auto border-r border-gray-200">
+        <div className="p-4 space-y-4">
+          <h3 className="text-lg font-semibold text-gray-900">Runs</h3>
+          {selectedPipeline && (
+            <WorkflowRunsList
+              owner={owner}
+              repo={repo}
+              packageName={packageName}
+              onSelectRun={handleSelectRun}
+              runId={selectedRun}
+              limit={runsPageSize}
+              pipelineId={selectedPipeline.id}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Jobs List */}
+      <div className="lg:col-span-1 overflow-y-auto border-r border-gray-200" onScroll={handleJobsScroll}>
+        <div className="p-4 space-y-4">
+          <h3 className="text-lg font-semibold text-gray-900">Jobs</h3>
+          <div className="space-y-2">
+            {jobs.length === 0 ? (
+              <p className="text-sm text-gray-500">No jobs available</p>
+            ) : (
+              <>
+                {jobs.map((job) => {
+                  const jobDuration = job.startedAt && job.completedAt
+                    ? Math.round((new Date(job.completedAt).getTime() - new Date(job.startedAt).getTime()) / 1000)
+                    : 0;
+                  const isRunning = job.status === 'in_progress' || job.status === 'queued';
+                  const isFailed = job.conclusion === 'failure';
+
+                  return (
+                    <div
+                      key={job.id}
+                      className={`rounded-lg border transition-colors ${
+                        selectedJob?.id === job.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      <button
+                        onClick={() => handleSelectJob(job)}
+                        className="w-full text-left p-3"
+                      >
+                        <div className="flex items-start gap-2">
+                          {getStatusIcon(job.status, job.conclusion)}
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm text-gray-900 truncate">
+                              {job.name}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {job.status} • {jobDuration}s
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  );
+                })}
+                {jobLoadingMore && (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin">
+                      <ClockIcon className="h-5 w-5 text-blue-600" />
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+          {/* Log Viewer */}
+      <div className="lg:col-span-1 overflow-hidden  border-t pt-2 h-[50vh]">
+        <div className="p-4 h-full overflow-hidden flex flex-col">
+          <h3 className="text-lg font-semibold text-gray-900">Logs</h3>
+          {selectedJob && jobLogs ? (
+            <LogViewer
+              steps={(() => {
+                const hierarchicalSteps = parseStepsFromLogs(jobLogs);
+
+                let stepCounter = 0;
+                const addStepNumbers = (steps: HierarchicalStep[]): any[] => {
+                  return steps.map((step) => {
+                    stepCounter++;
+                     const startedAt = step.logs.at(0)?.split(" ")[0];
+                     const completedAt = step.logs.at(-1)?.split(" ")[0];
+                    return {
+                      stepNumber: stepCounter,
+                      stepName: step.name,
+                      level: step.level,
+                      status: '',
+                      conclusion: '',
+                      startedAt: startedAt,
+                      completedAt: completedAt,
+                      logs: step.logs.map((line: string, lineIdx: number) => ({
+                        lineNumber: lineIdx + 1,
+                        timestamp: new Date().toISOString(),
+                        content: line,
+                        ansiContent: line,
+                      })),
+                      children: step.children ? addStepNumbers(step.children) : undefined,
+                    };
+                  });
+                };
+                return addStepNumbers(hierarchicalSteps);
+              })()}
+              jobName={selectedJob.name}
+              jobStatus={selectedJob.status}
+              jobConclusion={selectedJob.conclusion}
+              gitHubLogsUrl={selectedJob.htmlUrl}
+            />
+          ) : selectedJob ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-spin">
+                <ClockIcon className="h-8 w-8 text-blue-600" />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              <p className="text-sm">Select a job to view logs</p>
+            </div>
+          )}
+        </div>
+      </div>
+      </div>
+  );
+}

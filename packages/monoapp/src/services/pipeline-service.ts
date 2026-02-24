@@ -3,7 +3,10 @@
  * Handles pipeline tracking, storage, and real-time updates
  */
 
-import { PrismaClient } from '@prisma/client';
+import * as PrismaPkg from '@prisma/client';
+
+const PrismaClient = (PrismaPkg as any).PrismaClient || (PrismaPkg as any).default || PrismaPkg;
+
 import type {
   ReleasePipeline,
   WorkflowRun,
@@ -334,7 +337,7 @@ export async function getRecentPipelines(
     });
 
     // Enrich with workflowPath if not already set (should be set in database now)
-    return pipelines.map(p => ({
+    return pipelines.map((p: ReleasePipeline) => ({
       ...p,
       workflowPath: p.workflowPath || 'release.yml',
     }));

@@ -1,5 +1,11 @@
 # @monodog/utils
 
+## 1.0.16
+
+### Patch Changes
+
+- [`f27db43`](https://github.com/manojkmfsi/monodog/commit/f27db43277895381dbf239ffd57ebb17e7fd6e13) - sasasasasasasas
+
 ## 1.0.15
 
 ### Patch Changes

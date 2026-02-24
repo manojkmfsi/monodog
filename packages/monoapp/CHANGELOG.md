@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.30
+
+### Patch Changes
+
+- [`f27db43`](https://github.com/manojkmfsi/monodog/commit/f27db43277895381dbf239ffd57ebb17e7fd6e13) - sasasasasasasas
+
 ## 1.1.29
 
 ### Patch Changes

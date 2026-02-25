@@ -232,7 +232,6 @@ async function getJobLogs(owner, repo, jobId, accessToken) {
     return new Promise((resolve, reject) => {
         const request = https_1.default.request(requestOptions, (response) => {
             let body = '';
-            let finalUrl = path;
             // Handle redirects
             if (response.statusCode === 301 || response.statusCode === 302 || response.statusCode === 303) {
                 const location = response.headers.location;
@@ -346,6 +345,7 @@ function parseJobLogs(rawLogs, job) {
                 steps.push(currentStep);
             }
             // Extract step name
+            // eslint-disable-next-line no-control-regex
             const nameMatch = line.match(/##\[group\](.*?)(\u001b\[0m)?$/);
             const stepName = nameMatch ? nameMatch[1].trim() : `Step ${steps.length + 1}`;
             // Find matching step in workflow

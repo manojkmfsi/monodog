@@ -19,8 +19,8 @@ const navigation = [
   { name: 'Health Status', href: '/health', icon: HeartIcon },
   { name: 'Release', href: '/release', icon: CloudArrowUpIcon },
   { name: 'Release Pipeline', href: '/pipeline', icon: RocketLaunchIcon },
-  { name: 'Publish Control', href: '/publish', icon: CloudArrowUpIcon },
-  { name: 'CI/CD', href: '/ci', icon: CpuChipIcon },
+  // { name: 'Publish Control', href: '/publish', icon: CloudArrowUpIcon },
+  // { name: 'CI/CD', href: '/ci', icon: CpuChipIcon },
   { name: 'Configuration', href: '/config', icon: Cog6ToothIcon },
 ];
 
@@ -89,18 +89,18 @@ export default function Layout({ children }: LayoutProps) {
           {/* User info */}
           <div className="flex items-center gap-3">
             <div className="flex flex-col items-end text-sm">
-              {session && <span className="font-medium text-primary-700">{session.user.login}</span>}
-
-              {session && <span className="text-neutral-500">{session.permission.role}</span>}
-            </div>
-            <div className="flex flex-col items-end text-sm">
               <button className="font-medium" onClick={logout} title="Logout"><LogoutIcon></LogoutIcon></button>
             </div>
-            {/* <img
-              src=""
+            <div className="flex flex-col items-end text-sm">
+              {session && <span className="font-medium text-primary-700">{session.user?.login ?? 'anonymous'}</span>}
+
+              {session && <span className="text-neutral-500">{session.permission?.role ?? 'Denied'}</span>}
+            </div>
+            <img
+              src={session.user?.avatar_url ?? ''}
               alt="User Avatar"
               className="h-8 w-8 rounded-full border border-neutral-200"
-            /> */}
+            />
           </div>
         </header>
 

@@ -1,5 +1,62 @@
 # @monodog/ci-status
 
+## 1.2.27
+
+### Patch Changes
+
+- [`268ba95`](https://github.com/manojkmfsi/monodog/commit/268ba95ef4d07b9793a1b41b7b45a545550df18f) - dxdvxvxcvxvxcvxcvcxvcx
+
+- [`a3a34c5`](https://github.com/manojkmfsi/monodog/commit/a3a34c5220ae2f19f46bb66629950898159aec72) - dsdscdcxcxvxcvcxvxc
+
+- [`41b5080`](https://github.com/manojkmfsi/monodog/commit/41b5080186f69009774ca8778a54b1442fbb4c75) - sadsfdcbvcbvcvnvn
+
+- [`236a117`](https://github.com/manojkmfsi/monodog/commit/236a117f8e45c856026f61be0cf77cacd3e36151) - bnmnm,n,mn,n,n,nk
+
+- [`8093aa2`](https://github.com/manojkmfsi/monodog/commit/8093aa25b8022d26ede776138c1abf079728907f) - ccbvbnbmnm,n,m,m,.
+
+- [`a59a75f`](https://github.com/manojkmfsi/monodog/commit/a59a75f06fa4f10bf9ba5d9117c0119f97e7ece6) - nn,m,m,m,m,.m.,
+
+- [`c2e12b7`](https://github.com/manojkmfsi/monodog/commit/c2e12b7e51b3669dcc6e1ed9354ac03df126c639) - sfddsgfdgfgfvb
+
+- [`5c746f6`](https://github.com/manojkmfsi/monodog/commit/5c746f632d7bfdc09ceadc86bc16da18d04cfaeb) - zszcxcbvfhfhjk.
+
+- [`2086225`](https://github.com/manojkmfsi/monodog/commit/20862253d97dbb40c6b579e5a1910ea610b40bdc) - mmmm,m,m ,m,m,m,,mm,
+
+- [`1b5a6ed`](https://github.com/manojkmfsi/monodog/commit/1b5a6edf52a46e63ec36a28c96ac426b88548d92) - dfdsfdsfsfsdfsfrfdd
+
+- [`70620b4`](https://github.com/manojkmfsi/monodog/commit/70620b46ec4337dc98d747bea8ec3447e474c378) - dfdfddsyojlkvmkm
+
+- [`f5ff240`](https://github.com/manojkmfsi/monodog/commit/f5ff2407c7a940ce15410dfdac24c723ff1b217c) - dvcfdvdfvfdvfdvfdf
+
+- [`a68915f`](https://github.com/manojkmfsi/monodog/commit/a68915f449c193519350795a4fa3f64ec023ae35) - xvcvcc vcbvccc
+
+- [`bc4c39f`](https://github.com/manojkmfsi/monodog/commit/bc4c39ff7a1c70f7f67b431351909f0d4e830beb) - nmm,,m ,mmbgfgcvbnm,
+
+- [`118be1d`](https://github.com/manojkmfsi/monodog/commit/118be1d93e367d1dc61e29b3576e613bfc42c9ef) - njnkjkjjkkjkjknlk
+
+- [`0ca4c24`](https://github.com/manojkmfsi/monodog/commit/0ca4c249d97054b24a8130b0334b6505244336c2) - hgvhjbhjbhjbmnnmnmnm,
+
+- [`65578b1`](https://github.com/manojkmfsi/monodog/commit/65578b1ab48a2f3d0440ac1c6236adc5bf184a34) - cvxcvcvvcbcvbbvvbnb
+
+- [`82278f0`](https://github.com/manojkmfsi/monodog/commit/82278f0563be4b2ff6a042d0faff9c7e24a63ee0) - ryttuip89665467980909009[-
+
+- [`baa140b`](https://github.com/manojkmfsi/monodog/commit/baa140b9408827b6825f663d0a327fe1637aba90) - hjbdshjhfdnj,mfn,mdfdf
+
+- [`efee08b`](https://github.com/manojkmfsi/monodog/commit/efee08b5d8cc52f35b7a21dae69ca7dde5b99427) - fgkjlkn,m cgfcbv
+
+- [`89f309c`](https://github.com/manojkmfsi/monodog/commit/89f309ce413cc2e028ae45381d97268322f9f639) - bjlkmkm.,m.,
+
+- [`fe401da`](https://github.com/manojkmfsi/monodog/commit/fe401da0dace81d5b0bdff6db6f75f152079ac3e) - hjkjskjnamsn,mansn,man,msa
+
+- [`b08f20f`](https://github.com/manojkmfsi/monodog/commit/b08f20f18fd0bc2f72290a33b4ec4d1a71cf6876) - njjkjknnnn,mn,mn,mn,m
+
+- [`301b08a`](https://github.com/manojkmfsi/monodog/commit/301b08ab2103c46ca629eb28afd956b3810e7fc7) - hhkkkjhkhkjkkjkkjk
+
+- [`5989cc1`](https://github.com/manojkmfsi/monodog/commit/5989cc13771e5fccab37d270b39f615d75917fa9) - njnlkmjkm.,m.,m.,m.,
+
+- Updated dependencies [[`268ba95`](https://github.com/manojkmfsi/monodog/commit/268ba95ef4d07b9793a1b41b7b45a545550df18f), [`0541cc8`](https://github.com/manojkmfsi/monodog/commit/0541cc88c639265386c29a59b09e6b63cdee6064), [`41b5080`](https://github.com/manojkmfsi/monodog/commit/41b5080186f69009774ca8778a54b1442fbb4c75), [`fd64aae`](https://github.com/manojkmfsi/monodog/commit/fd64aae11ea04ace31b21b1f54e41de19991b163), [`3a32768`](https://github.com/manojkmfsi/monodog/commit/3a32768c4e1be683847d9308632c1d4eb85e43fd), [`49319b4`](https://github.com/manojkmfsi/monodog/commit/49319b45a928d7f581eb14a9219d5a89ae6a467e), [`2086225`](https://github.com/manojkmfsi/monodog/commit/20862253d97dbb40c6b579e5a1910ea610b40bdc), [`70620b4`](https://github.com/manojkmfsi/monodog/commit/70620b46ec4337dc98d747bea8ec3447e474c378), [`baa140b`](https://github.com/manojkmfsi/monodog/commit/baa140b9408827b6825f663d0a327fe1637aba90), [`be8a08d`](https://github.com/manojkmfsi/monodog/commit/be8a08da49152a7a3cea86ee0a486e5802dc4487), [`fe401da`](https://github.com/manojkmfsi/monodog/commit/fe401da0dace81d5b0bdff6db6f75f152079ac3e), [`b08f20f`](https://github.com/manojkmfsi/monodog/commit/b08f20f18fd0bc2f72290a33b4ec4d1a71cf6876)]:
+  - @monodog/utils@1.0.17
+
 ## 1.2.26
 
 ### Patch Changes

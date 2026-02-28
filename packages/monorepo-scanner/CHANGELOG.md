@@ -1,5 +1,14 @@
 # @monodog/monorepo-scanner
 
+## 1.0.27
+
+### Patch Changes
+
+- [`9290e97`](https://github.com/manojkmfsi/monodog/commit/9290e9705b2efc749eed30b282aeaad10f92309b) - hygyugujkkjjkjkjk
+
+- Updated dependencies [[`268ba95`](https://github.com/manojkmfsi/monodog/commit/268ba95ef4d07b9793a1b41b7b45a545550df18f), [`0541cc8`](https://github.com/manojkmfsi/monodog/commit/0541cc88c639265386c29a59b09e6b63cdee6064), [`41b5080`](https://github.com/manojkmfsi/monodog/commit/41b5080186f69009774ca8778a54b1442fbb4c75), [`fd64aae`](https://github.com/manojkmfsi/monodog/commit/fd64aae11ea04ace31b21b1f54e41de19991b163), [`3a32768`](https://github.com/manojkmfsi/monodog/commit/3a32768c4e1be683847d9308632c1d4eb85e43fd), [`49319b4`](https://github.com/manojkmfsi/monodog/commit/49319b45a928d7f581eb14a9219d5a89ae6a467e), [`2086225`](https://github.com/manojkmfsi/monodog/commit/20862253d97dbb40c6b579e5a1910ea610b40bdc), [`70620b4`](https://github.com/manojkmfsi/monodog/commit/70620b46ec4337dc98d747bea8ec3447e474c378), [`baa140b`](https://github.com/manojkmfsi/monodog/commit/baa140b9408827b6825f663d0a327fe1637aba90), [`be8a08d`](https://github.com/manojkmfsi/monodog/commit/be8a08da49152a7a3cea86ee0a486e5802dc4487), [`fe401da`](https://github.com/manojkmfsi/monodog/commit/fe401da0dace81d5b0bdff6db6f75f152079ac3e), [`b08f20f`](https://github.com/manojkmfsi/monodog/commit/b08f20f18fd0bc2f72290a33b4ec4d1a71cf6876)]:
+  - @monodog/utils@1.0.17
+
 ## 1.0.26
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.0.1
+
+### Patch Changes
+
+- updated installation script
+
 ## 3.1.1
 
 ### Patch Changes

@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { ValidationResult, SelectedPackage } from '../ReleaseManager';
+import { CheckIcon, XMarkIcon } from '../../../icons';
 
 interface ReleaseValidationProps {
   validation: ValidationResult;
@@ -41,7 +42,7 @@ export default function ReleaseValidation({
       <div className="grid grid-cols-2 gap-4">
         <div className={`p-4 rounded-lg ${validation.isValid ? 'bg-green-50' : 'bg-red-50'}`}>
           <p className={`font-medium ${validation.isValid ? 'text-green-900' : 'text-red-900'}`}>
-            {validation.isValid ? '✓ Ready to Release' : '✗ Not Ready'}
+            {validation.isValid ? 'Ready to Release' : 'Not Ready'}
           </p>
           <p className={`text-sm mt-1 ${validation.isValid ? 'text-green-700' : 'text-red-700'}`}>
             {validation.isValid
@@ -69,11 +70,11 @@ export default function ReleaseValidation({
               }`}
             >
               <div
-                className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center font-bold text-white ${
+                className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center font-bold text-white p-1 ${
                   check.passed ? 'bg-green-500' : 'bg-red-500'
                 }`}
               >
-                {check.passed ? '✓' : '✗'}
+                {check.passed ? <CheckIcon></CheckIcon> : <XMarkIcon></XMarkIcon>}
               </div>
               <span
                 className={`font-medium ${
@@ -108,7 +109,7 @@ export default function ReleaseValidation({
           <div className="space-y-2">
             {validation.warnings.map((warning, idx) => (
               <p key={idx} className="text-yellow-700 text-sm">
-                ⚠️ {warning}
+                {warning}
               </p>
             ))}
           </div>

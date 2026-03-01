@@ -70,8 +70,8 @@ function createApp(rootPath) {
     app.use('/api/health/', health_routes_1.default);
     app.use('/api/config/', config_routes_1.default);
     app.use('/api/publish', publish_routes_1.default);
-    app.use('/api', router); // Pipeline routes
-    // 404 handler
+    app.use('/api', router);
+    // 404 handlerAPI_ENDPOINTS
     app.use('*', error_handler_1.notFoundHandler);
     // Global error handler (must be last)
     app.use(error_handler_1.errorHandler);
@@ -90,55 +90,7 @@ function startServer(rootPath) {
         const app = createApp(rootPath);
         const server = app.listen(validatedPort, host, () => {
             console.log((0, constants_1.SUCCESS_SERVER_START)(host, validatedPort));
-            logger_1.AppLogger.info('API endpoints available:', {
-                endpoints: [
-                    // Auth endpoints
-                    'GET  /api/auth/login',
-                    'GET  /api/auth/callback',
-                    'GET  /api/auth/me',
-                    'POST /api/auth/validate',
-                    'POST /api/auth/logout',
-                    'POST /api/auth/refresh',
-                    // Permission endpoints
-                    'GET  /api/permissions/:owner/:repo',
-                    'POST /api/permissions/:owner/:repo/can-action',
-                    'POST /api/permissions/:owner/:repo/invalidate',
-                    // Package endpoints
-                    'POST /api/packages/refresh',
-                    'GET  /api/packages',
-                    'GET  /api/packages/:name',
-                    'PUT  /api/packages/update-config',
-                    // Commit endpoints
-                    'GET  /api/commits/:packagePath',
-                    // Health endpoints
-                    'GET  /api/health/packages',
-                    'POST /api/health/refresh',
-                    // Config endpoints
-                    'PUT  /api/config/files/:id',
-                    'GET  /api/config/files',
-                    // Publish endpoints
-                    'GET  /api/publish/packages',
-                    'GET  /api/publish/changesets',
-                    'GET  /api/publish/status',
-                    'POST /api/publish/preview',
-                    'POST /api/publish/changesets',
-                    'POST /api/publish/trigger',
-                    // Pipeline endpoints
-                    'GET  /api/pipelines',
-                    'GET  /api/pipelines/:pipelineId',
-                    'GET  /api/pipelines/package/:owner/:repo/:packageName',
-                    'PUT  /api/pipelines/:pipelineId/status',
-                    'GET  /api/workflows/:owner/:repo',
-                    'GET  /api/workflows/:owner/:repo/runs',
-                    'GET  /api/runs/:runId/jobs',
-                    'GET  /api/jobs/:jobId/logs',
-                    'POST /api/workflows/:workflowId/trigger',
-                    'POST /api/workflows/:workflowId/dispatch',
-                    'GET  /api/audit-logs',
-                    'GET  /api/metrics',
-                    'GET  /api/rate-limit',
-                ],
-            });
+            logger_1.AppLogger.info('API endpoints available:', { ENDPOINTS: constants_1.ENDPOINTS });
         });
         server.on('error', (err) => {
             if (err.code === 'EADDRINUSE') {

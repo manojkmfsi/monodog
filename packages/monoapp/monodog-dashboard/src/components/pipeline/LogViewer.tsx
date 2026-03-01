@@ -1,32 +1,13 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDownIcon, ChevronRightIcon , CheckCircleIcon, ExclamationCircleIcon, ClockIcon, XCircleIcon} from '../../icons/index';
 import DOMPurify from 'dompurify';
+import type { HierarchicalStep, LogViewerProps, StepItemProps } from '../../types';
 
 interface LogLine {
   lineNumber: number;
   timestamp: string;
   content: string;
   ansiContent: string;
-}
-
-interface HierarchicalStep {
-  stepNumber: number;
-  stepName: string;
-  level: number;
-  startedAt: string | null;
-  completedAt: string | null;
-  conclusion: string | null;
-  status: 'queued' | 'in_progress' | 'completed';
-  logs: LogLine[];
-  children?: HierarchicalStep[];
-}
-
-interface LogViewerProps {
-  steps: HierarchicalStep[];
-  jobName: string;
-  jobStatus: string;
-  jobConclusion: string;
-  gitHubLogsUrl: string;
 }
 
 /**

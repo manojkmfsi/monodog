@@ -11,6 +11,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../services/auth-context';
+import apiClient from '../../services/api';
 import PackageSelector from './components/PackageSelector';
 import VersionBumpSelector from './components/VersionBumpSelector';
 import ChangesetPreview from './components/ChangesetPreview';
@@ -18,33 +19,12 @@ import ReleaseValidation from './components/ReleaseValidation';
 import PublishConfirmation from './components/PublishConfirmation';
 import LoadingState from './components/LoadingState';
 import ErrorState from './components/ErrorState';
-import '../../styles/release-manager.css';
+import { DASHBOARD_ERROR_MESSAGES } from '../../constants/messages';
+import { DASHBOARD_API_ENDPOINTS } from '../../constants/api-config';
+import type { SelectedPackage, ChangesetData, ValidationResult } from './types';
 
-export interface SelectedPackage {
-  name: string;
-  currentVersion: string;
-  newVersion: string;
-  bumpType: 'major' | 'minor' | 'patch';
-  affectedDependencies: string[];
-}
-
-export interface ChangesetData {
-  packages: SelectedPackage[];
-  summary: string;
-  timestamp: string;
-}
-
-export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings: string[];
-  checks: {
-    permissions: boolean;
-    workingTreeClean: boolean;
-    ciPassing: boolean;
-    versionAvailable: boolean;
-  };
-}
+// Re-export types for backward compatibility
+export type { SelectedPackage, ChangesetData, ValidationResult };
 
 export default function ReleaseManager() {
   const { isAuthenticated, hasPermission } = useAuth();
@@ -54,8 +34,8 @@ export default function ReleaseManager() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
-  const [allPackages, setAllPackages] = useState<any[]>([]);
-  const [existingChangesets, setExistingChangesets] = useState<any[]>([]);
+  const [allPackages, setAllPackages] = useState<Array<{ name: string; version: string; dependents?: string[] }>>([]);
+  const [existingChangesets, setExistingChangesets] = useState<Array<{ id: string; summary: string }>>([]);
 
   // Fetch workspace packages on mount
   useEffect(() => {
@@ -65,49 +45,33 @@ export default function ReleaseManager() {
   const fetchWorkspaceData = async () => {
     try {
       setLoading(true);
-      const apiUrl = (window as any).ENV?.API_URL ?? 'http://localhost:8999';
-      const API_BASE = `${apiUrl}/api`;
-
-      // Get auth token from localStorage
-      const token = localStorage.getItem('monodog_session_token');
-      const headers = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      };
 
       // Fetch packages
-      const packagesRes = await fetch(`${API_BASE}/publish/packages`, {
-        headers,
-      });
-      if (packagesRes.ok) {
-        const packagesData = await packagesRes.json();
-        setAllPackages(packagesData.packages || []);
+      const packagesRes = await apiClient.get(DASHBOARD_API_ENDPOINTS.PUBLISH.PACKAGES);
+      if (packagesRes.success) {
+        setAllPackages(packagesRes.data.packages || []);
       } else {
-        console.warn('Failed to fetch packages:', packagesRes.status);
+        console.warn('Failed to fetch packages:', packagesRes.error?.message);
         // Fallback to regular packages endpoint
-        const fallbackRes = await fetch(`${API_BASE}/packages`, { headers });
-        if (fallbackRes.ok) {
-          const fallbackData = await fallbackRes.json();
-          setAllPackages(fallbackData || []);
+        const fallbackRes = await apiClient.get(DASHBOARD_API_ENDPOINTS.PACKAGES.LIST);
+        if (fallbackRes.success) {
+          setAllPackages(fallbackRes.data || []);
         }
       }
 
       // Fetch existing changesets
-      const changesetsRes = await fetch(`${API_BASE}/publish/changesets`, {
-        headers,
-      });
-      if (changesetsRes.ok) {
-        const changesetsData = await changesetsRes.json();
-        setExistingChangesets(changesetsData.changesets || []);
+      const changesetsRes = await apiClient.get(DASHBOARD_API_ENDPOINTS.PUBLISH.CHANGESETS);
+      if (changesetsRes.success) {
+        setExistingChangesets(changesetsRes.data.changesets || []);
       } else {
-        if (changesetsRes.status === 401 || changesetsRes.status === 403) {
+        if (changesetsRes.error?.status === 401 || changesetsRes.error?.status === 403) {
           window.location.href = '/login';
         }
       }
 
       setError(null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch workspace data';
+      const message = err instanceof Error ? err.message : DASHBOARD_ERROR_MESSAGES.FAILED_TO_FETCH_PACKAGES;
       setError(message);
       console.error('Error fetching workspace data:', err);
     } finally {
@@ -115,7 +79,7 @@ export default function ReleaseManager() {
     }
   };
 
-  const handlePackagesSelected = (packages: any[]) => {
+  const handlePackagesSelected = (packages: Array<{ name: string; version: string; dependents?: string[] }>) => {
     const selected: SelectedPackage[] = packages.map(pkg => ({
       name: pkg.name,
       currentVersion: pkg.version,
@@ -140,34 +104,21 @@ export default function ReleaseManager() {
   const validateRelease = async (packages: SelectedPackage[], summary: string) => {
     try {
       setLoading(true);
-      const apiUrl = (window as any).ENV?.API_URL ?? 'http://localhost:8999';
-      const API_BASE = `${apiUrl}/api`;
 
-      // Get auth token from localStorage
-      const token = localStorage.getItem('monodog_session_token');
-      const headers = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      };
-
-      const response = await fetch(`${API_BASE}/publish/preview`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          packages: packages.map(p => p.name),
-          bumps: packages.map(p => ({
-            package: p.name,
-            bumpType: p.bumpType,
-          })),
-          summary,
-        }),
+      const response = await apiClient.post(DASHBOARD_API_ENDPOINTS.PUBLISH.PREVIEW, {
+        packages: packages.map(p => p.name),
+        bumps: packages.map(p => ({
+          package: p.name,
+          bumpType: p.bumpType,
+        })),
+        summary,
       });
 
-      if (!response.ok) {
-        throw new Error('Validation failed');
+      if (!response.success) {
+        throw new Error(DASHBOARD_ERROR_MESSAGES.VALIDATION_FAILED);
       }
 
-      const result = await response.json();
+      const result = response.data;
 
       // Ensure the result has the expected structure
       const validationData: ValidationResult = {
@@ -198,50 +149,33 @@ export default function ReleaseManager() {
     try {
       // Check permission before publishing
       if (!hasPermission('maintain')) {
-        setError('You do not have permission to publish packages. Required: maintain permission');
+        setError(DASHBOARD_ERROR_MESSAGES.PERMISSION_ERROR);
         return;
       }
 
       setLoading(true);
-      const apiUrl = (window as any).ENV?.API_URL ?? 'http://localhost:8999';
-      const API_BASE = `${apiUrl}/api`;
-
-      // Get auth token from localStorage
-      const token = localStorage.getItem('monodog_session_token');
-      const headers = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      };
 
       // Create changeset
-      const changesetRes = await fetch(`${API_BASE}/publish/changesets`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          packages: selectedPackages.map(p => p.name),
-          bumps: selectedPackages.map(p => ({
-            package: p.name,
-            bumpType: p.bumpType,
-          })),
-          summary: changesetSummary,
-        }),
+      const changesetRes = await apiClient.post(DASHBOARD_API_ENDPOINTS.PUBLISH.CHANGESETS, {
+        packages: selectedPackages.map(p => p.name),
+        bumps: selectedPackages.map(p => ({
+          package: p.name,
+          bumpType: p.bumpType,
+        })),
+        summary: changesetSummary,
       });
 
-      if (!changesetRes.ok) {
-        throw new Error('Failed to create changeset');
+      if (!changesetRes.success) {
+        throw new Error(DASHBOARD_ERROR_MESSAGES.FAILED_TO_CREATE_CHANGESET);
       }
 
       // Trigger publish
-      const publishRes = await fetch(`${API_BASE}/publish/trigger`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          packages: selectedPackages,
-        }),
+      const publishRes = await apiClient.post(DASHBOARD_API_ENDPOINTS.PUBLISH.TRIGGER, {
+        packages: selectedPackages,
       });
 
-      if (!publishRes.ok) {
-        throw new Error('Failed to trigger publish');
+      if (!publishRes.success) {
+        throw new Error(DASHBOARD_ERROR_MESSAGES.FAILED_TO_TRIGGER_PUBLISH);
       }
 
       setCurrentStep('confirm');
@@ -301,7 +235,7 @@ export default function ReleaseManager() {
       {/* Permission Check */}
       {!canCreateChangeset && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-yellow-700 font-medium">⚠️ Limited Access</p>
+          <p className="text-yellow-700 font-medium"> Limited Access</p>
           <p className="text-yellow-600 text-sm mt-1">
             You do not have write permission to create and publish changesets. Contact your repository administrator to request access.
           </p>
@@ -331,7 +265,7 @@ export default function ReleaseManager() {
       {/* Step Content */}
       {currentStep === 'select' && !canCreateChangeset && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700 font-medium">🚫 Access Denied</p>
+          <p className="text-red-700 font-medium">Access Denied</p>
           <p className="text-red-600 text-sm mt-1">
             You do not have write permission to create changesets. Contact your repository administrator.
           </p>
@@ -359,14 +293,14 @@ export default function ReleaseManager() {
           packages={selectedPackages}
           existingChangesets={existingChangesets}
           onConfirm={handlePreviewConfirmed}
-          onBack={() => setCurrentStep('select')}
+          onBack={() => setCurrentStep('bump')}
           loading={loading}
         />
       )}
 
       {currentStep === 'validate' && !canPublish && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700 font-medium">🚫 Access Denied</p>
+          <p className="text-red-700 font-medium">Access Denied</p>
           <p className="text-red-600 text-sm mt-1">
             You do not have maintain permission to publish changesets. Contact your repository administrator.
           </p>

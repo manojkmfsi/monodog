@@ -4,15 +4,9 @@
  */
 
 import React, { useState } from 'react';
-import { SelectedPackage } from '../ReleaseManager';
-
-interface ChangesetPreviewProps {
-  packages: SelectedPackage[];
-  existingChangesets: any[];
-  onConfirm: (summary: string) => void;
-  onBack: () => void;
-  loading?: boolean;
-}
+import { ArrowLongRightIcon } from '../../../icons';
+import { CHANGESET_SUMMARY, SUMMARY_LIMIT } from '../../../constants/messages'
+import type { ChangesetPreviewProps } from '../../../types';
 
 export default function ChangesetPreview({
   packages,
@@ -30,7 +24,7 @@ export default function ChangesetPreview({
       newErrors.push('Please enter a changelog summary');
     }
     if (summary.trim().length < 10) {
-      newErrors.push('Summary must be at least 10 characters');
+      newErrors.push(SUMMARY_LIMIT);
     }
     setErrors(newErrors);
     return newErrors.length === 0;
@@ -58,8 +52,8 @@ export default function ChangesetPreview({
         </label>
         <textarea
           value={summary}
-          onChange={e => setSummary(e.target.value)}
-          placeholder="Describe the changes in this release (e.g., 'Add new API endpoints for user management')"
+          onChange={e => {setSummary(e.target.value); validateSummary();}}
+          placeholder={CHANGESET_SUMMARY}
           rows={4}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm"
         />
@@ -67,7 +61,7 @@ export default function ChangesetPreview({
           <div className="mt-2 space-y-1">
             {errors.map((error, idx) => (
               <p key={idx} className="text-sm text-red-600">
-                ✗ {error}
+                {error}
               </p>
             ))}
           </div>
@@ -82,8 +76,8 @@ export default function ChangesetPreview({
             <div key={pkg.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div>
                 <p className="font-medium text-gray-900">{pkg.name}</p>
-                <p className="text-sm text-gray-500">
-                  {pkg.currentVersion} → {pkg.newVersion}
+                <p className="flex items-center gap-2 text-sm text-gray-500">
+                  {pkg.currentVersion} <ArrowLongRightIcon></ArrowLongRightIcon> {pkg.newVersion}
                 </p>
               </div>
               <div className="text-right">
@@ -99,7 +93,7 @@ export default function ChangesetPreview({
       {/* Conflict Warning */}
       {existingChangesets.length > 0 && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-yellow-800 font-medium">⚠️ Unpublished Changesets</p>
+          <p className="text-yellow-800 font-medium">Unpublished Changesets</p>
           <p className="text-yellow-700 text-sm mt-1">
             There are {existingChangesets.length} existing unpublished changeset(s).
             Creating new ones will accumulate until published.

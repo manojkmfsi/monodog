@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { PlayIcon, ExclamationCircleIcon } from '../../icons/index';
-
-const apiUrl = (window as any).ENV?.API_URL;
+import apiClient from '../../services/api';
+import { DASHBOARD_ERROR_MESSAGES } from '../../constants/messages';
+import { DASHBOARD_API_ENDPOINTS } from '../../constants/api-config';
+import type { WorkflowTriggerProps } from '../../types';
 
 interface WorkflowOption {
   id: number;
@@ -9,20 +11,9 @@ interface WorkflowOption {
   path: string;
 }
 
-interface WorkflowTriggerProps {
-  owner: string;
-  repo: string;
-  workflowId: string;
-  defaultBranch?: string;
-  onSuccess?: (runUrl: string) => void;
-  onError?: (error: string) => void;
-  pipelineId?: string;
-}
-
 export default function WorkflowTrigger({
   owner,
   repo,
-  workflowId,
   defaultBranch = 'main',
   onSuccess,
   onError,
@@ -47,23 +38,15 @@ export default function WorkflowTrigger({
   const fetchWorkflows = async () => {
     try {
       setLoadingWorkflows(true);
-      const token = localStorage.getItem('monodog_session_token');
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      };
 
-      const response = await fetch(
-        `${apiUrl}/api/workflows/${owner}/${repo}/available`,
-        { headers }
+      const response = await apiClient.get(
+        DASHBOARD_API_ENDPOINTS.WORKFLOWS.AVAILABLE(owner, repo)
       );
-
-      if (response.ok) {
-        const data = await response.json();
-        setWorkflows(data.workflows || []);
+      if (response.success) {
+        setWorkflows(response.data.workflows || []);
         // If no workflow path was set, use the first available one
-        if (data.workflows?.length > 0 && !selectedWorkflow) {
-          setSelectedWorkflow(data.workflows[0].path);
+        if (response.data.workflows?.length > 0 && !selectedWorkflow) {
+          setSelectedWorkflow(response.data.workflows[0].path);
         }
       }
     } catch (err) {
@@ -78,31 +61,22 @@ export default function WorkflowTrigger({
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem('monodog_session_token');
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      };
-      const response = await fetch(
-        `${apiUrl}/api/workflows/${owner}/${repo}/trigger`,
+      const response = await apiClient.post(
+        DASHBOARD_API_ENDPOINTS.WORKFLOWS.TRIGGER(owner, repo),
         {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            workflow: selectedWorkflow,
-            ref: branch,
-            inputs,
-            pipelineId,
-            workflowId
-          }),
+          workflow: selectedWorkflow,
+          ref: branch,
+          inputs,
+          pipelineId,
+          workflowId: workflows.find((w) => w.path == selectedWorkflow)?.id ?? ''
         }
       );
 
-      if (!response.ok) {
-        throw new Error('Failed to trigger workflow');
+      if (!response.success) {
+        throw new Error(DASHBOARD_ERROR_MESSAGES.FAILED_TO_TRIGGER_WORKFLOW);
       }
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.success) {
         onSuccess?.(data.runUrl || `https://github.com/${owner}/${repo}/actions`);
@@ -110,11 +84,11 @@ export default function WorkflowTrigger({
         setBranch(defaultBranch);
         setInputs({});
       } else {
-        throw new Error(data.message || 'Failed to trigger workflow');
+        throw new Error(data.message || DASHBOARD_ERROR_MESSAGES.FAILED_TO_TRIGGER_WORKFLOW);
       }
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Unknown error';
+        err instanceof Error ? err.message : DASHBOARD_ERROR_MESSAGES.UNKNOWN_ERROR;
       setError(errorMessage);
       onError?.(errorMessage);
     } finally {

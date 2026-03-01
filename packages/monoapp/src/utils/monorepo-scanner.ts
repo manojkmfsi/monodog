@@ -39,7 +39,7 @@ export class MonorepoScanner {
     try {
       // Check cache first
       const cacheKey = 'full-scan';
-      const cached = this.getFromCache(cacheKey);
+      const cached = this.getFromCache<ScanResult>(cacheKey);
       if (cached) {
         return cached;
       }
@@ -308,15 +308,16 @@ export class MonorepoScanner {
       });
 
     return JSON.parse(stdout);
-    } catch (error: any) {
-      if (error.stdout) {
+    } catch (error) {
+      const errorObj = error as { stdout?: string | Buffer; message?: string };
+      if (errorObj.stdout) {
         try {
-          return JSON.parse(error.stdout.toString());
+          return JSON.parse(errorObj.stdout.toString());
         } catch (parseError) {
           throw new Error(`Failed to parse audit JSON: ${parseError}`);
         }
       }
-      throw new Error(`pnpm audit failed: ${error.message}`);
+      throw new Error(`pnpm audit failed: ${errorObj.message || 'Unknown error'}`);
     }
   }
 
@@ -457,10 +458,10 @@ export class MonorepoScanner {
   /**
    * Gets cache value if not expired
    */
-  private getFromCache(key: string): any {
+  private getFromCache<T = unknown>(key: string): T | null {
     const cached = this.cache.get(key);
     if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
-      return cached.data;
+      return cached.data as T;
     }
     return null;
   }
@@ -468,7 +469,7 @@ export class MonorepoScanner {
   /**
    * Sets cache value with timestamp
    */
-  private setCache(key: string, data: any): void {
+  private setCache<T = unknown>(key: string, data: T): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),

@@ -39,11 +39,13 @@ exports.previewPublish = previewPublish;
 exports.createChangeset = createChangeset;
 exports.checkPublishStatus = checkPublishStatus;
 exports.triggerPublish = triggerPublish;
+require("../types/controllers");
 const logger_1 = require("../middleware/logger");
 const changeset_service_1 = require("../services/changeset-service");
 const pipelineService = __importStar(require("../services/pipeline-service"));
 const utilities_1 = require("../utils/utilities");
 const github_actions_service_1 = require("../services/github-actions-service");
+const constants_1 = require("../constants");
 /**
  * Get all workspace packages
  */
@@ -61,10 +63,10 @@ async function getPublishPackages(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Failed to fetch packages: ${error}`);
-        res.status(500).json({
+        res.status(constants_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
             success: false,
-            error: 'Failed to fetch packages',
-            message: error instanceof Error ? error.message : 'Unknown error',
+            error: constants_1.OPERATION_ERRORS.FAILED_TO_FETCH_PACKAGES,
+            message: (0, constants_1.extractErrorMessage)(error),
         });
     }
 }
@@ -83,9 +85,9 @@ async function getPublishChangesets(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Failed to fetch changesets: ${error}`);
-        res.status(500).json({
+        res.status(constants_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
             success: false,
-            error: 'Failed to fetch changesets',
+            error: constants_1.OPERATION_ERRORS.FAILED_TO_FETCH_CHANGESETS,
         });
     }
 }
@@ -96,10 +98,10 @@ async function previewPublish(req, res) {
     try {
         const { packages: selectedPackageNames, bumps } = req.body;
         if (!selectedPackageNames || !Array.isArray(selectedPackageNames)) {
-            res.status(400).json({
+            res.status(constants_1.HTTP_STATUS_BAD_REQUEST).json({
                 success: false,
-                error: 'Invalid request',
-                message: 'packages array is required',
+                error: constants_1.VALIDATION_ERRORS.INVALID_REQUEST,
+                message: constants_1.VALIDATION_ERRORS.PACKAGES_ARRAY_REQUIRED,
             });
             return;
         }
@@ -119,29 +121,76 @@ async function previewPublish(req, res) {
         // Get authenticated user
         const authUser = req.user;
         const userPermission = req.permission.permission || 'read';
+        const accessToken = req.accessToken;
         // Check 1: Working tree clean
         const workingTreeClean = isClean;
         if (!workingTreeClean) {
-            errors.push('Working tree has uncommitted changes');
+            errors.push(constants_1.VALIDATION_ERRORS.WORKING_TREE_NOT_CLEAN);
         }
         // Check 2: User permissions
-        const permissionHierarchy = {
-            admin: 4,
-            maintain: 3,
-            write: 2,
-            read: 1,
-            none: 0,
-        };
-        const userLevel = permissionHierarchy[userPermission] || 0;
-        const requiredLevel = permissionHierarchy['write'] || 0;
+        const userLevel = constants_1.PERMISSION_HIERARCHY[userPermission.toUpperCase()]?.level || 0;
+        const requiredLevel = constants_1.PERMISSION_HIERARCHY.WRITE.level;
         const permissions = userLevel >= requiredLevel;
         if (!permissions) {
             errors.push(`Insufficient permissions. Required: write, Got: ${userPermission}`);
         }
-        // Check 3: CI passing (simplified - always true for now)
-        const ciPassing = true;
-        // Check 4: Version available on npm (simplified - always true for now)
-        const versionAvailable = true;
+        // Check 3: CI passing - Check if most recent workflow run passed
+        let ciPassing = false;
+        try {
+            const repoInfo = await (0, utilities_1.getRepositoryInfoFromGit)();
+            if (repoInfo && accessToken) {
+                const { owner, repo } = repoInfo;
+                // Fetch the workflow ID from GitHub
+                try {
+                    const workflowsResponse = await (0, github_actions_service_1.listWorkflows)(owner, repo, accessToken);
+                    const releaseWorkflow = workflowsResponse.workflows.find((workflow) => workflow.name === 'Release' ||
+                        workflow.name === 'Deployment Workflow' ||
+                        workflow.name.toLowerCase().includes('release') ||
+                        workflow.name.toLowerCase().includes('deployment'));
+                    if (releaseWorkflow) {
+                        const workflowId = String(releaseWorkflow.id);
+                        const workflowPath = String(releaseWorkflow.path);
+                        // Check CI status using the helper function
+                        ciPassing = await (0, changeset_service_1.checkCIPassing)(accessToken, owner, repo, workflowId, workflowPath);
+                        if (!ciPassing) {
+                            warnings.push('Latest CI workflow run did not pass');
+                        }
+                    }
+                    else {
+                        logger_1.AppLogger.warn('Release workflow not found, skipping CI check');
+                        ciPassing = true; // Allow if no workflow found
+                    }
+                }
+                catch (workflowError) {
+                    logger_1.AppLogger.error(`Failed to fetch workflows for CI check: ${workflowError}`);
+                    ciPassing = true; // Allow if workflow fetch fails
+                }
+            }
+            else {
+                logger_1.AppLogger.warn('No repository info or access token to check CI');
+                ciPassing = true; // Allow if no auth
+            }
+        }
+        catch (ciCheckError) {
+            logger_1.AppLogger.error(`CI check error: ${ciCheckError}`);
+            ciPassing = true; // Allow on error
+        }
+        // Check 4: Version available on npm - Verify new versions don't exist on npm
+        let versionAvailable = true;
+        try {
+            for (const pkg of newVersions) {
+                const available = await (0, changeset_service_1.checkVersionAvailableOnNpm)(pkg.package, pkg.newVersion);
+                if (!available) {
+                    versionAvailable = false;
+                    errors.push(`Version ${pkg.newVersion} of package ${pkg.package} already exists on npm`);
+                }
+            }
+        }
+        catch (npmCheckError) {
+            logger_1.AppLogger.error(`NPM version check error: ${npmCheckError}`);
+            // Don't fail the check on error, set to true
+            versionAvailable = true;
+        }
         logger_1.AppLogger.info(`Publishing preview for user: ${authUser?.login} (permission: ${userPermission})`);
         const isValid = errors.length === 0;
         res.json({
@@ -165,10 +214,10 @@ async function previewPublish(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Failed to preview publish: ${error}`);
-        res.status(500).json({
+        res.status(constants_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
             success: false,
-            error: 'Failed to preview publish',
-            message: error instanceof Error ? error.message : 'Unknown error',
+            error: constants_1.OPERATION_ERRORS.FAILED_TO_PREVIEW_PUBLISH,
+            message: (0, constants_1.extractErrorMessage)(error),
         });
     }
 }
@@ -181,37 +230,30 @@ async function createChangeset(req, res) {
         const authUser = req.user;
         const userPermission = req.permission.permission || 'read';
         if (!selectedPackageNames || !Array.isArray(selectedPackageNames)) {
-            res.status(400).json({
+            res.status(constants_1.HTTP_STATUS_BAD_REQUEST).json({
                 success: false,
-                error: 'Invalid request',
-                message: 'packages array is required',
+                error: constants_1.VALIDATION_ERRORS.INVALID_REQUEST,
+                message: constants_1.VALIDATION_ERRORS.PACKAGES_ARRAY_REQUIRED,
             });
             return;
         }
         if (!summary || typeof summary !== 'string' || summary.length < 10) {
-            res.status(400).json({
+            res.status(constants_1.HTTP_STATUS_BAD_REQUEST).json({
                 success: false,
-                error: 'Invalid summary',
-                message: 'Summary must be at least 10 characters',
+                error: constants_1.VALIDATION_ERRORS.INVALID_SUMMARY,
+                message: constants_1.VALIDATION_ERRORS.SUMMARY_TOO_SHORT,
             });
             return;
         }
         // Check permissions
-        const permissionHierarchy = {
-            admin: 4,
-            maintain: 3,
-            write: 2,
-            read: 1,
-            none: 0,
-        };
-        const userLevel = permissionHierarchy[userPermission] || 0;
-        const requiredLevel = permissionHierarchy['write'] || 0;
+        const userLevel = constants_1.PERMISSION_HIERARCHY[userPermission.toUpperCase()]?.level || 0;
+        const requiredLevel = constants_1.PERMISSION_HIERARCHY.WRITE.level;
         if (userLevel < requiredLevel) {
             logger_1.AppLogger.warn(`User ${authUser?.login} attempted to create changeset without write permission`);
-            res.status(403).json({
+            res.status(constants_1.HTTP_STATUS_FORBIDDEN).json({
                 success: false,
-                error: 'Forbidden',
-                message: `This action requires write permission. You have: ${userPermission}`,
+                error: constants_1.PERMISSION_ERRORS.FORBIDDEN,
+                message: constants_1.PERMISSION_ERRORS.INSUFFICIENT_WRITE_PERMISSION(userPermission),
             });
             return;
         }
@@ -220,9 +262,9 @@ async function createChangeset(req, res) {
         // Generate the changeset
         const result = await (0, changeset_service_1.generateChangeset)(rootPath, selectedPackageNames, bumps || [], summary, authUser?.login);
         if (!result.success) {
-            res.status(400).json({
+            res.status(constants_1.HTTP_STATUS_BAD_REQUEST).json({
                 success: false,
-                error: 'Failed to create changeset',
+                error: constants_1.OPERATION_ERRORS.FAILED_TO_CREATE_CHANGESET,
                 message: result.message,
             });
             return;
@@ -230,15 +272,15 @@ async function createChangeset(req, res) {
         res.json({
             success: true,
             changeset: result.changeset,
-            message: 'Changeset created successfully',
+            message: constants_1.CHANGESET_MESSAGES.CREATED,
         });
     }
     catch (error) {
         logger_1.AppLogger.error(`Failed to create changeset: ${error}`);
-        res.status(500).json({
+        res.status(constants_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
             success: false,
-            error: 'Failed to create changeset',
-            message: error instanceof Error ? error.message : 'Unknown error',
+            error: constants_1.OPERATION_ERRORS.FAILED_TO_CREATE_CHANGESET,
+            message: (0, constants_1.extractErrorMessage)(error),
         });
     }
 }
@@ -264,9 +306,9 @@ async function checkPublishStatus(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Failed to check publish status: ${error}`);
-        res.status(500).json({
+        res.status(constants_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
             success: false,
-            error: 'Failed to check publish status',
+            error: constants_1.OPERATION_ERRORS.FAILED_TO_PUBLISH,
         });
     }
 }
@@ -281,41 +323,34 @@ async function triggerPublish(req, res) {
         const { packages: selectedPackages } = req.body;
         const selectedPackageNames = selectedPackages?.map((pkg) => pkg.name) || [];
         // Check permissions
-        const permissionHierarchy = {
-            admin: 4,
-            maintain: 3,
-            write: 2,
-            read: 1,
-            none: 0,
-        };
-        const userLevel = permissionHierarchy[userPermission] || 0;
-        const requiredLevel = permissionHierarchy['maintain'] || 0;
+        const userLevel = constants_1.PERMISSION_HIERARCHY[userPermission.toUpperCase()]?.level || 0;
+        const requiredLevel = constants_1.PERMISSION_HIERARCHY.MAINTAIN.level;
         if (userLevel < requiredLevel) {
             logger_1.AppLogger.warn(`User ${authUser?.login} attempted to trigger publish without maintain permission`);
-            res.status(403).json({
+            res.status(constants_1.HTTP_STATUS_FORBIDDEN).json({
                 success: false,
-                error: 'Forbidden',
-                message: `This action requires maintain permission. You have: ${userPermission}`,
+                error: constants_1.PERMISSION_ERRORS.FORBIDDEN,
+                message: constants_1.PERMISSION_ERRORS.INSUFFICIENT_MAINTAIN_PERMISSION(userPermission),
             });
             return;
         }
         // Check if working tree is clean
         const isClean = await (0, changeset_service_1.isWorkingTreeClean)(rootPath);
         if (!isClean) {
-            res.status(400).json({
+            res.status(constants_1.HTTP_STATUS_BAD_REQUEST).json({
                 success: false,
-                error: 'Working tree not clean',
-                message: 'Please commit or stash all changes before publishing',
+                error: constants_1.VALIDATION_ERRORS.WORKING_TREE_NOT_CLEAN,
+                message: constants_1.VALIDATION_ERRORS.WORKING_TREE_NOT_CLEAN,
             });
             return;
         }
         // Check if changesets exist
         const changesets = await (0, changeset_service_1.getExistingChangesets)(rootPath);
         if (changesets.length === 0) {
-            res.status(400).json({
+            res.status(constants_1.HTTP_STATUS_BAD_REQUEST).json({
                 success: false,
-                error: 'No changesets found',
-                message: 'Create changesets before publishing',
+                error: constants_1.VALIDATION_ERRORS.NO_CHANGESETS,
+                message: constants_1.VALIDATION_ERRORS.NO_CHANGESETS,
             });
             return;
         }
@@ -323,9 +358,9 @@ async function triggerPublish(req, res) {
         // Trigger publish pipeline with user context and package info
         const result = await (0, changeset_service_1.triggerPublishPipeline)(rootPath, authUser?.login, selectedPackages);
         if (!result.success) {
-            res.status(500).json({
+            res.status(constants_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
                 success: false,
-                error: 'Failed to trigger publish pipeline',
+                error: constants_1.OPERATION_ERRORS.FAILED_TO_PUBLISH,
                 message: result.message,
             });
             return;
@@ -408,16 +443,16 @@ async function triggerPublish(req, res) {
         }
         res.json({
             success: true,
-            message: 'Publishing workflow initiated',
+            message: constants_1.PUBLISH_MESSAGES.WORKFLOW_INITIATED,
             result: result.result,
         });
     }
     catch (error) {
         logger_1.AppLogger.error(`Failed to trigger publish: ${error}`);
-        res.status(500).json({
+        res.status(constants_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
             success: false,
-            error: 'Failed to trigger publish',
-            message: error instanceof Error ? error.message : 'Unknown error',
+            error: constants_1.OPERATION_ERRORS.FAILED_TO_PUBLISH,
+            message: (0, constants_1.extractErrorMessage)(error),
         });
     }
 }

@@ -62,14 +62,15 @@ declare function findCircularDependencies(packages: PackageInfo[]): string[][];
  */
 declare function generateDependencyGraph(packages: PackageInfo[]): {
     nodes: {
+        id: string;
         label: string;
         type: string;
         version: string;
         dependencies: number;
     }[];
     edges: {
-        from: string;
-        to: string;
+        source: string;
+        target: string;
         type: string;
     }[];
 };

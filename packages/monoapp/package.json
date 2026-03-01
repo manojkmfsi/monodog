@@ -30,7 +30,7 @@
     "schema:format": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma format",
     "schema:validate": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma validate",
     "generate": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma generate",
-    "migrate": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate dev",
+    "migrate": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate deploy",
     "migrate:reset": "DATABASE_URL=$(npm run db:url --silent 2>/dev/null | tr -d '\\n') prisma migrate reset --force"
   },
   "keywords": [
@@ -50,7 +50,15 @@
     "package-health-monitor",
     "devops",
     "repository-health",
-    "package-audit"
+    "package-audit",
+    "CI/CD",
+    "pipeline",
+    "release-manager",
+    "workflow-runs",
+    "monitor-pipeline",
+    "github-actions",
+    "changesets",
+    "version-control"
   ],
   "dependencies": {
     "@prisma/client": "^5.22.0",
@@ -67,6 +75,8 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
     "@types/body-parser": "^1.19.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.25",

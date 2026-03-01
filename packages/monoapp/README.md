@@ -2,7 +2,7 @@
 
 ## Overview
 
-The dashboard will provide visual management and monitoring capabilities for packages in monorepos using pnpm and turbo. It will be distributed as an npm package installable in any monorepo to auto-generate a web UI for package oversight.
+Monodog provides visual management and monitoring capabilities for packages in monorepos using pnpm and Turbo. It is distributed as an npm package that can be installed in any monorepo to automatically generate a web UI for package oversight.
 
 This service is typically run locally or on a central server and power a dedicated frontend dashboard.
 <img width="1593" height="807" alt="package-scan" src="https://github.com/user-attachments/assets/d7e86b80-9f6a-4608-9103-68e6d660cc36" />
@@ -17,8 +17,7 @@ This service is typically run locally or on a central server and power a dedicat
 | **Framework** | Express.js, React    | Express Handles all API routing and middleware and React for building the user interface. |
 | **Styling**   | Tailwind CSS         | Utility-first framework for responsive, modern, and aesthetic design.                     |
 | **ORM**       | Prisma               | Database layer for managing package and health status records.                            |
-| **Scanning**  | monorepo-scanner     | Core logic for file system scanning and package metadata extraction.                      |
-| **VCS**       | GitService           | Used to fetch and analyze commit history per package path.                                |
+|**VCS**       | Github           |  Handles secure auth, automates Changeset PRs, and monitors CI/CD status.                           |
 
 ---
 
@@ -57,4 +56,10 @@ Run app using serve script:
 | **GET** | `/api/commits/:packagePath` | Fetch Git commit history for a specific package directory.                              | Persistent   |
 | **GET** | `/api/config/files`         | Scan the monorepo for essential configuration files (e.g., `tsconfig`, `.eslintrc`).    | Generated runtime   |
 | **PUT** | `/api/config/files/:id`      | Update a configuration files (e.g., `tsconfig`, `.eslintrc`).                          | Generated runtime   |
+| **GET** | `/auth/login`               | Initiate GitHub OAuth 2.0 authentication flow. Redirects to GitHub for authorization.  | Session creation    |
+| **GET** | `/auth/callback`            | Handle OAuth callback from GitHub with authorization code and validate state parameter. | Session persistence |
+| **GET** | `/auth/me`                  | Retrieve authenticated user profile.                         | Persistent          |
+| **GET** | `/auth/validate`            | Validate current session token status.                       | Persistent          |
+| **GET** | `/auth/logout`              | Invalidate session and clear authentication token.                                      | Session termination |
+| **POST** | `/auth/refresh`            | Extend session token validity period.                        | Session update      |
 

@@ -1,13 +1,5 @@
 // Route configuration for the dashboard application
-export interface RouteConfig {
-  path: string;
-  name: string;
-  component: string;
-  title: string;
-  description?: string;
-  protected?: boolean;
-  exact?: boolean;
-}
+import type { RouteConfig } from '../types/routes.types';
 
 export const routes: RouteConfig[] = [
   {

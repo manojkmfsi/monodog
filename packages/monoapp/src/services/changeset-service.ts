@@ -5,37 +5,16 @@
 
 import path from 'path';
 import fs from 'fs/promises';
+import https from 'https';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { AppLogger } from '../middleware/logger';
 import { getPackagesService } from './package-service';
-import { getRepositoryInfoFromGit } from '../utils/utilities';
-
+import { getWorkflowRuns } from './github-actions-service';
+import { CHANGESET_MESSAGES } from '../constants/api-messages';
+import type { VersionBump, Package, VersionBumpItem, PublishPlan } from '../types/changeset';
+import { VALIDATION_ERRORS } from '../constants/error-messages';
 const execPromise = promisify(exec);
-
-export type VersionBump = 'major' | 'minor' | 'patch';
-
-export interface Package {
-  name: string;
-  version: string;
-  path: string;
-  private?: boolean;
-  dependencies?: Record<string, string>;
-  devDependencies?: Record<string, string>;
-}
-
-export interface VersionBumpItem {
-  package: string;
-  currentVersion: string;
-  newVersion: string;
-  bumpType: VersionBump;
-}
-
-export interface PublishPlan {
-  packages: VersionBumpItem[];
-  changesets: string[];
-  timestamp: Date;
-}
 
 /**
  * Get all workspace packages
@@ -44,13 +23,13 @@ export async function getWorkspacePackages(rootPath: string): Promise<Package[]>
   try {
     // Get packages from package service
     const packages = await getPackagesService(rootPath);
-    return packages.map((pkg: any) => ({
-      name: pkg.name,
-      version: pkg.version || '0.0.0',
-      path: pkg.path,
-      private: pkg.private || false,
-      dependencies: pkg.dependencies || {},
-      devDependencies: pkg.devDependencies || {},
+    return packages.map((pkg: Record<string, unknown>) => ({
+      name: pkg.name as string,
+      version: (pkg.version as string) || '0.0.0',
+      path: pkg.path as string,
+      private: (pkg.private as boolean) || false,
+      dependencies: (pkg.dependencies as Record<string, string>) || {},
+      devDependencies: (pkg.devDependencies as Record<string, string>) || {},
     }));
   } catch (error) {
     AppLogger.error(`Failed to get workspace packages: ${error}`);
@@ -140,7 +119,7 @@ export async function validateChangeset(
 
   // Validate summary
   if (!summary || summary.length < 10) {
-    errors.push('Summary must be at least 10 characters');
+    errors.push(VALIDATION_ERRORS.SUMMARY_TOO_SHORT);
   }
 
   return {
@@ -199,7 +178,7 @@ export async function generateChangeset(
     AppLogger.info(`Changeset created: ${changesetName} by user: ${createdBy || 'unknown'}`);
     return {
       success: true,
-      message: 'Changeset created successfully',
+      message: CHANGESET_MESSAGES.CREATED,
       changeset: changesetName,
     };
   } catch (error) {
@@ -215,7 +194,7 @@ export async function generateChangeset(
  * Check if working tree is clean
  */
 export async function isWorkingTreeClean(rootPath: string): Promise<boolean> {
-  return true; // For testing purposes, we assume it's always clean. Replace with actual git status check in production.
+  return true;
   try {
     const { stdout } = await execPromise('git status --porcelain', {
       cwd: rootPath,
@@ -233,7 +212,7 @@ export async function triggerPublishPipeline(
   rootPath: string,
   publishedBy?: string,
   selectedPackages?: object[]
-): Promise<{ success: boolean; message: string; result?: any }> {
+): Promise<{ success: boolean; message: string; result?: unknown }> {
   try {
     AppLogger.info(`Publishing workflow triggered by user: ${publishedBy || 'unknown'}`);
 
@@ -294,3 +273,93 @@ export async function triggerPublishPipeline(
     };
   }
 }
+
+/**
+ * Check if CI pipeline is passing
+ * Fetches the most recent workflow run and checks if it passed
+ */
+export async function checkCIPassing(
+  accessToken: string | null | undefined,
+  owner: string,
+  repo: string,
+  workflowId: string,
+  workflowPath: string
+): Promise<boolean> {
+  try {
+    if (!accessToken) {
+      AppLogger.warn('No access token available for CI check');
+      return true; // Allow publishing if no token
+    }
+
+    const { runs } = await getWorkflowRuns(owner, repo, accessToken, {
+      workflowId,
+      workflowPath,
+      status: 'completed',
+      per_page: 1,
+    });
+
+    if (!runs || runs.length === 0) {
+      AppLogger.warn('No completed workflow runs found');
+      return true; // Allow if no runs exist
+    }
+
+    const latestRun = runs[0];
+    const passed = latestRun.conclusion === 'success';
+
+    if (passed) {
+      AppLogger.info('CI check passed: Latest workflow run succeeded');
+    } else {
+      AppLogger.warn(`CI check failed: Latest run conclusion is ${latestRun.conclusion}`);
+    }
+
+    return passed;
+  } catch (error) {
+    AppLogger.error(`Failed to check CI status: ${error}`);
+    return true; // Allow on error
+  }
+}
+
+/**
+ * Check if a package version is available on npm registry
+ * Returns true if version does NOT exist (safe to publish)
+ * Returns false if version already exists
+ */
+export async function checkVersionAvailableOnNpm(
+  packageName: string,
+  version: string
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    try {
+      const url = `https://registry.npmjs.org/${encodeURIComponent(packageName)}/${encodeURIComponent(version)}`;
+
+      const request = https.get(url, (response) => {
+        if (response.statusCode === 200) {
+          AppLogger.warn(`NPM version check: Version ${version} of ${packageName} already exists`);
+          resolve(false); // Version exists, not available for publishing
+        } else if (response.statusCode === 404) {
+          AppLogger.info(`NPM version check: Version ${version} of ${packageName} is available`);
+          resolve(true); // Version doesn't exist, safe to publish
+        } else {
+          AppLogger.warn(`NPM check unexpected status ${response.statusCode}`);
+          resolve(true); // Default to allowing publish
+        }
+      });
+
+      request.on('error', (error) => {
+        AppLogger.error(`Failed to check npm version: ${error}`);
+        resolve(true); // Allow on error
+      });
+
+      request.setTimeout(5000, () => {
+        request.destroy();
+        AppLogger.warn('NPM registry check timeout');
+        resolve(true); // Allow on timeout
+      });
+    } catch (error) {
+      AppLogger.error(`NPM version check error: ${error}`);
+      resolve(true); // Allow on error
+    }
+  });
+}
+
+

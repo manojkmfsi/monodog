@@ -5,9 +5,11 @@ import WorkflowRunsList from './WorkflowRunsList';
 import WorkflowTrigger from './WorkflowTrigger';
 import { useAuth } from '../../services/auth-context';
 import { monorepoService } from '../../services/monorepoService';
-import { getSessionPermission } from './utils/pipeline.utils'
-
-const apiUrl = (window as any).ENV?.API_URL;
+import { getSessionPermission } from './utils/pipeline.utils';
+import { DASHBOARD_ERROR_MESSAGES, DASHBOARD_AUTH_MESSAGES } from '../../constants/messages';
+import { DASHBOARD_API_ENDPOINTS, API_CONFIG } from '../../constants/api-config';
+import apiClient from '../../services/api';
+import type { WorkflowRun, HierarchicalStep } from '../../types';
 
 interface Job {
   id: number;
@@ -30,24 +32,12 @@ interface Pipeline {
   workflowId: string;
   workflowPath?: string;
   lastRunId: string | null;
-  workflowRuns: any[];
+  workflowRuns: WorkflowRun[];
 }
 
 interface PipelineManagerProps {
   packageName?: string;
   onNavigate?: (path: string) => void;
-}
-
-/**
- * Parse GitHub Actions logs and split them into hierarchical steps
- * Detects levels based on indentation and group markers
- */
-interface HierarchicalStep {
-  name: string;
-  logs: string[];
-  level: number;
-  children?: HierarchicalStep[];
-  startIndex: number;
 }
 
 function parseStepsFromLogs(rawLogs: string): HierarchicalStep[] {
@@ -159,30 +149,30 @@ export default function PipelineManager({
   useEffect(() => {
     const fetchPipelinesOnce = async () => {
       try {
-        const url = `${apiUrl}/api/pipelines`;
+        const url = DASHBOARD_API_ENDPOINTS.PIPELINES.LIST;
 
-        const token = localStorage.getItem('monodog_session_token');
-        const headers: HeadersInit = {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        };
+        const response = await apiClient.get(url);
 
-        const response = await fetch(url, { headers });
-
-        if (response.status === 401 || response.status === 403) {
-          window.location.href = '/login';
-          return;
+        if (!response.success) {
+          if (response.error?.status === 401 || response.error?.status === 403) {
+            window.location.href = '/login';
+            return;
+          }
+          // If endpoint doesn't exist (404), use empty array instead of throwing
+          if (response.error?.status === 404) {
+            console.warn('Pipelines endpoint not available');
+            setPipelines([]);
+            setLoading(false);
+            return;
+          }
+          throw new Error(`Failed to fetch pipelines: ${response.error?.message}`);
         }
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch pipelines: ${response.statusText}`);
-        }
+        const pipelineData = Array.isArray(response.data) ? response.data : [];
+        setPipelines(pipelineData);
 
-        const data = await response.json();
-        setPipelines(data);
-
-        if (data.length > 0 && !selectedPipeline) {
-          setSelectedPipeline(data[0]);
+        if (pipelineData.length > 0 && !selectedPipeline) {
+          setSelectedPipeline(pipelineData[0]);
         }
         setLoading(false);
       } catch (err) {
@@ -203,22 +193,16 @@ export default function PipelineManager({
 
     const pollPipelineStatus = async () => {
       try {
-        const token = localStorage.getItem('monodog_session_token');
-        const headers: HeadersInit = {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        };
-
         // Fetch the most recent workflow run for the selected pipeline
         pipelines.forEach(async (pipeline)=>{
 
         if (pipeline.workflowId && pipeline.currentStatus !== 'completed' && !updatingPipelines.has(pipeline.workflowId)) {
 
-          const runsUrl = `${apiUrl}/api/workflows/${owner}/${repo}?workflow_id=${pipeline.workflowId}&per_page=${runsPageSize}&page=1`;
-          const runsResponse = await fetch(runsUrl, { headers });
+          const runsUrl = DASHBOARD_API_ENDPOINTS.WORKFLOWS.LIST(owner, repo) + `?workflow_id=${pipeline.workflowId}&per_page=${runsPageSize}&page=1`;
+          const runsResponse = await apiClient.get(runsUrl);
 
-          if (runsResponse.ok) {
-            const runsData = await runsResponse.json();
+          if (runsResponse.success) {
+            const runsData = runsResponse.data;
             const latestRun = runsData.workflow_runs?.[0] || runsData.runs?.[0];
 
             if (latestRun) {
@@ -232,16 +216,12 @@ export default function PipelineManager({
 
                 try {
                   // Update pipeline status in the database
-                  const updateResponse = await fetch(
-                    `${apiUrl}/api/pipelines/${pipeline.id}/status`,
+                  const updateResponse = await apiClient.put(
+                    DASHBOARD_API_ENDPOINTS.PIPELINES.STATUS(pipeline.id),
                     {
-                      method: 'PUT',
-                      headers,
-                      body: JSON.stringify({
-                        currentStatus: latestRun.status,
-                        currentConclusion: latestRun.conclusion || null,
-                        lastRunId: latestRun.id,
-                      }),
+                      currentStatus: latestRun.status,
+                      currentConclusion: latestRun.conclusion || null,
+                      lastRunId: latestRun.id,
                     }
                   );
 
@@ -299,28 +279,19 @@ export default function PipelineManager({
 
     const fetchJobs = async () => {
       try {
-        const token = localStorage.getItem('monodog_session_token');
-        const headers: HeadersInit = {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        };
-
-        const response = await fetch(
-          `${apiUrl}/api/workflows/${owner}/${repo}/runs/${selectedRun}`,
-          { headers }
+        const response = await apiClient.get(
+          DASHBOARD_API_ENDPOINTS.WORKFLOWS.RUNS(owner, repo, selectedRun)
         );
 
-        if (response.status === 401 || response.status === 403) {
-          window.location.href = '/login';
-          return;
+        if (!response.success) {
+          if (response.error?.status === 401 || response.error?.status === 403) {
+            window.location.href = '/login';
+            return;
+          }
+          throw new Error(`Failed to fetch jobs: ${response.error?.message}`);
         }
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch jobs: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        setJobs(data.jobs || []);
+        setJobs(response.data.jobs || []);
 
         // Auto-select first job
         // if (data.jobs && data.jobs.length > 0 && !selectedJob) {
@@ -343,55 +314,36 @@ export default function PipelineManager({
 
     const fetchLogs = async () => {
       try {
-        const token = localStorage.getItem('monodog_session_token');
-        const headers: HeadersInit = {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        };
-
-        const response = await fetch(
-          `${apiUrl}/api/workflows/${owner}/${repo}/jobs/${selectedJob.gitHubJobId}/logs`,
-          { headers }
+        const response = await apiClient.get(
+          DASHBOARD_API_ENDPOINTS.WORKFLOWS.LOGS(owner, repo, selectedJob.gitHubJobId)
         );
 
-        if (response.status === 401 || response.status === 403) {
-          if (response.status === 403) {
-            setError('Access denied: You do not have admin rights to view logs for this repository');
-          } else {
-            setError('Session expired. Please log in again.');
+        if (!response.success) {
+          if (response.error?.status === 403) {
+            setError(DASHBOARD_ERROR_MESSAGES.PERMISSION_ERROR);
+          } else if (response.error?.status === 401) {
+            setError(DASHBOARD_AUTH_MESSAGES.SESSION_EXPIRED);
             window.location.href = '/login';
-          }
-          return;
-        }
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          const errorDetails = errorData.details || errorData.error || response.statusText;
-
-          // Check for specific error patterns
-          if (errorDetails.includes('403') || errorDetails.includes('admin')) {
-            setError('Admin access required: Repository logs require admin permissions. Contact your repository administrator.');
-          } else if (errorDetails.includes('404') || errorDetails.includes('not found')) {
-            setError('Job logs not found. The job may have been cleaned up or the job ID may be invalid.');
           } else {
-            setError(`Failed to fetch logs: ${errorDetails}`);
+            const errorDetails = response.error?.details || response.error?.message || 'Unknown error';
+            setError(`${DASHBOARD_ERROR_MESSAGES.FAILED_TO_FETCH_LOGS}: ${errorDetails}`);
           }
           return;
         }
 
-        const data = await response.json();
+        const data = response.data;
 
         // Check if logs are empty
         if (data.meta && data.meta.isEmpty) {
           setJobLogs('');
-          setError('No logs available for this job yet. The job may still be running or logs have been cleaned up.');
+          setError(DASHBOARD_ERROR_MESSAGES.FAILED_TO_FETCH_LOGS);
         } else {
           setJobLogs(data.logs || data);
           setError(null);
         }
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Failed to fetch logs';
-        setError(`Error loading logs: ${errorMsg}`);
+        const errorMsg = err instanceof Error ? err.message : DASHBOARD_ERROR_MESSAGES.FAILED_TO_FETCH_LOGS;
+        setError(`${DASHBOARD_ERROR_MESSAGES.FAILED_TO_FETCH_LOGS}: ${errorMsg}`);
       }
     };
 
@@ -425,18 +377,12 @@ export default function PipelineManager({
 
     setPipelineLoadingMore(true);
     try {
-      const url = `${apiUrl}/api/pipelines?offset=${pipelineOffset + pipelinePageSize}&limit=${pipelinePageSize}`;
+      const url = DASHBOARD_API_ENDPOINTS.PIPELINES.LIST + `?offset=${pipelineOffset + pipelinePageSize}&limit=${pipelinePageSize}`;
 
-      const token = localStorage.getItem('monodog_session_token');
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      };
+      const response = await apiClient.get(url);
+      if (!response.success) throw new Error('Failed to fetch more pipelines');
 
-      const response = await fetch(url, { headers });
-      if (!response.ok) throw new Error('Failed to fetch more pipelines');
-
-      const newPipelines = await response.json();
+      const newPipelines = response.data;
       setPipelines(prev => [...prev, ...newPipelines]);
       setPipelineOffset(prev => prev + pipelinePageSize);
     } catch (err) {
@@ -461,20 +407,13 @@ export default function PipelineManager({
 
     setJobLoadingMore(true);
     try {
-      const token = localStorage.getItem('monodog_session_token');
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      };
-
-      const response = await fetch(
-        `${apiUrl}/api/workflows/${owner}/${repo}/runs/${selectedRun}?page=${Math.floor(jobOffset / jobPageSize) + 2}`,
-        { headers }
+      const response = await apiClient.get(
+        DASHBOARD_API_ENDPOINTS.WORKFLOWS.RUNS(owner, repo, selectedRun) + `?page=${Math.floor(jobOffset / jobPageSize) + 2}`
       );
 
-      if (!response.ok) throw new Error('Failed to fetch more jobs');
+      if (!response.success) throw new Error('Failed to fetch more jobs');
 
-      const data = await response.json();
+      const data = response.data;
       const newJobs = (data.jobs || []).map((job: any) => ({
         id: job.id,
         gitHubJobId: job.id,
@@ -526,7 +465,6 @@ export default function PipelineManager({
               <WorkflowTrigger
                 owner={owner}
                 repo={repo}
-                workflowId={selectedPipeline.workflowPath || selectedPipeline.workflowId}
                 // pipelineId={selectedPipeline.id}
               />
             )}

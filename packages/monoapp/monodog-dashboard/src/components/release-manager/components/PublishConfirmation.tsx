@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { SelectedPackage } from '../ReleaseManager';
+import { ArrowLongRightIcon, CheckIcon } from '../../../icons';
 
 interface PublishConfirmationProps {
   packages: SelectedPackage[];
@@ -93,8 +94,8 @@ export default function PublishConfirmation({
             <div key={pkg.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div>
                 <p className="font-medium text-gray-900">{pkg.name}</p>
-                <p className="text-sm text-gray-500">
-                  v{pkg.currentVersion} → v{pkg.newVersion}
+                <p className="flex items-center gap-2 text-sm text-gray-500">
+                  v{pkg.currentVersion} <ArrowLongRightIcon></ArrowLongRightIcon> v{pkg.newVersion}
                 </p>
               </div>
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
@@ -117,11 +118,11 @@ export default function PublishConfirmation({
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h4 className="font-medium text-blue-900 mb-2">Next Steps</h4>
         <ul className="text-sm text-blue-700 space-y-2">
-          <li>✓ Changeset created and committed</li>
-          <li>✓ Package versions updated</li>
-          <li>✓ Release pipeline triggered</li>
-          <li>✓ GitHub release created (in progress)</li>
-          <li>⏳ npm registry will be updated shortly</li>
+          <li>Changeset created and committed</li>
+          <li>Package versions updated</li>
+          <li>Release pipeline triggered</li>
+          <li>GitHub release created (in progress)</li>
+          <li>npm registry will be updated shortly</li>
         </ul>
       </div>
 
@@ -137,11 +138,11 @@ export default function PublishConfirmation({
 
       {/* Links */}
       <div className="border-t pt-6 flex gap-4 justify-center">
-        <a href="#" className="text-primary-600 hover:text-primary-700 font-medium text-sm">
-          View Release on GitHub →
+        <a href="#" className="flex items-center gap-2 gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm">
+          View Release on GitHub <ArrowLongRightIcon></ArrowLongRightIcon>
         </a>
-        <a href="#" className="text-primary-600 hover:text-primary-700 font-medium text-sm">
-          View on npm →
+        <a href="#" className="flex items-center gap-2 gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm">
+          View on npm <ArrowLongRightIcon></ArrowLongRightIcon>
         </a>
       </div>
     </div>

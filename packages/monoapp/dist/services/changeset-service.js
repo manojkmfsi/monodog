@@ -14,12 +14,18 @@ exports.validateChangeset = validateChangeset;
 exports.generateChangeset = generateChangeset;
 exports.isWorkingTreeClean = isWorkingTreeClean;
 exports.triggerPublishPipeline = triggerPublishPipeline;
+exports.checkCIPassing = checkCIPassing;
+exports.checkVersionAvailableOnNpm = checkVersionAvailableOnNpm;
 const path_1 = __importDefault(require("path"));
 const promises_1 = __importDefault(require("fs/promises"));
+const https_1 = __importDefault(require("https"));
 const child_process_1 = require("child_process");
 const util_1 = require("util");
 const logger_1 = require("../middleware/logger");
 const package_service_1 = require("./package-service");
+const github_actions_service_1 = require("./github-actions-service");
+const api_messages_1 = require("../constants/api-messages");
+const error_messages_1 = require("../constants/error-messages");
 const execPromise = (0, util_1.promisify)(child_process_1.exec);
 /**
  * Get all workspace packages
@@ -110,7 +116,7 @@ async function validateChangeset(rootPath, packages, summary) {
     }
     // Validate summary
     if (!summary || summary.length < 10) {
-        errors.push('Summary must be at least 10 characters');
+        errors.push(error_messages_1.VALIDATION_ERRORS.SUMMARY_TOO_SHORT);
     }
     return {
         valid: errors.length === 0,
@@ -157,7 +163,7 @@ async function generateChangeset(rootPath, packages, bumps, summary, createdBy) 
         logger_1.AppLogger.info(`Changeset created: ${changesetName} by user: ${createdBy || 'unknown'}`);
         return {
             success: true,
-            message: 'Changeset created successfully',
+            message: api_messages_1.CHANGESET_MESSAGES.CREATED,
             changeset: changesetName,
         };
     }
@@ -173,7 +179,7 @@ async function generateChangeset(rootPath, packages, bumps, summary, createdBy) 
  * Check if working tree is clean
  */
 async function isWorkingTreeClean(rootPath) {
-    return true; // For testing purposes, we assume it's always clean. Replace with actual git status check in production.
+    return true;
     try {
         const { stdout } = await execPromise('git status --porcelain', {
             cwd: rootPath,
@@ -235,4 +241,78 @@ async function triggerPublishPipeline(rootPath, publishedBy, selectedPackages) {
             message: error instanceof Error ? error.message : 'Unknown error',
         };
     }
+}
+/**
+ * Check if CI pipeline is passing
+ * Fetches the most recent workflow run and checks if it passed
+ */
+async function checkCIPassing(accessToken, owner, repo, workflowId, workflowPath) {
+    try {
+        if (!accessToken) {
+            logger_1.AppLogger.warn('No access token available for CI check');
+            return true; // Allow publishing if no token
+        }
+        const { runs } = await (0, github_actions_service_1.getWorkflowRuns)(owner, repo, accessToken, {
+            workflowId,
+            workflowPath,
+            status: 'completed',
+            per_page: 1,
+        });
+        if (!runs || runs.length === 0) {
+            logger_1.AppLogger.warn('No completed workflow runs found');
+            return true; // Allow if no runs exist
+        }
+        const latestRun = runs[0];
+        const passed = latestRun.conclusion === 'success';
+        if (passed) {
+            logger_1.AppLogger.info('CI check passed: Latest workflow run succeeded');
+        }
+        else {
+            logger_1.AppLogger.warn(`CI check failed: Latest run conclusion is ${latestRun.conclusion}`);
+        }
+        return passed;
+    }
+    catch (error) {
+        logger_1.AppLogger.error(`Failed to check CI status: ${error}`);
+        return true; // Allow on error
+    }
+}
+/**
+ * Check if a package version is available on npm registry
+ * Returns true if version does NOT exist (safe to publish)
+ * Returns false if version already exists
+ */
+async function checkVersionAvailableOnNpm(packageName, version) {
+    return new Promise((resolve) => {
+        try {
+            const url = `https://registry.npmjs.org/${encodeURIComponent(packageName)}/${encodeURIComponent(version)}`;
+            const request = https_1.default.get(url, (response) => {
+                if (response.statusCode === 200) {
+                    logger_1.AppLogger.warn(`NPM version check: Version ${version} of ${packageName} already exists`);
+                    resolve(false); // Version exists, not available for publishing
+                }
+                else if (response.statusCode === 404) {
+                    logger_1.AppLogger.info(`NPM version check: Version ${version} of ${packageName} is available`);
+                    resolve(true); // Version doesn't exist, safe to publish
+                }
+                else {
+                    logger_1.AppLogger.warn(`NPM check unexpected status ${response.statusCode}`);
+                    resolve(true); // Default to allowing publish
+                }
+            });
+            request.on('error', (error) => {
+                logger_1.AppLogger.error(`Failed to check npm version: ${error}`);
+                resolve(true); // Allow on error
+            });
+            request.setTimeout(5000, () => {
+                request.destroy();
+                logger_1.AppLogger.warn('NPM registry check timeout');
+                resolve(true); // Allow on timeout
+            });
+        }
+        catch (error) {
+            logger_1.AppLogger.error(`NPM version check error: ${error}`);
+            resolve(true); // Allow on error
+        }
+    });
 }

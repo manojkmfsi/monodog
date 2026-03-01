@@ -7,23 +7,46 @@ import https from 'https';
 import type {
   WorkflowRun,
   WorkflowJob,
-  JobLogs,
   StepLog,
   LogLine,
   WorkflowTriggerRequest,
   WorkflowTriggerResponse,
   RateLimitInfo,
 } from '../types/github-actions';
+import type { GitHubRequestOptions } from '../types/github-service';
 import { AppLogger } from '../middleware/logger';
+import { GITHUB_ACTIONS } from '../constants/features';
+import { PIPELINE_MESSAGES } from '../constants/api-messages';
 
 const GITHUB_API_BASE = 'api.github.com';
 
-interface GitHubRequestOptions {
-  hostname: string;
-  path: string;
-  method: string;
-  headers: Record<string, string>;
-}
+const requestOptions = (method: string, path: string, accessToken?: string, payload?: string): GitHubRequestOptions => {
+  const body = payload ?? null;
+  return {
+    hostname: GITHUB_API_BASE,
+    path,
+    method: method.toUpperCase(),
+    headers: {
+      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+      'User-Agent': 'MonoDog',
+      Accept: 'application/vnd.github+json',
+      // Conditional Body Headers
+      ...(body && {
+        'Content-Type': 'application/json',
+        'Content-Length': String(Buffer.byteLength(body)),
+      }),
+    },
+  }
+};
+
+const redirectOptions = (url: URL): GitHubRequestOptions => ({
+  hostname: url.hostname,
+  path: url.pathname + url.search,
+  method: 'GET',
+  headers: {
+    'User-Agent': 'MonoDog',
+  },
+});
 
 /**
  * Make an HTTPS request to GitHub API
@@ -99,18 +122,7 @@ export async function listWorkflows(
   }>;
   rateLimit: RateLimitInfo;
 }> {
-  const path = `/repos/${owner}/${repo}/actions/workflows`;
-
-  const requestOptions: GitHubRequestOptions = {
-    hostname: GITHUB_API_BASE,
-    path,
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'User-Agent': 'MonoDog',
-      Accept: 'application/vnd.github+json',
-    },
-  };
+  const path = GITHUB_ACTIONS.WORKFLOWS_ENDPOINT(owner, repo);
 
   try {
     const { data, rateLimit } = await makeGitHubRequest<{
@@ -121,7 +133,7 @@ export async function listWorkflows(
         path: string;
         state: string;
       }>;
-    }>(requestOptions);
+    }>(requestOptions('GET', path, accessToken));
 
     return {
       workflows: data.workflows,
@@ -189,18 +201,8 @@ export async function getWorkflowRuns(
   params.append('page', String(options?.page || 1));
   params.append('per_page', String(options?.per_page || 30));
 
-  const path = `/repos/${owner}/${repo}/actions/runs?${params.toString()}`;
-
-  const requestOptions: GitHubRequestOptions = {
-    hostname: GITHUB_API_BASE,
-    path,
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'User-Agent': 'MonoDog',
-      Accept: 'application/vnd.github+json',
-    },
-  };
+  const basePath = GITHUB_ACTIONS.WORKFLOW_RUNS_ENDPOINT(owner, repo, '');
+  const path = `${basePath.replace('/workflows//runs', '/runs')}?${params.toString()}`;
 
   try {
     const fullUrl = `https://${GITHUB_API_BASE}${path}`;
@@ -208,7 +210,7 @@ export async function getWorkflowRuns(
     const { data, rateLimit } = await makeGitHubRequest<{
       total_count: number;
       workflow_runs: WorkflowRun[];
-    }>(requestOptions);
+    }>(requestOptions('GET', path, accessToken));
 
     AppLogger.info(`GitHub API Response: total_count=${data.total_count}, returned ${data.workflow_runs.length} runs`);
     if (workflowToFilter || (options?.workflowId && Number(options.workflowId) !== 1)) {
@@ -234,22 +236,11 @@ export async function getWorkflowRun(
   runId: number,
   accessToken: string
 ): Promise<{ run: WorkflowRun; rateLimit: RateLimitInfo }> {
-  const path = `/repos/${owner}/${repo}/actions/runs/${runId}`;
-
-  const requestOptions: GitHubRequestOptions = {
-    hostname: GITHUB_API_BASE,
-    path,
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'User-Agent': 'MonoDog',
-      Accept: 'application/vnd.github+json',
-    },
-  };
+  const path = GITHUB_ACTIONS.WORKFLOW_RUN_ENDPOINT(owner, repo, runId);
 
   try {
     const { data, rateLimit } = await makeGitHubRequest<WorkflowRun>(
-      requestOptions
+      requestOptions('GET', path, accessToken)
     );
     return { run: data, rateLimit };
   } catch (error) {
@@ -277,24 +268,13 @@ export async function getWorkflowRunJobs(
   params.append('page', String(page));
   params.append('per_page', String(perPage));
 
-  const path = `/repos/${owner}/${repo}/actions/runs/${runId}/jobs?${params.toString()}`;
-
-  const requestOptions: GitHubRequestOptions = {
-    hostname: GITHUB_API_BASE,
-    path,
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'User-Agent': 'MonoDog',
-      Accept: 'application/vnd.github+json',
-    },
-  };
+  const path = `${GITHUB_ACTIONS.JOBS_ENDPOINT(owner, repo, runId)}?${params.toString()}`;
 
   try {
     const { data, rateLimit } = await makeGitHubRequest<{
       total_count: number;
       jobs: WorkflowJob[];
-    }>(requestOptions);
+    }>(requestOptions('GET', path, accessToken));
 
     return {
       jobs: data.jobs,
@@ -319,23 +299,12 @@ export async function getJobLogs(
   jobId: number,
   accessToken: string
 ): Promise<{ logs: string; rateLimit: RateLimitInfo }> {
-  const path = `/repos/${owner}/${repo}/actions/jobs/${jobId}/logs`;
+  const path = `${GITHUB_ACTIONS.LOGS_ENDPOINT(owner, repo, jobId)}`;
 
   AppLogger.info(`Fetching job logs from GitHub: owner=${owner}, repo=${repo}, jobId=${jobId}`);
 
-  const requestOptions: GitHubRequestOptions = {
-    hostname: GITHUB_API_BASE,
-    path,
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'User-Agent': 'MonoDog',
-      Accept: 'application/vnd.github.raw',
-    },
-  };
-
   return new Promise((resolve, reject) => {
-    const request = https.request(requestOptions, (response) => {
+    const request = https.request(requestOptions('GET', path, accessToken), (response) => {
       let body = '';
 
       // Handle redirects
@@ -345,16 +314,7 @@ export async function getJobLogs(
         if (location) {
           // Recursively follow redirect with GET
           const url = new URL(location);
-          const redirectOptions: GitHubRequestOptions = {
-            hostname: url.hostname,
-            path: url.pathname + url.search,
-            method: 'GET',
-            headers: {
-              'User-Agent': 'MonoDog',
-              // Authorization: `Bearer ${accessToken}`,
-            },
-          };
-          const redirectRequest = https.request(redirectOptions, (redirectResponse) => {
+          const redirectRequest = https.request(redirectOptions(url), (redirectResponse) => {
             let redirectBody = '';
             redirectResponse.on('data', (chunk) => {
               redirectBody += chunk;
@@ -559,30 +519,17 @@ export async function triggerWorkflow(
     workflowIdentifier = workflowIdentifier.split('/').pop() || workflowIdentifier;
   }
 
-  const path = `/repos/${request.owner}/${request.repo}/actions/workflows/${workflowIdentifier}/dispatches`;
+  const path = GITHUB_ACTIONS.TRIGGER_WORKFLOW_ENDPOINT(request.owner, request.repo, workflowIdentifier);
 
   const payload = JSON.stringify({
     ref: request.ref,
     inputs: request.inputs || {},
   });
 
-  const requestOptions: GitHubRequestOptions = {
-    hostname: GITHUB_API_BASE,
-    path,
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'User-Agent': 'MonoDog',
-      'Content-Type': 'application/json',
-      'Content-Length': String(Buffer.byteLength(payload)),
-      Accept: 'application/vnd.github+json',
-    },
-  };
-
   try {
     AppLogger.debug(`Triggering workflow: ${workflowIdentifier} (original: ${request.workflow}) on ${request.owner}/${request.repo} branch: ${request.ref}`);
     const response = await makeGitHubRequest<Record<string, unknown>>(
-      requestOptions,
+      requestOptions('POST', path, accessToken, payload),
       payload
     );
 
@@ -591,7 +538,7 @@ export async function triggerWorkflow(
     return {
       response: {
         success: true,
-        message: 'Workflow triggered successfully',
+        message: PIPELINE_MESSAGES.TRIGGERED_SUCCESSFULLY,
       },
       rateLimit: response.rateLimit,
     };
@@ -616,22 +563,11 @@ export async function cancelWorkflowRun(
   runId: number,
   accessToken: string
 ): Promise<{ success: boolean; rateLimit: RateLimitInfo }> {
-  const path = `/repos/${owner}/${repo}/actions/runs/${runId}/cancel`;
-
-  const requestOptions: GitHubRequestOptions = {
-    hostname: GITHUB_API_BASE,
-    path,
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'User-Agent': 'MonoDog',
-      Accept: 'application/vnd.github+json',
-    },
-  };
+  const path = GITHUB_ACTIONS.CANCEL_ENDPOINT(owner, repo, runId);
 
   try {
     const { rateLimit } = await makeGitHubRequest<Record<string, unknown>>(
-      requestOptions
+      requestOptions('POST', path, accessToken)
     );
     return { success: true, rateLimit };
   } catch (error) {
@@ -653,24 +589,13 @@ export async function rerunWorkflow(
   accessToken: string,
   failedOnly: boolean = false
 ): Promise<{ success: boolean; rateLimit: RateLimitInfo }> {
-  const path = failedOnly
-    ? `/repos/${owner}/${repo}/actions/runs/${runId}/rerun-failed-jobs`
-    : `/repos/${owner}/${repo}/actions/runs/${runId}/rerun`;
+  const basePath = GITHUB_ACTIONS.RERUN_ENDPOINT(owner, repo, runId);
+  const path = failedOnly ? `${basePath}-failed-jobs` : basePath;
 
-  const requestOptions: GitHubRequestOptions = {
-    hostname: GITHUB_API_BASE,
-    path,
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'User-Agent': 'MonoDog',
-      Accept: 'application/vnd.github+json',
-    },
-  };
 
   try {
     const { rateLimit } = await makeGitHubRequest<Record<string, unknown>>(
-      requestOptions
+      requestOptions('POST', path, accessToken)
     );
     return { success: true, rateLimit };
   } catch (error) {
@@ -681,32 +606,3 @@ export async function rerunWorkflow(
     };
   }
 }
-
-/**
- * Get rate limit information
- */
-// export async function getRateLimit(
-//   accessToken: string
-// ): Promise<RateLimitInfo> {
-//   const requestOptions: GitHubRequestOptions = {
-//     hostname: GITHUB_API_BASE,
-//     path: '/rate_limit',
-//     method: 'GET',
-//     headers: {
-//       Authorization: `Bearer ${accessToken}`,
-//       'User-Agent': 'MonoDog',
-//       Accept: 'application/vnd.github+json',
-//     },
-//   };
-
-//   try {
-//     const { data } = await makeGitHubRequest<{
-//       resources: { core: RateLimitInfo };
-//     }>(requestOptions);
-
-//     return data.resources.core;
-//   } catch (error) {
-//     AppLogger.error(`Failed to get rate limit: ${error}`);
-//     return { limit: 0, remaining: 0, reset: 0, used: 0 };
-//   }
-// }

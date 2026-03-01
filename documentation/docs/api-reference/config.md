@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 6
 title: Config Endpoint
 ---
 
@@ -14,6 +14,7 @@ GET /api/config/files
 ```
 
 Returns all configuration files found in the monorepo (tsconfig, eslintrc, etc.).
+
 Response:
 ```json
 {
@@ -53,7 +54,8 @@ PUT /api/config/files/ID
 ```
 ID is the path of configuration file.
 
-Update content of the configuration file
+Update content of the configuration file.
+
 Response:
 ```json
 {

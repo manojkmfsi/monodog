@@ -1,30 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ExclamationCircleIcon, CheckCircleIcon, ClockIcon } from '../../icons/index';
 import { useAuth } from '../../services/auth-context';
-
-const apiUrl = (window as any).ENV?.API_URL;
-
-interface WorkflowRun {
-  id: number;
-  name: string;
-  status: string;
-  conclusion: string | null;
-  created_at: string;
-  updated_at: string;
-  head_branch: string;
-  actor: {login: string};
-  htmlUrl: string;
-}
-
-interface WorkflowRunsListProps {
-  owner: string;
-  repo: string;
-  packageName?: string;
-  onSelectRun?: (runId: number) => void;
-  runId: number,
-  limit?: number;
-  pipelineId?: string;
-}
+import { DASHBOARD_ERROR_MESSAGES } from '../../constants/messages';
+import { DASHBOARD_API_ENDPOINTS } from '../../constants/api-config';
+import apiClient from '../../services/api';
+import type { WorkflowRun, WorkflowRunsListProps } from '../../types';
 
 function getStatusIcon(status: string, conclusion: string | null) {
   if (status === 'completed') {
@@ -95,32 +75,38 @@ export default function WorkflowRunsList({
         setLoading(true);
         setError(null);
 
-        let url = `${apiUrl}/api/workflows/${owner}/${repo}?per_page=${limit}`;
+        let url = DASHBOARD_API_ENDPOINTS.WORKFLOWS.LIST(owner, repo) + `?per_page=${limit}`;
         if (packageName) {
-          url = `${apiUrl}/api/workflows/package/${owner}/${repo}/${encodeURIComponent(packageName)}`;
+          url = DASHBOARD_API_ENDPOINTS.WORKFLOWS.BY_PACKAGE(owner, repo, packageName);
         }
 
-        const token = localStorage.getItem('monodog_session_token');
-        const headers: HeadersInit = {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        };
-
-        const response = await fetch(url, { headers });
-        if (!response.ok) {
-          throw new Error('Failed to fetch workflow runs');
+        const response = await apiClient.get(url);
+        if (!response.success) {
+          throw new Error(DASHBOARD_ERROR_MESSAGES.FAILED_TO_FETCH_WORKFLOWS);
         }
+        const data = (response.data as { runs: WorkflowRun[] });
+        let runsList: WorkflowRun[] = [];
 
-        const data = await response.json();
-        const runsList = packageName
-          ? data
-              .flatMap((p: any) => p.workflowRuns)
-              .slice(0, limit)
-          : data.runs;
+
+        if (packageName) {
+          // When querying by package, API might return array or single object
+          if (Array.isArray(data)) {
+            runsList = (data as Array<{ runs: WorkflowRun[] }>)
+              .flatMap((p) => p.runs || [])
+              .slice(0, limit);
+          } else {
+            const dataObj = data as { runs: WorkflowRun[] };
+            runsList = (Array.isArray(dataObj.runs) ? dataObj.runs : [])
+              .slice(0, limit);
+          }
+        } else {
+          // Direct workflow list
+          runsList = Array.isArray(data.runs) ? (data.runs as WorkflowRun[]) : [];
+        }
 
         setRuns(runsList);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : DASHBOARD_ERROR_MESSAGES.UNKNOWN_ERROR);
       } finally {
         setLoading(false);
       }
@@ -137,22 +123,13 @@ export default function WorkflowRunsList({
     setActionInProgress(run.id);
 
     try {
-      const token = localStorage.getItem('monodog_session_token');
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      };
 
-      const response = await fetch(
-        `${apiUrl}/api/workflows/${owner}/${repo}/runs/${run.id}/cancel`,
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ pipelineId }),
-        }
+      const response = await apiClient.post(
+        DASHBOARD_API_ENDPOINTS.WORKFLOWS.CANCEL(owner, repo, run.id),
+        { pipelineId },
       );
 
-      if (response.ok) {
+      if (response.success) {
         // Update the run status locally
         setRuns(runs.map(r =>
           r.id === run.id
@@ -160,11 +137,11 @@ export default function WorkflowRunsList({
             : r
         ));
       } else {
-        throw new Error('Failed to cancel run');
+        throw new Error(DASHBOARD_ERROR_MESSAGES.FAILED_TO_CANCEL_RUN);
       }
     } catch (err) {
       console.error('Failed to cancel run:', err);
-      setError(err instanceof Error ? err.message : 'Failed to cancel run');
+      setError(err instanceof Error ? err.message : DASHBOARD_ERROR_MESSAGES.FAILED_TO_CANCEL_RUN);
     } finally {
       setActionInProgress(null);
     }
@@ -175,22 +152,13 @@ export default function WorkflowRunsList({
     setActionInProgress(run.id);
 
     try {
-      const token = localStorage.getItem('monodog_session_token');
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      };
 
-      const response = await fetch(
-        `${apiUrl}/api/workflows/${owner}/${repo}/runs/${run.id}/rerun`,
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ pipelineId, failedOnly: false }),
-        }
+      const response = await apiClient.post(
+        DASHBOARD_API_ENDPOINTS.WORKFLOWS.RERUN(owner, repo, run.id),
+        { pipelineId, failedOnly: false },
       );
 
-      if (response.ok) {
+      if (response.success) {
         // Update the run status locally
         setRuns(runs.map(r =>
           r.id === run.id
@@ -198,11 +166,11 @@ export default function WorkflowRunsList({
             : r
         ));
       } else {
-        throw new Error('Failed to rerun workflow');
+        throw new Error(DASHBOARD_ERROR_MESSAGES.FAILED_TO_RERUN_WORKFLOW);
       }
     } catch (err) {
       console.error('Failed to rerun workflow:', err);
-      setError(err instanceof Error ? err.message : 'Failed to rerun workflow');
+      setError(err instanceof Error ? err.message : DASHBOARD_ERROR_MESSAGES.FAILED_TO_RERUN_WORKFLOW);
     } finally {
       setActionInProgress(null);
     }
@@ -228,7 +196,7 @@ export default function WorkflowRunsList({
 
   return (
     <div className="space-y-2">
-      {runs.length === 0 ? (
+      {!runs || runs.length === 0 ? (
         <p className="text-sm text-gray-500 py-4">No workflow runs found</p>
       ) : (
         runs.map(run => (

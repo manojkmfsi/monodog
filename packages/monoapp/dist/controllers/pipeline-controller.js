@@ -48,9 +48,12 @@ exports.triggerWorkflow = triggerWorkflow;
 exports.getPipelineAuditLogs = getPipelineAuditLogs;
 exports.cancelWorkflowRun = cancelWorkflowRun;
 exports.rerunWorkflow = rerunWorkflow;
+require("../types/controllers");
 const logger_1 = require("../middleware/logger");
 const pipelineService = __importStar(require("../services/pipeline-service"));
 const githubActionsService = __importStar(require("../services/github-actions-service"));
+const error_messages_1 = require("../constants/error-messages");
+const http_1 = require("../constants/http");
 /**
  * Get recent pipelines for the dashboard
  * GET /api/pipelines
@@ -58,7 +61,7 @@ const githubActionsService = __importStar(require("../services/github-actions-se
 async function getRecentPipelines(req, res) {
     try {
         if (!req.user) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(http_1.HTTP_STATUS_UNAUTHORIZED).json({ error: error_messages_1.AUTH_ERRORS.UNAUTHORIZED });
         }
         const limit = Math.min(parseInt(req.query.limit) || 20, 100);
         const offset = parseInt(req.query.offset) || 0;
@@ -67,7 +70,7 @@ async function getRecentPipelines(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Error getting pipelines: ${error}`);
-        res.status(500).json({ error: 'Failed to get pipelines' });
+        res.status(http_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ error: error_messages_1.OPERATION_ERRORS.FAILED_TO_FETCH_PACKAGES });
     }
 }
 /**
@@ -77,12 +80,12 @@ async function getRecentPipelines(req, res) {
 async function updatePipelineStatus(req, res) {
     try {
         if (!req.user) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(http_1.HTTP_STATUS_UNAUTHORIZED).json({ error: error_messages_1.AUTH_ERRORS.UNAUTHORIZED });
         }
         const { pipelineId } = req.params;
         const { currentStatus, currentConclusion, lastRunId } = req.body;
         if (!currentStatus) {
-            return res.status(400).json({ error: 'currentStatus is required' });
+            return res.status(http_1.HTTP_STATUS_BAD_REQUEST).json({ error: error_messages_1.VALIDATION_ERRORS.CURRENT_STATUS_REQUIRED });
         }
         const updatedPipeline = await pipelineService.updatePipelineStatus(pipelineId, currentStatus, currentConclusion || null, lastRunId ? String(lastRunId) : undefined);
         res.json({
@@ -92,7 +95,7 @@ async function updatePipelineStatus(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Error updating pipeline status: ${error}`);
-        res.status(500).json({ error: 'Failed to update pipeline status' });
+        res.status(http_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ error: error_messages_1.OPERATION_ERRORS.FAILED_TO_FETCH_PACKAGES });
     }
 }
 /**
@@ -102,7 +105,7 @@ async function updatePipelineStatus(req, res) {
 async function listAvailableWorkflows(req, res) {
     try {
         if (!req.user || !req.accessToken) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(http_1.HTTP_STATUS_UNAUTHORIZED).json({ error: error_messages_1.AUTH_ERRORS.UNAUTHORIZED });
         }
         const { owner, repo } = req.params;
         const result = await githubActionsService.listWorkflows(owner, repo, req.accessToken);
@@ -110,7 +113,7 @@ async function listAvailableWorkflows(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Error listing workflows: ${error}`);
-        res.status(500).json({ error: 'Failed to list workflows' });
+        res.status(http_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ error: error_messages_1.OPERATION_ERRORS.FAILED_TO_TRIGGER_WORKFLOW });
     }
 }
 /**
@@ -120,7 +123,7 @@ async function listAvailableWorkflows(req, res) {
 async function getWorkflowRuns(req, res) {
     try {
         if (!req.user || !req.accessToken) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(http_1.HTTP_STATUS_UNAUTHORIZED).json({ error: error_messages_1.AUTH_ERRORS.UNAUTHORIZED });
         }
         const { owner, repo } = req.params;
         const workflowId = req.query.workflow_id;
@@ -141,7 +144,7 @@ async function getWorkflowRuns(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Error getting workflows: ${error}`);
-        res.status(500).json({ error: 'Failed to get workflows' });
+        res.status(http_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ error: error_messages_1.OPERATION_ERRORS.FAILED_TO_FETCH_WORKFLOW_RUNS });
     }
 }
 /**
@@ -151,7 +154,7 @@ async function getWorkflowRuns(req, res) {
 async function getWorkflowRunWithJobs(req, res) {
     try {
         if (!req.user || !req.accessToken) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(http_1.HTTP_STATUS_UNAUTHORIZED).json({ error: error_messages_1.AUTH_ERRORS.UNAUTHORIZED });
         }
         const { owner, repo, runId } = req.params;
         const page = parseInt(req.query.page) || 1;
@@ -187,7 +190,7 @@ async function getWorkflowRunWithJobs(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Error getting workflow run: ${error}`);
-        res.status(500).json({ error: 'Failed to get workflow run' });
+        res.status(http_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ error: error_messages_1.OPERATION_ERRORS.FAILED_TO_FETCH_WORKFLOW_RUNS });
     }
 }
 /**
@@ -197,7 +200,7 @@ async function getWorkflowRunWithJobs(req, res) {
 async function getJobLogs(req, res) {
     try {
         if (!req.user || !req.accessToken) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(http_1.HTTP_STATUS_UNAUTHORIZED).json({ error: error_messages_1.AUTH_ERRORS.UNAUTHORIZED });
         }
         const { owner, repo, jobId } = req.params;
         logger_1.AppLogger.info(`[LOGS] Fetching job logs: owner=${owner}, repo=${repo}, jobId=${jobId}, user=${req.user?.login}`);
@@ -215,8 +218,8 @@ async function getJobLogs(req, res) {
     catch (error) {
         const errorMsg = error instanceof Error ? error.message : 'Unknown error';
         logger_1.AppLogger.error(`[LOGS ERROR] Failed to fetch job logs: ${errorMsg}`);
-        res.status(500).json({
-            error: 'Failed to get job logs',
+        res.status(http_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
+            error: error_messages_1.OPERATION_ERRORS.FAILED_TO_FETCH_LOGS,
             details: errorMsg,
             jobId: req.params.jobId,
         });
@@ -229,12 +232,12 @@ async function getJobLogs(req, res) {
 async function triggerWorkflow(req, res) {
     try {
         if (!req.user || !req.accessToken) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(http_1.HTTP_STATUS_UNAUTHORIZED).json({ error: 'Unauthorized' });
         }
         const { owner, repo } = req.params;
         const { pipelineId, workflowId, ref, inputs } = req.body;
         if (!workflowId || !ref) {
-            return res.status(400).json({
+            return res.status(http_1.HTTP_STATUS_BAD_REQUEST).json({
                 error: 'Missing required fields: workflowId, ref',
             });
         }
@@ -256,7 +259,7 @@ async function triggerWorkflow(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Error triggering workflow: ${error}`);
-        res.status(500).json({ error: 'Failed to trigger workflow' });
+        res.status(http_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ error: error_messages_1.OPERATION_ERRORS.FAILED_TO_TRIGGER_WORKFLOW });
     }
 }
 /**
@@ -266,7 +269,7 @@ async function triggerWorkflow(req, res) {
 async function getPipelineAuditLogs(req, res) {
     try {
         if (!req.user) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(http_1.HTTP_STATUS_UNAUTHORIZED).json({ error: 'Unauthorized' });
         }
         const { pipelineId } = req.params;
         const limit = Math.min(parseInt(req.query.limit) || 50, 500);
@@ -280,7 +283,7 @@ async function getPipelineAuditLogs(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Error getting audit logs: ${error}`);
-        res.status(500).json({ error: 'Failed to get audit logs' });
+        res.status(http_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ error: error_messages_1.OPERATION_ERRORS.FAILED_TO_FETCH_LOGS });
     }
 }
 /**
@@ -290,7 +293,7 @@ async function getPipelineAuditLogs(req, res) {
 async function cancelWorkflowRun(req, res) {
     try {
         if (!req.user || !req.accessToken) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(http_1.HTTP_STATUS_UNAUTHORIZED).json({ error: 'Unauthorized' });
         }
         const { owner, repo, runId } = req.params;
         const { pipelineId } = req.body;
@@ -302,7 +305,7 @@ async function cancelWorkflowRun(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Error cancelling workflow: ${error}`);
-        res.status(500).json({ error: 'Failed to cancel workflow' });
+        res.status(http_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ error: error_messages_1.OPERATION_ERRORS.FAILED_TO_CANCEL_WORKFLOW });
     }
 }
 /**
@@ -312,7 +315,7 @@ async function cancelWorkflowRun(req, res) {
 async function rerunWorkflow(req, res) {
     try {
         if (!req.user || !req.accessToken) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(http_1.HTTP_STATUS_UNAUTHORIZED).json({ error: 'Unauthorized' });
         }
         const { owner, repo, runId } = req.params;
         const { failedOnly = false, pipelineId } = req.body;
@@ -324,6 +327,6 @@ async function rerunWorkflow(req, res) {
     }
     catch (error) {
         logger_1.AppLogger.error(`Error rerunning workflow: ${error}`);
-        res.status(500).json({ error: 'Failed to rerun workflow' });
+        res.status(http_1.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ error: error_messages_1.OPERATION_ERRORS.FAILED_TO_RERUN_WORKFLOW });
     }
 }

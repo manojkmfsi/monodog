@@ -1,3 +1,5 @@
 /prisma/schema/*.db
 /monodog-dashboard/*
 !/monodog-dashboard/dist
+/monodog-dashboard/.env.example
+/monodog-dashboard/package.json

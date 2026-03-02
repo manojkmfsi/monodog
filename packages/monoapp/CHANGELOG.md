@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.35
+
+### Patch Changes
+
+- remove npmignore
+
 ## 1.1.34
 
 ### Patch Changes

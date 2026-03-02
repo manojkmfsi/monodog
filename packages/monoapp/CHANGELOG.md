@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.37
+
+### Patch Changes
+
+- added dashboard in fles
+
 ## 1.1.36
 
 ### Patch Changes

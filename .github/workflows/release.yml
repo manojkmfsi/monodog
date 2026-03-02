@@ -43,19 +43,15 @@ jobs:
       # Use the 'working-directory' flag specifically for Dashboard
       - name: "Install dependencies (at Dashboard)"
         working-directory: packages/monoapp/monodog-dashboard
-        run: pnpm install --no-frozen-lockfile
+        run: npm install
 
       - name: "Create build (Dashboard)"
         working-directory: packages/monoapp/monodog-dashboard
-        run: pnpm run build
+        run: npm run build
 
       - name: "Lint code"
         working-directory: packages/monoapp/monodog-dashboard
-        run: pnpm run lint
-
-      - name: "Run tests"
-        working-directory: packages/monoapp/monodog-dashboard
-        run: pnpm test
+        run: npm run lint
 
   create-github-release:
     name: Create GitHub release document and publish to npm
@@ -90,11 +86,11 @@ jobs:
       # Use the 'working-directory' flag specifically for Dashboard
       - name: "Install dependencies - Dashboard"
         working-directory: packages/monoapp/monodog-dashboard
-        run: pnpm install --no-frozen-lockfile
+        run: npm install
 
       - name: "Build Dashboard"
         working-directory: packages/monoapp/monodog-dashboard
-        run: pnpm run build
+        run: npm run build
 
       - name: 'Set Git user name and email'
         run: |

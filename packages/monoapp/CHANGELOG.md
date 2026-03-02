@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.40
+
+### Patch Changes
+
+- remove source map
+
 ## 1.1.39
 
 ### Patch Changes

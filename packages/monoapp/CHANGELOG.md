@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- added files in pack.json
+- ignore .db
 
 ## 1.1.35
 

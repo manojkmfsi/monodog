@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.36
+
+### Patch Changes
+
+- ignore .db
+
 ## 1.1.35
 
 ### Patch Changes

@@ -6,6 +6,7 @@
   "author": "Mindfiredigital",
   "files": [
     "dist",
+    "monodog-dashboard",
     "prisma",
     ".env.example",
     "CHANGELOG.md",

@@ -17,7 +17,6 @@ export default function WorkflowTrigger({
   defaultBranch = 'main',
   onSuccess,
   onError,
-  pipelineId,
 }: WorkflowTriggerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [branch, setBranch] = useState(defaultBranch);
@@ -67,7 +66,6 @@ export default function WorkflowTrigger({
           workflow: selectedWorkflow,
           ref: branch,
           inputs,
-          pipelineId,
           workflowId: workflows.find((w) => w.path == selectedWorkflow)?.id ?? ''
         }
       );

@@ -61,7 +61,6 @@ export default function WorkflowRunsList({
   onSelectRun,
   runId,
   limit = 10,
-  pipelineId,
 }: WorkflowRunsListProps) {
   const [runs, setRuns] = useState<WorkflowRun[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,7 +125,6 @@ export default function WorkflowRunsList({
 
       const response = await apiClient.post(
         DASHBOARD_API_ENDPOINTS.WORKFLOWS.CANCEL(owner, repo, run.id),
-        { pipelineId },
       );
 
       if (response.success) {
@@ -155,7 +153,7 @@ export default function WorkflowRunsList({
 
       const response = await apiClient.post(
         DASHBOARD_API_ENDPOINTS.WORKFLOWS.RERUN(owner, repo, run.id),
-        { pipelineId, failedOnly: false },
+        { failedOnly: false },
       );
 
       if (response.success) {
@@ -180,7 +178,7 @@ export default function WorkflowRunsList({
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin">
-          <ClockIcon className="h-6 w-6 text-blue-600" />
+          <ClockIcon className="h-8 w-8 text-blue-600" />
         </div>
       </div>
     );

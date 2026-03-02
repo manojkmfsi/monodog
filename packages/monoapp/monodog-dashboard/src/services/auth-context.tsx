@@ -14,7 +14,6 @@ import {
   DASHBOARD_AUTH_MESSAGES,
   DASHBOARD_ERROR_MESSAGES,
   DASHBOARD_API_ENDPOINTS,
-  API_CONFIG,
 } from '../constants';
 import apiClient from './api';
 import { cookieUtils } from '../utils/cookies';

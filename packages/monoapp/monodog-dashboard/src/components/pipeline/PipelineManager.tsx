@@ -3,11 +3,12 @@ import { ExclamationCircleIcon, CheckCircleIcon, ClockIcon, XCircleIcon } from '
 import LogViewer from './LogViewer';
 import WorkflowRunsList from './WorkflowRunsList';
 import WorkflowTrigger from './WorkflowTrigger';
+import JobsList from './JobsList';
 import { useAuth } from '../../services/auth-context';
 import { monorepoService } from '../../services/monorepoService';
 import { getSessionPermission } from './utils/pipeline.utils';
 import { DASHBOARD_ERROR_MESSAGES, DASHBOARD_AUTH_MESSAGES } from '../../constants/messages';
-import { DASHBOARD_API_ENDPOINTS, API_CONFIG } from '../../constants/api-config';
+import { DASHBOARD_API_ENDPOINTS } from '../../constants/api-config';
 import apiClient from '../../services/api';
 import type { WorkflowRun, HierarchicalStep } from '../../types';
 
@@ -124,7 +125,6 @@ export default function PipelineManager({
   onNavigate,
 }: PipelineManagerProps) {
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
-  const [selectedPipeline, setSelectedPipeline] = useState<Pipeline | null>(null);
   const [selectedRun, setSelectedRun] = useState<number | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -137,11 +137,8 @@ export default function PipelineManager({
   // Infinite scroll state
   const [pipelineOffset, setPipelineOffset] = useState(0);
   const [pipelineLoadingMore, setPipelineLoadingMore] = useState(false);
-  const [jobOffset, setJobOffset] = useState(0);
-  const [jobLoadingMore, setJobLoadingMore] = useState(false);
   const pipelinePageSize = 10;
   const runsPageSize = 20;
-  const jobPageSize = 20;
 
   const { owner, repo } = useMemo(() => getSessionPermission() || {}, []);
 
@@ -171,9 +168,6 @@ export default function PipelineManager({
         const pipelineData = Array.isArray(response.data) ? response.data : [];
         setPipelines(pipelineData);
 
-        if (pipelineData.length > 0 && !selectedPipeline) {
-          setSelectedPipeline(pipelineData[0]);
-        }
         setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
@@ -185,11 +179,10 @@ export default function PipelineManager({
         const interval = setInterval(fetchPipelinesOnce, 5000);
 
     return () => clearInterval(interval);
-  }, [selectedPipeline, owner, repo, packageName]);
+  }, [owner, repo, packageName]);
 
   // Poll all non success pipeline for status updates
   useEffect(() => {
-    // if (!selectedPipeline) return;
 
     const pollPipelineStatus = async () => {
       try {
@@ -271,11 +264,11 @@ export default function PipelineManager({
     const interval = setInterval(pollPipelineStatus, 10000);
 
     return () => clearInterval(interval);
-  }, [selectedPipeline,pipelines, owner, repo]);
+  }, [pipelines, owner, repo]);
 
   // Fetch jobs for selected run
   useEffect(() => {
-    if (!selectedRun || !selectedPipeline) return;
+    if (!selectedRun) return;
 
     const fetchJobs = async () => {
       try {
@@ -310,7 +303,7 @@ export default function PipelineManager({
 
   // Fetch logs for selected job
   useEffect(() => {
-    if (!selectedJob || !selectedPipeline) return;
+    if (!selectedJob) return;
 
     const fetchLogs = async () => {
       try {
@@ -325,7 +318,8 @@ export default function PipelineManager({
             setError(DASHBOARD_AUTH_MESSAGES.SESSION_EXPIRED);
             window.location.href = '/login';
           } else {
-            const errorDetails = response.error?.details || response.error?.message || 'Unknown error';
+            console.log(response)
+            const errorDetails = response.error?.details || 'Unknown error';
             setError(`${DASHBOARD_ERROR_MESSAGES.FAILED_TO_FETCH_LOGS}: ${errorDetails}`);
           }
           return;
@@ -392,56 +386,11 @@ export default function PipelineManager({
     }
   };
 
-  // Handle infinite scroll for jobs list
-  const handleJobsScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const element = e.currentTarget;
-    const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
-
-    if (isNearBottom && !jobLoadingMore && jobs.length >= jobPageSize && selectedRun) {
-      loadMoreJobs();
-    }
-  };
-
-  const loadMoreJobs = async () => {
-    if (jobLoadingMore || !selectedRun) return;
-
-    setJobLoadingMore(true);
-    try {
-      const response = await apiClient.get(
-        DASHBOARD_API_ENDPOINTS.WORKFLOWS.RUNS(owner, repo, selectedRun) + `?page=${Math.floor(jobOffset / jobPageSize) + 2}`
-      );
-
-      if (!response.success) throw new Error('Failed to fetch more jobs');
-
-      const data = response.data;
-      const newJobs = (data.jobs || []).map((job: any) => ({
-        id: job.id,
-        gitHubJobId: job.id,
-        name: job.name,
-        status: job.status,
-        conclusion: job.conclusion || null,
-        htmlUrl: job.html_url,
-        startedAt: job.started_at,
-        completedAt: job.completed_at,
-      }));
-
-      setJobs(prev => [...prev, ...newJobs]);
-      setJobOffset(prev => prev + jobPageSize);
-    } catch (err) {
-      console.error('Error loading more jobs:', err);
-    } finally {
-      setJobLoadingMore(false);
-    }
-  };
-
   const handleSelectRun = (runId: number) => {
     setSelectedRun(runId);
     setSelectedJob(null);
     setJobs([]);
-    setJobOffset(0);
   };
-
-  // Remove unused currentRun variable - it's no longer needed
 
   if (loading && pipelines.length === 0) {
     return (
@@ -461,11 +410,10 @@ export default function PipelineManager({
         <div className="p-4 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Pipelines</h3>
-            {selectedPipeline && hasPermission('maintain') && (
+            {hasPermission('maintain') && (
               <WorkflowTrigger
                 owner={owner}
                 repo={repo}
-                // pipelineId={selectedPipeline.id}
               />
             )}
           </div>
@@ -482,18 +430,9 @@ export default function PipelineManager({
             ) : (
               <>
                 {pipelines.map((pipeline) => (
-                  <button
+                  <div
                     key={pipeline.id}
-                    onClick={() => {
-                      setSelectedPipeline(pipeline);
-                      setSelectedRun(null);
-                      setJobs([]);
-                    }}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                      selectedPipeline?.id === pipeline.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:bg-gray-50'
-                    }`}
+                    className={`w-full text-left p-3 rounded-lg border transition-colors border-gray-200 hover:bg-gray-50`}
                   >
                     <div className="flex items-start gap-2">
                       {getStatusIcon(pipeline.currentStatus, pipeline.currentConclusion || null, updatingPipelines.has(pipeline.id))}
@@ -509,7 +448,7 @@ export default function PipelineManager({
                         </p>
                       </div>
                     </div>
-                  </button>
+                  </div>
                 ))}
                 {pipelineLoadingMore && (
                   <div className="flex justify-center py-4">
@@ -528,7 +467,6 @@ export default function PipelineManager({
       <div className="lg:col-span-1 overflow-y-auto border-r border-gray-200">
         <div className="p-4 space-y-4">
           <h3 className="text-lg font-semibold text-gray-900">Runs</h3>
-          {selectedPipeline && (
             <WorkflowRunsList
               owner={owner}
               repo={repo}
@@ -536,70 +474,37 @@ export default function PipelineManager({
               onSelectRun={handleSelectRun}
               runId={selectedRun}
               limit={runsPageSize}
-              pipelineId={selectedPipeline.id}
             />
-          )}
         </div>
       </div>
 
       {/* Jobs List */}
-      <div className="lg:col-span-1 overflow-y-auto border-r border-gray-200" onScroll={handleJobsScroll}>
-        <div className="p-4 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">Jobs</h3>
-          <div className="space-y-2">
-            {jobs.length === 0 ? (
-              <p className="text-sm text-gray-500">No jobs available</p>
-            ) : (
-              <>
-                {jobs.map((job) => {
-                  const jobDuration = job.startedAt && job.completedAt
-                    ? Math.round((new Date(job.completedAt).getTime() - new Date(job.startedAt).getTime()) / 1000)
-                    : 0;
-                  const isRunning = job.status === 'in_progress' || job.status === 'queued';
-                  const isFailed = job.conclusion === 'failure';
-
-                  return (
-                    <div
-                      key={job.id}
-                      className={`rounded-lg border transition-colors ${
-                        selectedJob?.id === job.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      <button
-                        onClick={() => handleSelectJob(job)}
-                        className="w-full text-left p-3"
-                      >
-                        <div className="flex items-start gap-2">
-                          {getStatusIcon(job.status, job.conclusion)}
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-sm text-gray-900 truncate">
-                              {job.name}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              {job.status} • {jobDuration}s
-                            </p>
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  );
-                })}
-                {jobLoadingMore && (
-                  <div className="flex justify-center py-4">
-                    <div className="animate-spin">
-                      <ClockIcon className="h-5 w-5 text-blue-600" />
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+      <div className="lg:col-span-1 overflow-y-auto border-r border-gray-200">
+      <div className="p-4 space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">Jobs</h3>
+        <div className="space-y-2">
+          {jobs.length ? (
+            <JobsList
+              jobs={jobs}
+              selectedJob={selectedJob}
+              onSelectJob={handleSelectJob}
+            />
+          ) : selectedRun ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-spin">
+                <ClockIcon className="h-8 w-8 text-blue-600" />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              <p className="text-sm">Select a run to view jobs</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
-          {/* Log Viewer */}
+    </div>
+      {/* Log Viewer */}
       <div className="lg:col-span-1 overflow-hidden  border-t pt-2 h-[50vh]">
         <div className="p-4 h-full overflow-hidden flex flex-col">
           <h3 className="text-lg font-semibold text-gray-900">Logs</h3>

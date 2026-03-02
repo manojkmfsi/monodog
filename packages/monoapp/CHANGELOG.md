@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.34
+
+### Patch Changes
+
+- updated release file
+
 ## 1.1.33
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @monodog/backend
 
+## 1.6.1
+
+### Patch Changes
+
+- [`3504320`](https://github.com/manojkmfsi/monodog/commit/35043200d538b102b28a5f84d7abadee6df0a9e7) - dcxcxcxcxcxcxc
+
+- Updated dependencies [[`9983ecf`](https://github.com/manojkmfsi/monodog/commit/9983ecf2ac11e5c456d4fde6a954deeeb2d40564)]:
+  - @monodog/ci-status@1.3.0
+  - @monodog/utils@1.0.18
+  - @monodog/monorepo-scanner@1.0.28
+
 ## 1.6.0
 
 ### Minor Changes

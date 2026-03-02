@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.32
+
+### Patch Changes
+
+- fix pipeline issues and optimize code
+
 ## 1.1.31
 
 ### Patch Changes

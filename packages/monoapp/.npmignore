@@ -1,6 +1,6 @@
 /prisma/schema/*.db
-# /monodog-dashboard/*
-# !/monodog-dashboard/dist
+/monodog-dashboard/*
+!/monodog-dashboard/dist
 # /src
 # /.turbo
 # *__tests__*

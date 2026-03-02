@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
         contents: write # Required to create release tags and update the changelog
-        issues: write   # Required to close issues/PRs linked in the changelog
         pull-requests: write # Required for creating release pull requests (if configured)
 
     steps:
@@ -30,7 +29,6 @@ jobs:
           version: 8
 
       - name: "Install dependencies (at ROOT)"
-        # This installs all monorepo deps
         run: pnpm install --no-frozen-lockfile
 
       - name: "Create build (Backend)"
@@ -42,8 +40,12 @@ jobs:
       - name: "Run tests"
         run: pnpm test
 
+      # Use the 'working-directory' flag specifically for Dashboard
+      - name: "Install dependencies (at Dashboard)"
+        working-directory: packages/monoapp/monodog-dashboard
+        run: pnpm install --no-frozen-lockfile
+
       - name: "Create build (Dashboard)"
-        # Use the 'working-directory' flag specifically for this folder
         working-directory: packages/monoapp/monodog-dashboard
         run: pnpm run build
 
@@ -83,7 +85,12 @@ jobs:
         run: pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: 'Build Backend'
-        run: pnpm turbo run build
+        run: pnpm run build
+
+      # Use the 'working-directory' flag specifically for Dashboard
+      - name: "Install dependencies - Dashboard"
+        working-directory: packages/monoapp/monodog-dashboard
+        run: pnpm install --no-frozen-lockfile
 
       - name: "Build Dashboard"
         working-directory: packages/monoapp/monodog-dashboard

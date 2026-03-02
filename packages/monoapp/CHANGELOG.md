@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.33
+
+### Patch Changes
+
+- Remove dist and updated text
+
 ## 1.1.32
 
 ### Patch Changes

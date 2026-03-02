@@ -4,6 +4,18 @@
   "description": "App for monodog monorepo",
   "license": "MIT",
   "author": "Mindfiredigital",
+  "files": [
+    "dist",
+    "monodog-dashboard/dist",
+    "prisma",
+    ".env.example",
+    "CHANGELOG.md",
+    "LICENCE",
+    "README",
+    "monodog-config.example.json",
+    "monodog-config.json",
+    "package.json"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/mindfiredigital/MonoDog",

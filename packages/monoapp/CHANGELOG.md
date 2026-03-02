@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.38
+
+### Patch Changes
+
+- remove files
+
 ## 1.1.37
 
 ### Patch Changes

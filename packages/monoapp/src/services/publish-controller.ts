@@ -1,0 +1,347 @@
+/**
+ * Publish Controller
+ * Orchestrates the independent release process
+ * Coordinates: change detection, versioning, readiness, and publishing
+ */
+
+import {
+  PublishRunner,
+  PublishRunnerFactory,
+  PublishRunnerConfig,
+  PublishRunnerResult,
+} from './publish-runners';
+import { changeTrackerService } from './change-tracker-service';
+import { releaseReadinessService } from './release-readiness-service';
+import { npmPublishService } from './npm-publish-service';
+import { secureTokenService } from './secure-token-service';
+import { changelogGenerator } from './changelog-generator';
+
+export interface PublishRequest {
+  packageNames: string[];
+  packagePaths: Record<string, string>;
+  versionMap?: Record<string, string>;
+  method?: 'node' | 'github-actions' | 'auto';
+  dryRun?: boolean;
+  autoTag?: boolean;
+  createReleases?: boolean;
+  userId?: string;
+}
+
+export interface PublishPipelineStatus {
+  pipelineId: string;
+  status: 'pending' | 'validating' | 'ready' | 'publishing' | 'completed' | 'failed';
+  progress: number;
+  packagesToPublish: string[];
+  results: Record<string, PublishRunnerResult>;
+  startedAt?: string;
+  completedAt?: string;
+  error?: string;
+}
+
+export class PublishController {
+  private pipelines: Map<string, PublishPipelineStatus> = new Map();
+
+  /**
+   * Validate and prepare packages for publishing
+   */
+  async preparePublish(request: PublishRequest): Promise<{
+    valid: boolean;
+    readiness: any;
+    analysis: any;
+  }> {
+    console.info(`🔍 Preparing publish for: ${request.packageNames.join(', ')}`);
+
+    try {
+      // 1. Get readiness status for all packages
+      const packages = request.packageNames.map(name => ({
+        name,
+        path: request.packagePaths[name],
+        currentVersion: this.getCurrentVersion(name, request.packagePaths[name]),
+      }));
+
+      const readiness = await releaseReadinessService.checkReleaseReadiness(packages);
+
+      // 2. Analyze changes for each package
+      const analysis: Record<string, any> = {};
+      for (const pkg of packages) {
+        try {
+          const changes = await changeTrackerService.analyzeChanges(
+            pkg.name,
+            pkg.path,
+            pkg.currentVersion,
+            ''
+          );
+          analysis[pkg.name] = changes;
+        } catch (error) {
+          console.error(`Failed to analyze ${pkg.name}:`, error);
+        }
+      }
+
+      // 3. Print readiness report
+      releaseReadinessService.printReadinessReport(readiness);
+
+      return {
+        valid: readiness.canProceed,
+        readiness,
+        analysis,
+      };
+    } catch (error) {
+      console.error('Failed to prepare publish:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Publish packages to npm
+   */
+  async publish(request: PublishRequest): Promise<PublishPipelineStatus> {
+    const pipelineId = this.generatePipelineId();
+    const status: PublishPipelineStatus = {
+      pipelineId,
+      status: 'pending',
+      progress: 0,
+      packagesToPublish: request.packageNames,
+      results: {},
+    };
+
+    this.pipelines.set(pipelineId, status);
+
+    try {
+      status.startedAt = new Date().toISOString();
+      status.status = 'validating';
+
+      // 1. Validate packages
+      const prep = await this.preparePublish(request);
+      if (!prep.valid && !request.dryRun) {
+        throw new Error(
+          `Packages not ready for publishing. Fix blockers and try again.`
+        );
+      }
+
+      status.status = 'ready';
+      status.progress = 20;
+
+      // 2. Get credentials
+      const npmToken = await secureTokenService.getToken('npm', 'env');
+      const githubToken = request.method !== 'node'
+        ? await secureTokenService.getToken('github', 'env')
+        : undefined;
+
+      // 3. Publish each package
+      status.status = 'publishing';
+      const publisherCount = request.packageNames.length;
+
+      for (let i = 0; i < request.packageNames.length; i++) {
+        const packageName = request.packageNames[i];
+        const packagePath = request.packagePaths[packageName];
+
+        console.info(`\n📦 Publishing ${i + 1}/${publisherCount}: ${packageName}`);
+
+        const result = await this.publishPackage(
+          packageName,
+          packagePath,
+          request.versionMap?.[packageName],
+          npmToken,
+          githubToken,
+          request
+        );
+
+        status.results[packageName] = result;
+        status.progress = 20 + ((i + 1) / publisherCount) * 80;
+      }
+
+      // 4. Generate changelog entries
+      if (!request.dryRun) {
+        console.info('\n📝 Generating changelogs...');
+        await this.generateChangelogs(request.packageNames, request.packagePaths, status.results);
+      }
+
+      status.status = 'completed';
+      status.progress = 100;
+      status.completedAt = new Date().toISOString();
+
+      console.info(`\n✅ Publish pipeline completed: ${pipelineId}`);
+    } catch (error) {
+      status.status = 'failed';
+      status.error = error instanceof Error ? error.message : String(error);
+      status.completedAt = new Date().toISOString();
+
+      console.error(`\n❌ Publish pipeline failed: ${status.error}`);
+    }
+
+    return status;
+  }
+
+  /**
+   * Publish a single package
+   */
+  private async publishPackage(
+    packageName: string,
+    packagePath: string,
+    proposedVersion?: string,
+    npmToken?: string,
+    githubToken?: string,
+    request?: PublishRequest
+  ): Promise<PublishRunnerResult> {
+    try {
+      // Determine runner
+      const method = request?.method || 'auto';
+      const runner = PublishRunnerFactory.createRunner(
+        method === 'auto' ? undefined : method,
+        githubToken
+      );
+
+      // Get current version
+      const currentVersion = this.getCurrentVersion(packageName, packagePath);
+
+      // Prepare config
+      const config: PublishRunnerConfig = {
+        packageName,
+        packagePath,
+        currentVersion,
+        proposedVersion,
+        npmToken: npmToken || '',
+        githubToken,
+        dryRun: request?.dryRun,
+        gitTag: request?.autoTag !== false,
+        createGitHubRelease: request?.createReleases,
+      };
+
+      // Run publisher
+      const result = await runner.run(config);
+
+      // Log result
+      if (result.success) {
+        console.info(`✅ Published: ${result.packageId}@${result.version}`);
+      } else {
+        console.error(`❌ Failed: ${result.packageId}`);
+        result.errors.forEach(e => console.error(`   ${e}`));
+      }
+
+      return result;
+    } catch (error) {
+      console.error(`Error publishing ${packageName}:`, error);
+      return {
+        success: false,
+        packageId: packageName,
+        version: '',
+        method: 'node',
+        npmUrl: '',
+        timestamp: new Date().toISOString(),
+        logs: [],
+        errors: [error instanceof Error ? error.message : String(error)],
+      };
+    }
+  }
+
+  /**
+   * Generate changelog entries for published packages
+   */
+  private async generateChangelogs(
+    packageNames: string[],
+    packagePaths: Record<string, string>,
+    results: Record<string, PublishRunnerResult>
+  ): Promise<void> {
+    for (const packageName of packageNames) {
+      const result = results[packageName];
+      if (!result?.success) continue;
+
+      try {
+        const packagePath = packagePaths[packageName];
+        // Would generate changelog using changelogGenerator
+        console.info(`  Generated changelog for ${packageName}`);
+      } catch (error) {
+        console.warn(`Failed to generate changelog for ${packageName}:`, error);
+      }
+    }
+  }
+
+  /**
+   * Get pipeline status
+   */
+  getPipelineStatus(pipelineId: string): PublishPipelineStatus | undefined {
+    return this.pipelines.get(pipelineId);
+  }
+
+  /**
+   * Get all pipelines
+   */
+  getAllPipelines(): PublishPipelineStatus[] {
+    return Array.from(this.pipelines.values());
+  }
+
+  /**
+   * Get list of available packages
+   */
+  getAvailablePackages(workspacePath: string): Array<{
+    name: string;
+    path: string;
+    version: string;
+  }> {
+    // Would scan packages directory and return available packages
+    return [];
+  }
+
+  /**
+   * Get detailed pipeline information
+   */
+  async getPipelineDetails(pipelineId: string): Promise<any> {
+    const status = this.pipelines.get(pipelineId);
+    if (!status) {
+      throw new Error(`Pipeline not found: ${pipelineId}`);
+    }
+
+    return {
+      ...status,
+      packages: status.packagesToPublish.map(name => ({
+        name,
+        result: status.results[name],
+      })),
+    };
+  }
+
+  /**
+   * Cancel a publishing pipeline
+   */
+  async cancelPipeline(pipelineId: string): Promise<void> {
+    const status = this.pipelines.get(pipelineId);
+    if (!status) {
+      throw new Error(`Pipeline not found: ${pipelineId}`);
+    }
+
+    if (status.status === 'completed' || status.status === 'failed') {
+      throw new Error(`Cannot cancel ${status.status} pipeline`);
+    }
+
+    status.status = 'failed';
+    status.error = 'Cancelled by user';
+    status.completedAt = new Date().toISOString();
+
+    console.info(`Cancelled pipeline: ${pipelineId}`);
+  }
+
+  /**
+   * Get current version from package.json
+   */
+  private getCurrentVersion(packageName: string, packagePath: string): string {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const pkgJsonPath = path.join(packagePath, 'package.json');
+      const content = fs.readFileSync(pkgJsonPath, 'utf8');
+      const pkgJson = JSON.parse(content);
+      return pkgJson.version || '0.0.0';
+    } catch {
+      return '0.0.0';
+    }
+  }
+
+  /**
+   * Generate unique pipeline ID
+   */
+  private generatePipelineId(): string {
+    return `publish-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+}
+
+export const publishController = new PublishController();

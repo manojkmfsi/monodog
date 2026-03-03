@@ -99,7 +99,7 @@ class ApiClient {
 
     return {
       success: false,
-      error: { code, message: statusText, status, details: details?.details as Record<string, unknown> | undefined },
+      error: { code, message: statusText, status, details: typeof details === 'object' && details !== null && 'details' in details ? (details as any).details : undefined },
       meta: {
         status,
         statusText,

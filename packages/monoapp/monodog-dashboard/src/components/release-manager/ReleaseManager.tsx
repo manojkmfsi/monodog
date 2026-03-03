@@ -1,17 +1,19 @@
 /**
  * Release Manager Component
  *
- * Comprehensive UI-driven version control and package publishing for monorepos using Changesets.
+ * Comprehensive UI-driven version control and package publishing for monorepos.
+ * Integrated with independent release engine for change detection and publishing.
  * Allows users to:
  * - Select packages and version bumps
- * - Generate changesets
+ * - Analyze changes and validate readiness
  * - Preview releases
- * - Trigger publishing pipeline
+ * - Trigger publishing pipeline with independent engine
  */
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../services/auth-context';
 import apiClient from '../../services/api';
+import releaseAPI from '../../services/release-api';
 import PackageSelector from './components/PackageSelector';
 import VersionBumpSelector from './components/VersionBumpSelector';
 import ChangesetPreview from './components/ChangesetPreview';
@@ -105,8 +107,53 @@ export default function ReleaseManager() {
     try {
       setLoading(true);
 
+      // First, check readiness using the independent release engine
+      const packageNames = packages.map(p => p.name);
+      const packagePaths = packageNames.reduce((acc, name) => {
+        const pkg = allPackages.find(p => p.name === name);
+        if (pkg) {
+          acc[name] = (pkg as any).path || './packages/' + name.split('/').pop();
+        }
+        return acc;
+      }, {} as Record<string, string>);
+
+      const readinessRes = await releaseAPI.checkReadiness(packageNames, packagePaths);
+      
+      let readinessErrors: string[] = [];
+      let readinessWarnings: string[] = [];
+      let canProceedFromReadiness = true;
+
+      if (readinessRes.success) {
+        const data = readinessRes.data as any;
+        canProceedFromReadiness = data.canProceed !== false;
+        
+        // Collect global blockers
+        if (data.globalBlockers && Array.isArray(data.globalBlockers)) {
+          readinessErrors.push(
+            ...data.globalBlockers.map((blocker: string) => `🚨 ${blocker}`)
+          );
+        }
+
+        // Collect per-package blockers and warnings
+        if (data.checks && Array.isArray(data.checks)) {
+          data.checks.forEach((check: any) => {
+            if (check.blockers && Array.isArray(check.blockers)) {
+              check.blockers.forEach((blocker: string) => {
+                readinessErrors.push(`❌ ${check.packageName}: ${blocker}`);
+              });
+            }
+            if (check.warnings && Array.isArray(check.warnings)) {
+              check.warnings.forEach((warning: string) => {
+                readinessWarnings.push(`⚠️  ${check.packageName}: ${warning}`);
+              });
+            }
+          });
+        }
+      }
+
+      // Then, validate using the old preview endpoint for backward compatibility
       const response = await apiClient.post(DASHBOARD_API_ENDPOINTS.PUBLISH.PREVIEW, {
-        packages: packages.map(p => p.name),
+        packages: packageNames,
         bumps: packages.map(p => ({
           package: p.name,
           bumpType: p.bumpType,
@@ -120,16 +167,22 @@ export default function ReleaseManager() {
 
       const result = response.data;
 
-      // Ensure the result has the expected structure
+      // Combine both validation results
       const validationData: ValidationResult = {
-        isValid: result.isValid ?? true,
-        errors: result.errors ?? [],
-        warnings: result.warnings ?? [],
+        isValid: (result.isValid ?? true) && canProceedFromReadiness,
+        errors: [
+          ...readinessErrors,
+          ...(result.errors ?? []),
+        ],
+        warnings: [
+          ...readinessWarnings,
+          ...(result.warnings ?? []),
+        ],
         checks: result.checks ?? {
           permissions: true,
-          workingTreeClean: true,
+          workingTreeClean: readinessErrors.length === 0,
           ciPassing: true,
-          versionAvailable: true,
+          versionAvailable: !readinessErrors.some(e => e.includes('already exists')),
         },
       };
 
@@ -147,6 +200,13 @@ export default function ReleaseManager() {
 
   const handlePublishConfirmed = async () => {
     try {
+      // Prevent publishing if validation failed
+      if (validationResult && !validationResult.isValid) {
+        setError('Cannot proceed with publishing. Please fix validation errors and re-validate.');
+        setCurrentStep('validate');
+        return;
+      }
+
       // Check permission before publishing
       if (!hasPermission('maintain')) {
         setError(DASHBOARD_ERROR_MESSAGES.PERMISSION_ERROR);
@@ -155,27 +215,47 @@ export default function ReleaseManager() {
 
       setLoading(true);
 
-      // Create changeset
-      const changesetRes = await apiClient.post(DASHBOARD_API_ENDPOINTS.PUBLISH.CHANGESETS, {
-        packages: selectedPackages.map(p => p.name),
-        bumps: selectedPackages.map(p => ({
-          package: p.name,
-          bumpType: p.bumpType,
-        })),
-        summary: changesetSummary,
+      const packageNames = selectedPackages.map(p => p.name);
+      const packagePaths = packageNames.reduce((acc, name) => {
+        const pkg = allPackages.find(p => p.name === name);
+        if (pkg) {
+          acc[name] = (pkg as any).path || './packages/' + name.split('/').pop();
+        }
+        return acc;
+      }, {} as Record<string, string>);
+
+      // Prepare version map from selected packages
+      const versionMap: Record<string, string> = {};
+      selectedPackages.forEach(pkg => {
+        versionMap[pkg.name] = pkg.newVersion;
       });
 
-      if (!changesetRes.success) {
-        throw new Error(DASHBOARD_ERROR_MESSAGES.FAILED_TO_CREATE_CHANGESET);
-      }
-
-      // Trigger publish
-      const publishRes = await apiClient.post(DASHBOARD_API_ENDPOINTS.PUBLISH.TRIGGER, {
-        packages: selectedPackages,
+      // Use the new independent release engine for publishing
+      const publishRes = await releaseAPI.startPublish(packageNames, packagePaths, {
+        versionMap,
+        method: 'node',  // Use Node.js direct publishing
+        dryRun: false,   // Actual publish
+        autoTag: true,   // Auto-create git tags
+        createReleases: true,  // Create GitHub releases
       });
 
       if (!publishRes.success) {
-        throw new Error(DASHBOARD_ERROR_MESSAGES.FAILED_TO_TRIGGER_PUBLISH);
+        throw new Error(publishRes.error?.message || 'Failed to start publishing');
+      }
+
+      // Also try to create a changeset record (for backward compatibility with existing workflows)
+      try {
+        await apiClient.post(DASHBOARD_API_ENDPOINTS.PUBLISH.CHANGESETS, {
+          packages: packageNames,
+          bumps: selectedPackages.map(p => ({
+            package: p.name,
+            bumpType: p.bumpType,
+          })),
+          summary: changesetSummary,
+        });
+      } catch (changesetErr) {
+        console.warn('Failed to create changeset record:', changesetErr);
+        // Continue anyway - the independent engine has already started
       }
 
       setCurrentStep('confirm');
@@ -224,7 +304,7 @@ export default function ReleaseManager() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Release Manager</h1>
           <p className="text-gray-600 mt-1">
-            Manage package versions and publish releases with Changesets
+            Manage package versions and publish releases with the independent release engine
           </p>
         </div>
         <div className="text-sm text-gray-500">
@@ -250,14 +330,14 @@ export default function ReleaseManager() {
         </div>
       )}
 
-      {/* Existing Changesets Warning */}
+      {/* Release Status Info */}
       {existingChangesets.length > 0 && currentStep === 'select' && (
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-blue-700 font-medium">
-            {existingChangesets.length} unpublished changeset(s) detected
+            {existingChangesets.length} pending release(s)
           </p>
           <p className="text-blue-600 text-sm mt-1">
-            Review existing changesets or pull the latest changes and refresh the dashboard before creating a new one.
+            Pull the latest changes and refresh the dashboard to see if these have been published.
           </p>
         </div>
       )}

@@ -1,0 +1,272 @@
+/**
+ * Independent Release Info Component Styles
+ */
+
+.container {
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  margin-bottom: 20px;
+}
+
+.header {
+  margin-bottom: 20px;
+  border-bottom: 2px solid #333;
+  padding-bottom: 15px;
+}
+
+.header h3 {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.error {
+  padding: 10px 15px;
+  background-color: #fee;
+  border: 1px solid #fcc;
+  border-radius: 4px;
+  color: #c00;
+  margin-bottom: 15px;
+  font-size: 13px;
+}
+
+.healthSection {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.statusDot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #4caf50;
+  animation: pulse 2s infinite;
+}
+
+.statusDot[data-status='unhealthy'] {
+  background-color: #f44336;
+}
+
+.statusDot[data-status='degraded'] {
+  background-color: #ff9800;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.stat {
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.statLabel {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.statValue {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.timestamp {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+  text-align: right;
+}
+
+.pipelinesSection {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pipelinesSection h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pipelinesList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.pipelineItem {
+  padding: 12px;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.pipelineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.pipelineId {
+  font-family: monospace;
+  color: #666;
+  font-size: 11px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pipelineStatus {
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.pipelineStatus[data-status='completed'] {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+
+.pipelineStatus[data-status='failed'] {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.pipelineStatus[data-status='publishing'] {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.pipelineProgress {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #45a049);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  color: #666;
+  font-size: 11px;
+  min-width: 35px;
+  text-align: right;
+}
+
+.pipelinePackages {
+  margin: 0;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featuresSection {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.featuresSection h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.featuresSection ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.featuresSection li {
+  padding: 6px 0;
+  color: #555;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.featuresSection li:before {
+  content: '✓ ';
+  color: #4caf50;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+@media (max-width: 600px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .container {
+    padding: 15px;
+  }
+}

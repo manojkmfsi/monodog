@@ -30,6 +30,7 @@ import permissionRouter from '../routes/permission-routes';
 import publishRouter from '../routes/publish-routes';
 import pipelineRouter from '../routes/pipeline-routes';
 import workflowRouter from '../routes/workflow-routes';
+import releaseRouter from '../routes/release-api';
 
 import {
   PORT_MIN,
@@ -108,6 +109,7 @@ function createApp(rootPath: string): Express {
   app.use('/api/publish', publishRouter);
   app.use('/api/pipelines', pipelineRouter);
   app.use('/api/workflows', workflowRouter);
+  app.use('/api/releases', releaseRouter);
 
   app.use('/api', router);
 

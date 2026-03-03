@@ -11,6 +11,7 @@ import {
   ConfigInspector,
   ReleaseManager,
   Pipeline,
+  IndependentReleaseManagerPage
 } from '../pages';
 
 // Component mapping for dynamic routing
@@ -25,6 +26,7 @@ const componentMap = {
   ConfigInspector,
   ReleaseManager,
   Pipeline,
+  IndependentReleaseManagerPage
 } as const;
 
 // Route component renderer

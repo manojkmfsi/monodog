@@ -1,0 +1,179 @@
+/**
+ * Publish Pipeline Schema
+ * Tracks the independent publishing process without GitHub Actions
+ * Supports hybrid execution (Node.js or GitHub Actions)
+ */
+
+model PublishPipeline {
+  id                  String   @id @default(cuid())
+  
+  // Pipeline identification
+  packageNames        String[]
+  releaseVersion      String?
+  
+  // Execution method
+  method              PublishMethod  // 'node' or 'github-actions'
+  status              PublishStatus  @default(pending)
+  conclusion          PublishConclusion?
+  
+  // Audit trail
+  triggeredBy         String        // User ID
+  triggeredAt         DateTime      @default(now())
+  completedAt         DateTime?
+  
+  // Release notes
+  releaseNotes        String?
+  
+  // Progress tracking
+  packageResults      PublishResult[]
+  
+  // Error handling
+  errorMessage        String?
+  errorDetails        String?
+  
+  // Metadata
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  
+  @@index([status, createdAt])
+  @@index([triggeredBy, createdAt])
+}
+
+model PublishResult {
+  id                  String   @id @default(cuid())
+  publishPipelineId   String
+  publishPipeline     PublishPipeline @relation(fields: [publishPipelineId], references: [id], onDelete: Cascade)
+  
+  // Package info
+  packageName         String
+  currentVersion      String
+  newVersion          String
+  
+  // Publishing result
+  status              PublishStatus
+  result              PublishResultType?
+  
+  // npm details
+  npmPackageId        String?  // @scope/name@1.2.3
+  tarballUrl          String?
+  publishedAt         DateTime?
+  
+  // Git details
+  gitTagCreated       String?  // Git tag name
+  gitCommitSha        String?
+  gitPushCompleted    Boolean  @default(false)
+  
+  // GitHub Release
+  githubReleaseUrl    String?
+  
+  // Errors
+  error               String?
+  errorDetails        String?
+  
+  @@index([publishPipelineId])
+  @@index([packageName, newVersion])
+}
+
+model TokenUsageLog {
+  id                  String   @id @default(cuid())
+  
+  // User context
+  userId              String
+  
+  // Token type
+  tokenType           TokenType
+  source              TokenSource  // 'env', 'user', 'oauth'
+  
+  // Operation details
+  operation           TokenOperation
+  resourceId          String        // Package name or repo
+  
+  // Result
+  success             Boolean
+  errorMessage        String?
+  
+  // Security
+  timestamp           DateTime      @default(now())
+  ipAddress           String?
+  
+  @@index([userId, timestamp])
+  @@index([tokenType, timestamp])
+}
+
+model UserSecret {
+  id                  String   @id @default(cuid())
+  userId              String   @index
+  
+  // Secret metadata
+  secretName          String   // 'npm_token', 'github_token'
+  secretType          SecretType
+  
+  // Encrypted value (never store plaintext)
+  encryptedValue      String
+  encryptionVersion   Int      @default(1)
+  
+  // Metadata
+  addedAt             DateTime @default(now())
+  lastUsedAt          DateTime?
+  expiresAt           DateTime?
+  
+  @@unique([userId, secretName])
+  @@index([userId])
+}
+
+enum PublishMethod {
+  node
+  github_actions
+  hybrid
+}
+
+enum PublishStatus {
+  pending       // Waiting to start
+  preparing     // Preparing versions and changelogs
+  publishing    // Publishing to npm
+  tagging       // Creating git tags
+  pushing       // Pushing to GitHub
+  releasing     // Creating GitHub releases
+  completed     // Done successfully
+  failed        // Failed at some point
+  cancelled     // User cancelled
+}
+
+enum PublishConclusion {
+  success
+  failure
+  cancelled
+  partial
+}
+
+enum PublishResultType {
+  published
+  skipped
+  error
+}
+
+enum TokenType {
+  npm
+  github
+  git
+}
+
+enum TokenSource {
+  env       // Environment variable
+  user      // User-provided secret
+  oauth     // OAuth session
+}
+
+enum TokenOperation {
+  publish
+  tag
+  release
+  commit
+  push
+}
+
+enum SecretType {
+  npm_token
+  github_token
+  github_oauth
+}

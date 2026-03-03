@@ -8,6 +8,7 @@ import {
   PublishPage,
   CIPage,
   ConfigPage,
+  IndependentReleaseManagerPage,
 } from '../pages';
 
 // Alternative AppRouter using dedicated page components
@@ -27,6 +28,7 @@ export default function AppRouterPages() {
       {/* <Route path="/publish" element={<PublishPage />} />
       <Route path="/ci" element={<CIPage />} /> */}
       <Route path="/config" element={<ConfigPage />} />
+      <Route path="/independent-release" element={<IndependentReleaseManagerPage />} />
 
       {/* 404 Page */}
       <Route

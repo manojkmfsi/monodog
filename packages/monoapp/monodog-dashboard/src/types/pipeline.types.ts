@@ -9,6 +9,8 @@ export interface WorkflowRun {
   conclusion: string | null;
   created_at: string;
   updated_at: string;
+  head_branch?: string;
+  actor?: { login: string };
 }
 
 export interface WorkflowRunsListProps {
@@ -19,15 +21,6 @@ export interface WorkflowRunsListProps {
   runId: number;
   limit?: number;
   pipelineId?: string;
-}
-
-export interface HierarchicalStep {
-  id: string;
-  name: string;
-  status: string;
-  number: number;
-  conclusion: string | null;
-  children?: HierarchicalStep[];
 }
 
 export interface WorkflowOption {
@@ -51,7 +44,7 @@ export interface HierarchicalStep {
   startedAt: string | null;
   completedAt: string | null;
   conclusion: string | null;
-  status: 'queued' | 'in_progress' | 'completed';
+  status: 'queued' | 'in_progress' | 'completed' | string;
   logs: any[];
   children?: HierarchicalStep[];
 }

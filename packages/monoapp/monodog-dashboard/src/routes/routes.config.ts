@@ -1,6 +1,21 @@
 // Route configuration for the dashboard application
 import type { RouteConfig } from '../types/routes.types';
 
+// Component name map for type safety
+export const COMPONENT_MAP: Record<string, string> = {
+  'Dashboard': 'Dashboard',
+  'PackagesOverview': 'PackagesOverview',
+  'PackageDetail': 'PackageDetail',
+  'DependencyGraph': 'DependencyGraph',
+  'HealthStatus': 'HealthStatus',
+  'PublishControl': 'PublishControl',
+  'IndependentReleaseManagerPage': 'IndependentReleaseManagerPage',
+  'ReleaseManager': 'ReleaseManager',
+  'CIIntegration': 'CIIntegration',
+  'Pipeline': 'Pipeline',
+  'ConfigInspector': 'ConfigInspector',
+} as const;
+
 export const routes: RouteConfig[] = [
   {
     path: '/',
@@ -51,7 +66,15 @@ export const routes: RouteConfig[] = [
     name: 'release',
     component: 'ReleaseManager',
     title: 'Release Manager',
-    description: 'Comprehensive release management with Changesets',
+    description: 'Comprehensive release management with independent engine',
+    protected: true,
+  },
+  {
+    path: '/independent-release',
+    name: 'independent-release',
+    component: 'IndependentReleaseManagerPage',
+    title: 'Independent Release',
+    description: 'New release system independent of Changesets',
     protected: true,
   },
   {

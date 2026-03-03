@@ -1,5 +1,11 @@
 # @manojkmfsi/monoapp
 
+## 1.1.44
+
+### Patch Changes
+
+- final commit
+
 ## 1.1.43
 
 ### Patch Changes

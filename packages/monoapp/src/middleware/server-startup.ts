@@ -28,7 +28,9 @@ import configRouter from '../routes/config-routes';
 import authRouter from '../routes/auth-routes';
 import permissionRouter from '../routes/permission-routes';
 import publishRouter from '../routes/publish-routes';
-import { setupPipelineRoutes } from '../routes/pipeline-routes';
+import pipelineRouter from '../routes/pipeline-routes';
+import workflowRouter from '../routes/workflow-routes';
+
 import {
   PORT_MIN,
   PORT_MAX,
@@ -95,7 +97,6 @@ function createApp(rootPath: string): Express {
 
   // Create a router for pipeline routes
   const router = express.Router();
-  setupPipelineRoutes(router);
 
   // Routes
   app.use('/api/auth', authRouter);
@@ -105,6 +106,9 @@ function createApp(rootPath: string): Express {
   app.use('/api/health/', healthRouter);
   app.use('/api/config/', configRouter);
   app.use('/api/publish', publishRouter);
+  app.use('/api/pipelines', pipelineRouter);
+  app.use('/api/workflows', workflowRouter);
+
   app.use('/api', router);
 
   // 404 handlerAPI_ENDPOINTS

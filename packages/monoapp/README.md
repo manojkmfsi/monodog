@@ -38,7 +38,6 @@ Install monodog in a monorepo workspace root:
 
     pnpm dlx @mindfiredigital/monodog
 
-
 Run app using serve script:
 
     cd ./monodog/ && npm run serve
@@ -62,4 +61,19 @@ Run app using serve script:
 | **GET** | `/auth/validate`            | Validate current session token status.                       | Persistent          |
 | **GET** | `/auth/logout`              | Invalidate session and clear authentication token.                                      | Session termination |
 | **POST** | `/auth/refresh`            | Extend session token validity period.                        | Session update      |
-
+| **GET** | `/api/publish/packages`     | (Publish API) List workspace packages available for publishing.                        | Persistent         |
+| **GET** | `/api/publish/changesets`   | Retrieve existing unpublished changesets.                                              | Persistent         |
+| **POST** | `/api/publish/preview`      | Preview a publish plan (version bumps, affected packages).                            | Generated data     |
+| **POST** | `/api/publish/changesets`   | Create a new changeset (write permission required).                                   | Triggers write     |
+| **GET** | `/api/publish/status`       | Check readiness for publishing (clean tree, CI status, etc.).                        | Persistent         |
+| **POST** | `/api/publish/trigger`      | Trigger a publishing workflow for selected packages.                                 | Triggers CI/CD     |
+| **GET** | `/api/pipelines`            | (Pipelines API) Retrieve recent pipeline records used by the dashboard.               | Persistent         |
+| **PUT** | `/api/pipelines/:pipelineId/status` | Update a pipeline's status from GitHub workflow.                                | Triggers write     |
+| **GET** | `/api/pipelines/:pipelineId/audit-logs` | Retrieve audit history for a pipeline.  
+| **GET** | `/api/workflows/:owner/:repo/available` | List workflows configured in a repo.                                         | Generated data     |
+| **GET** | `/api/workflows/:owner/:repo` | Fetch recent workflow runs for a repo.                                             | Generated data     |
+| **GET** | `/api/workflows/:owner/:repo/runs/:runId` | Get details (with jobs) for a specific run.                                  | Generated data     |
+| **GET** | `/api/workflows/:owner/:repo/jobs/:jobId/logs` | Get raw job logs text.                                                   | Generated data     |
+| **POST** | `/api/workflows/:owner/:repo/trigger` | Start a repository workflow run.                                               | Triggers workflow  |
+| **POST** | `/api/workflows/:owner/:repo/runs/:runId/cancel` | Cancel an in-progress run.                                            | Triggers action    |
+| **POST** | `/api/workflows/:owner/:repo/runs/:runId/rerun` | Rerun a completed workflow.                                              | Triggers action    |

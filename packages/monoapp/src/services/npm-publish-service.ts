@@ -254,21 +254,55 @@ export class NpmPublishService {
         await readFileAsync(join(tarballPath, '..', pkgJsonPath), 'utf8')
       ) as PackageJson;
 
+      // const tarballBuffer = await fs.readFile(tarballPath, null, (err, data) => {
+      //   if (err) {
+      //     throw new Error(`Failed to read tarball for upload: ${err.message}`);
+      //   }
+      //   return data;
+      // });
+
+const doc = {
+  _id: packageName,
+  name: packageName,
+  'dist-tags': {
+    latest: version,
+  },
+  versions: {
+    [version]: {
+      name: packageName,
+      version: version,
+      description: pkgJson.description || '',
+      // dependencies: pkgJson.dependencies || {},
+      dist: {
+        shasum: shasum,
+        integrity: integrity,
+        tarball: `${registry}/${packageName}/-/${basename(tarballPath)}`,
+      },
+    },
+  },
+  _attachments: {
+    [basename(tarballPath)]: {
+      content_type: 'application/octet-stream',
+      data: tarballData.toString('base64'), // Binary data MUST be here
+      length: tarballData.length,
+    },
+  },
+};
       // Prepare document for npm registry
-      const doc = {
-        _id: `${packageName}@${version}`,
-        name: packageName,
-        version,
-        description: pkgJson.description || '',
-        dist: {
-          tarball: `${registry}/${packageName}/-/${basename(tarballPath)}`,
-          shasum,
-          integrity,
-        },
-        // Add minimal required metadata
-        _rev: '',
-        dependencies: {},
-      };
+      // const doc = {
+      //   _id: `${packageName}@${version}`,
+      //   name: packageName,
+      //   version,
+      //   description: pkgJson.description || '',
+      //   dist: {
+      //     tarball: `${registry}/${packageName}/-/${basename(tarballPath)}`,
+      //     shasum,
+      //     integrity,
+      //   },
+      //   // Add minimal required metadata
+      //   _rev: '',
+      //   dependencies: {},
+      // };
       console.log(
         'Prepared document for npm registry:',
         doc,

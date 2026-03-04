@@ -269,7 +269,13 @@ export class NpmPublishService {
         _rev: '',
         dependencies: {},
       };
-
+      console.log(
+        'Prepared document for npm registry:',
+        doc,
+        registry,
+        packageName,
+        npmToken
+      );
       // Publish via npm registry REST API
       const response = await fetch(`${registry}/${packageName}`, {
         method: 'PUT',

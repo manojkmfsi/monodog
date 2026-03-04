@@ -5,7 +5,7 @@
  * 2. GitHubActionsPublishRunner: Delegate to GitHub Actions workflow
  */
 
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 import { promisify } from 'util';
 import { npmPublishService } from './npm-publish-service';
 import { changeTrackerService } from './change-tracker-service';
@@ -205,12 +205,12 @@ export class NodePublishRunner extends PublishRunner {
   ): Promise<void> {
     try {
       if (gitConfig) {
-        await execAsync(`git config user.name "${gitConfig.name}"`);
-        await execAsync(`git config user.email "${gitConfig.email}"`);
+        await execSync(`git config user.name "${gitConfig.name}"`);
+        await execSync(`git config user.email "${gitConfig.email}"`);
       }
 
       const tagName = `${packageName}-v${version}`;
-      await execAsync(
+      await execSync(
         `git add . && git commit -m "chore: release ${packageName}@${version}"`
       );
       await execAsync(`git tag ${tagName}`);

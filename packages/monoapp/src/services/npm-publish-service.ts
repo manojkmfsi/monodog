@@ -310,8 +310,9 @@ const doc = {
         packageName,
         npmToken
       );
+      const encodedName = packageName.replace('/', '%2f');
       // Publish via npm registry REST API
-      const response = await fetch(`${registry}/${packageName}`, {
+      const response = await fetch(`${registry}/${encodedName}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

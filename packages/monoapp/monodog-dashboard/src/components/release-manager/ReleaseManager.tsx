@@ -30,14 +30,23 @@ export type { SelectedPackage, ChangesetData, ValidationResult };
 
 export default function ReleaseManager() {
   const { isAuthenticated, hasPermission } = useAuth();
-  const [currentStep, setCurrentStep] = useState<'select' | 'bump' | 'preview' | 'validate' | 'confirm'>('select');
-  const [selectedPackages, setSelectedPackages] = useState<SelectedPackage[]>([]);
+  const [currentStep, setCurrentStep] = useState<
+    'select' | 'bump' | 'preview' | 'validate' | 'confirm'
+  >('select');
+  const [selectedPackages, setSelectedPackages] = useState<SelectedPackage[]>(
+    []
+  );
   const [changesetSummary, setChangesetSummary] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
-  const [allPackages, setAllPackages] = useState<Array<{ name: string; version: string; dependents?: string[] }>>([]);
-  const [existingChangesets, setExistingChangesets] = useState<Array<{ id: string; summary: string }>>([]);
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
+  const [allPackages, setAllPackages] = useState<
+    Array<{ name: string; version: string; dependents?: string[] }>
+  >([]);
+  const [existingChangesets, setExistingChangesets] = useState<
+    Array<{ id: string; summary: string }>
+  >([]);
 
   // Fetch workspace packages on mount
   useEffect(() => {
@@ -49,31 +58,43 @@ export default function ReleaseManager() {
       setLoading(true);
 
       // Fetch packages
-      const packagesRes = await apiClient.get(DASHBOARD_API_ENDPOINTS.PUBLISH.PACKAGES);
+      const packagesRes = await apiClient.get(
+        DASHBOARD_API_ENDPOINTS.PUBLISH.PACKAGES
+      );
       if (packagesRes.success) {
         setAllPackages(packagesRes.data.packages || []);
       } else {
         console.warn('Failed to fetch packages:', packagesRes.error?.message);
         // Fallback to regular packages endpoint
-        const fallbackRes = await apiClient.get(DASHBOARD_API_ENDPOINTS.PACKAGES.LIST);
+        const fallbackRes = await apiClient.get(
+          DASHBOARD_API_ENDPOINTS.PACKAGES.LIST
+        );
         if (fallbackRes.success) {
           setAllPackages(fallbackRes.data || []);
         }
       }
 
       // Fetch existing changesets
-      const changesetsRes = await apiClient.get(DASHBOARD_API_ENDPOINTS.PUBLISH.CHANGESETS);
+      const changesetsRes = await apiClient.get(
+        DASHBOARD_API_ENDPOINTS.PUBLISH.CHANGESETS
+      );
       if (changesetsRes.success) {
         setExistingChangesets(changesetsRes.data.changesets || []);
       } else {
-        if (changesetsRes.error?.status === 401 || changesetsRes.error?.status === 403) {
+        if (
+          changesetsRes.error?.status === 401 ||
+          changesetsRes.error?.status === 403
+        ) {
           window.location.href = '/login';
         }
       }
 
       setError(null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : DASHBOARD_ERROR_MESSAGES.FAILED_TO_FETCH_PACKAGES;
+      const message =
+        err instanceof Error
+          ? err.message
+          : DASHBOARD_ERROR_MESSAGES.FAILED_TO_FETCH_PACKAGES;
       setError(message);
       console.error('Error fetching workspace data:', err);
     } finally {
@@ -81,7 +102,9 @@ export default function ReleaseManager() {
     }
   };
 
-  const handlePackagesSelected = (packages: Array<{ name: string; version: string; dependents?: string[] }>) => {
+  const handlePackagesSelected = (
+    packages: Array<{ name: string; version: string; dependents?: string[] }>
+  ) => {
     const selected: SelectedPackage[] = packages.map(pkg => ({
       name: pkg.name,
       currentVersion: pkg.version,
@@ -103,30 +126,40 @@ export default function ReleaseManager() {
     validateRelease(selectedPackages, summary);
   };
 
-  const validateRelease = async (packages: SelectedPackage[], summary: string) => {
+  const validateRelease = async (
+    packages: SelectedPackage[],
+    summary: string
+  ) => {
     try {
       setLoading(true);
 
       // First, check readiness using the independent release engine
       const packageNames = packages.map(p => p.name);
-      const packagePaths = packageNames.reduce((acc, name) => {
-        const pkg = allPackages.find(p => p.name === name);
-        if (pkg) {
-          acc[name] = (pkg as any).path || './packages/' + name.split('/').pop();
-        }
-        return acc;
-      }, {} as Record<string, string>);
+      const packagePaths = packageNames.reduce(
+        (acc, name) => {
+          const pkg = allPackages.find(p => p.name === name);
+          if (pkg) {
+            acc[name] =
+              (pkg as any).path || './packages/' + name.split('/').pop();
+          }
+          return acc;
+        },
+        {} as Record<string, string>
+      );
 
-      const readinessRes = await releaseAPI.checkReadiness(packageNames, packagePaths);
-      
-      let readinessErrors: string[] = [];
-      let readinessWarnings: string[] = [];
+      const readinessRes = await releaseAPI.checkReadiness(
+        packageNames,
+        packagePaths
+      );
+
+      const readinessErrors: string[] = [];
+      const readinessWarnings: string[] = [];
       let canProceedFromReadiness = true;
 
       if (readinessRes.success) {
         const data = readinessRes.data as any;
         canProceedFromReadiness = data.canProceed !== false;
-        
+
         // Collect global blockers
         if (data.globalBlockers && Array.isArray(data.globalBlockers)) {
           readinessErrors.push(
@@ -152,14 +185,17 @@ export default function ReleaseManager() {
       }
 
       // Then, validate using the old preview endpoint for backward compatibility
-      const response = await apiClient.post(DASHBOARD_API_ENDPOINTS.PUBLISH.PREVIEW, {
-        packages: packageNames,
-        bumps: packages.map(p => ({
-          package: p.name,
-          bumpType: p.bumpType,
-        })),
-        summary,
-      });
+      const response = await apiClient.post(
+        DASHBOARD_API_ENDPOINTS.PUBLISH.PREVIEW,
+        {
+          packages: packageNames,
+          bumps: packages.map(p => ({
+            package: p.name,
+            bumpType: p.bumpType,
+          })),
+          summary,
+        }
+      );
 
       if (!response.success) {
         throw new Error(DASHBOARD_ERROR_MESSAGES.VALIDATION_FAILED);
@@ -170,19 +206,15 @@ export default function ReleaseManager() {
       // Combine both validation results
       const validationData: ValidationResult = {
         isValid: (result.isValid ?? true) && canProceedFromReadiness,
-        errors: [
-          ...readinessErrors,
-          ...(result.errors ?? []),
-        ],
-        warnings: [
-          ...readinessWarnings,
-          ...(result.warnings ?? []),
-        ],
+        errors: [...readinessErrors, ...(result.errors ?? [])],
+        warnings: [...readinessWarnings, ...(result.warnings ?? [])],
         checks: result.checks ?? {
           permissions: true,
           workingTreeClean: readinessErrors.length === 0,
           ciPassing: true,
-          versionAvailable: !readinessErrors.some(e => e.includes('already exists')),
+          versionAvailable: !readinessErrors.some(e =>
+            e.includes('already exists')
+          ),
         },
       };
 
@@ -202,7 +234,9 @@ export default function ReleaseManager() {
     try {
       // Prevent publishing if validation failed
       if (validationResult && !validationResult.isValid) {
-        setError('Cannot proceed with publishing. Please fix validation errors and re-validate.');
+        setError(
+          'Cannot proceed with publishing. Please fix validation errors and re-validate.'
+        );
         setCurrentStep('validate');
         return;
       }
@@ -216,13 +250,17 @@ export default function ReleaseManager() {
       setLoading(true);
 
       const packageNames = selectedPackages.map(p => p.name);
-      const packagePaths = packageNames.reduce((acc, name) => {
-        const pkg = allPackages.find(p => p.name === name);
-        if (pkg) {
-          acc[name] = (pkg as any).path || './packages/' + name.split('/').pop();
-        }
-        return acc;
-      }, {} as Record<string, string>);
+      const packagePaths = packageNames.reduce(
+        (acc, name) => {
+          const pkg = allPackages.find(p => p.name === name);
+          if (pkg) {
+            acc[name] =
+              (pkg as any).path || './packages/' + name.split('/').pop();
+          }
+          return acc;
+        },
+        {} as Record<string, string>
+      );
 
       // Prepare version map from selected packages
       const versionMap: Record<string, string> = {};
@@ -231,16 +269,22 @@ export default function ReleaseManager() {
       });
 
       // Use the new independent release engine for publishing
-      const publishRes = await releaseAPI.startPublish(packageNames, packagePaths, {
-        versionMap,
-        method: 'node',  // Use Node.js direct publishing
-        dryRun: false,   // Actual publish
-        autoTag: true,   // Auto-create git tags
-        createReleases: true,  // Create GitHub releases
-      });
+      const publishRes = await releaseAPI.startPublish(
+        packageNames,
+        packagePaths,
+        {
+          versionMap,
+          method: 'node', // Use Node.js direct publishing
+          dryRun: false, // Actual publish
+          autoTag: true, // Auto-create git tags
+          createReleases: true, // Create GitHub releases
+        }
+      );
 
       if (!publishRes.success) {
-        throw new Error(publishRes.error?.message || 'Failed to start publishing');
+        throw new Error(
+          publishRes.error?.message || 'Failed to start publishing'
+        );
       }
 
       // Also try to create a changeset record (for backward compatibility with existing workflows)
@@ -280,7 +324,9 @@ export default function ReleaseManager() {
   if (!isAuthenticated) {
     return (
       <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p className="text-yellow-800">Please log in to access release management.</p>
+        <p className="text-yellow-800">
+          Please log in to access release management.
+        </p>
       </div>
     );
   }
@@ -304,11 +350,16 @@ export default function ReleaseManager() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Release Manager</h1>
           <p className="text-gray-600 mt-1">
-            Manage package versions and publish releases with the independent release engine
+            Manage package versions and publish releases with the independent
+            release engine
           </p>
         </div>
         <div className="text-sm text-gray-500">
-          Step {['select', 'bump', 'preview', 'validate', 'confirm'].indexOf(currentStep) + 1} of 5
+          Step{' '}
+          {['select', 'bump', 'preview', 'validate', 'confirm'].indexOf(
+            currentStep
+          ) + 1}{' '}
+          of 5
         </div>
       </div>
 
@@ -317,7 +368,8 @@ export default function ReleaseManager() {
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="text-yellow-700 font-medium"> Limited Access</p>
           <p className="text-yellow-600 text-sm mt-1">
-            You do not have write permission to create and publish changesets. Contact your repository administrator to request access.
+            You do not have write permission to create and publish changesets.
+            Contact your repository administrator to request access.
           </p>
         </div>
       )}
@@ -337,7 +389,8 @@ export default function ReleaseManager() {
             {existingChangesets.length} pending release(s)
           </p>
           <p className="text-blue-600 text-sm mt-1">
-            Pull the latest changes and refresh the dashboard to see if these have been published.
+            Pull the latest changes and refresh the dashboard to see if these
+            have been published.
           </p>
         </div>
       )}
@@ -347,7 +400,8 @@ export default function ReleaseManager() {
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-700 font-medium">Access Denied</p>
           <p className="text-red-600 text-sm mt-1">
-            You do not have write permission to create changesets. Contact your repository administrator.
+            You do not have write permission to create changesets. Contact your
+            repository administrator.
           </p>
         </div>
       )}
@@ -382,7 +436,8 @@ export default function ReleaseManager() {
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-700 font-medium">Access Denied</p>
           <p className="text-red-600 text-sm mt-1">
-            You do not have maintain permission to publish changesets. Contact your repository administrator.
+            You do not have maintain permission to publish changesets. Contact
+            your repository administrator.
           </p>
         </div>
       )}
@@ -406,16 +461,20 @@ export default function ReleaseManager() {
 
       {/* Progress Indicator */}
       <div className="flex gap-2 justify-center">
-        {['select', 'bump', 'preview', 'validate', 'confirm'].map((step, index) => (
-          <div
-            key={step}
-            className={`h-2 flex-1 rounded-full transition-colors ${
-              ['select', 'bump', 'preview', 'validate', 'confirm'].indexOf(currentStep) >= index
-                ? 'bg-primary-500'
-                : 'bg-gray-300'
-            }`}
-          />
-        ))}
+        {['select', 'bump', 'preview', 'validate', 'confirm'].map(
+          (step, index) => (
+            <div
+              key={step}
+              className={`h-2 flex-1 rounded-full transition-colors ${
+                ['select', 'bump', 'preview', 'validate', 'confirm'].indexOf(
+                  currentStep
+                ) >= index
+                  ? 'bg-primary-500'
+                  : 'bg-gray-300'
+              }`}
+            />
+          )
+        )}
       </div>
     </div>
   );

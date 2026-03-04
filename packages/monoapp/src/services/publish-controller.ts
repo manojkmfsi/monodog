@@ -15,7 +15,8 @@ import { releaseReadinessService } from './release-readiness-service';
 import { npmPublishService } from './npm-publish-service';
 import { secureTokenService } from './secure-token-service';
 import { changelogGenerator } from './changelog-generator';
-
+import fs from 'fs';
+import path from 'path';
 export interface PublishRequest {
   packageNames: string[];
   packagePaths: Record<string, string>;
@@ -29,7 +30,13 @@ export interface PublishRequest {
 
 export interface PublishPipelineStatus {
   pipelineId: string;
-  status: 'pending' | 'validating' | 'ready' | 'publishing' | 'completed' | 'failed';
+  status:
+    | 'pending'
+    | 'validating'
+    | 'ready'
+    | 'publishing'
+    | 'completed'
+    | 'failed';
   progress: number;
   packagesToPublish: string[];
   results: Record<string, PublishRunnerResult>;
@@ -49,17 +56,23 @@ export class PublishController {
     readiness: any;
     analysis: any;
   }> {
-    console.info(`🔍 Preparing publish for: ${request.packageNames.join(', ')}`);
+    console.info(
+      `🔍 Preparing publish for: ${request.packageNames.join(', ')}`
+    );
 
     try {
       // 1. Get readiness status for all packages
       const packages = request.packageNames.map(name => ({
         name,
         path: request.packagePaths[name],
-        currentVersion: this.getCurrentVersion(name, request.packagePaths[name]),
+        currentVersion: this.getCurrentVersion(
+          name,
+          request.packagePaths[name]
+        ),
       }));
 
-      const readiness = await releaseReadinessService.checkReleaseReadiness(packages);
+      const readiness =
+        await releaseReadinessService.checkReleaseReadiness(packages);
 
       // 2. Analyze changes for each package
       const analysis: Record<string, any> = {};
@@ -123,9 +136,10 @@ export class PublishController {
 
       // 2. Get credentials
       const npmToken = await secureTokenService.getToken('npm', 'env');
-      const githubToken = request.method !== 'node'
-        ? await secureTokenService.getToken('github', 'env')
-        : undefined;
+      const githubToken =
+        request.method !== 'node'
+          ? await secureTokenService.getToken('github', 'env')
+          : undefined;
 
       // 3. Publish each package
       status.status = 'publishing';
@@ -135,7 +149,9 @@ export class PublishController {
         const packageName = request.packageNames[i];
         const packagePath = request.packagePaths[packageName];
 
-        console.info(`\n📦 Publishing ${i + 1}/${publisherCount}: ${packageName}`);
+        console.info(
+          `\n📦 Publishing ${i + 1}/${publisherCount}: ${packageName}`
+        );
 
         const result = await this.publishPackage(
           packageName,
@@ -153,7 +169,11 @@ export class PublishController {
       // 4. Generate changelog entries
       if (!request.dryRun) {
         console.info('\n📝 Generating changelogs...');
-        await this.generateChangelogs(request.packageNames, request.packagePaths, status.results);
+        await this.generateChangelogs(
+          request.packageNames,
+          request.packagePaths,
+          status.results
+        );
       }
 
       status.status = 'completed';
@@ -325,8 +345,6 @@ export class PublishController {
    */
   private getCurrentVersion(packageName: string, packagePath: string): string {
     try {
-      const fs = require('fs');
-      const path = require('path');
       const pkgJsonPath = path.join(packagePath, 'package.json');
       const content = fs.readFileSync(pkgJsonPath, 'utf8');
       const pkgJson = JSON.parse(content);

@@ -46,7 +46,7 @@ export interface ValidationResponse {
   checks?: any;
 }
 
-export interface PackagesApiResponse extends ApiResponse<{ packages: Package[] }> {}
-export interface AnalysisApiResponse extends ApiResponse<{ analysis: Record<string, any> }> {}
-export interface ReadinessApiResponse extends ApiResponse<{ checks: any[] }> {}
-export interface PublishApiResponse extends ApiResponse<{ pipelineId: string }> {}
+// export interface PackagesApiResponse extends ApiResponse<{ packages: Package[] }> {}
+// export interface AnalysisApiResponse extends ApiResponse<{ analysis: Record<string, any> }> {}
+// export interface ReadinessApiResponse extends ApiResponse<{ checks: any[] }> {}
+// export interface PublishApiResponse extends ApiResponse<{ pipelineId: string }> {}

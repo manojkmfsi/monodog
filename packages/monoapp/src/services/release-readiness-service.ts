@@ -8,6 +8,8 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { changeTrackerService } from './change-tracker-service';
 import { npmPublishService } from './npm-publish-service';
+import fs from 'fs';
+import path from 'path';
 
 const execAsync = promisify(exec);
 
@@ -59,7 +61,11 @@ export class ReleaseReadinessService {
 
     // Check each package
     for (const pkg of packages) {
-      const check = await this.checkPackage(pkg.name, pkg.path, pkg.currentVersion);
+      const check = await this.checkPackage(
+        pkg.name,
+        pkg.path,
+        pkg.currentVersion
+      );
       allChecks.push(check);
     }
 
@@ -93,7 +99,10 @@ export class ReleaseReadinessService {
 
     try {
       // 1. Check for meaningful changes
-      const hasChanges = await this.hasMeaningfulChanges(packageName, packagePath);
+      const hasChanges = await this.hasMeaningfulChanges(
+        packageName,
+        packagePath
+      );
       if (!hasChanges) {
         blockers.push('❌ No meaningful changes detected since last release');
       } else {
@@ -116,9 +125,10 @@ export class ReleaseReadinessService {
           proposedVersion
         );
         if (!isAvailable) {
-          blockers.push(
+          blockers
+            .push
             // `❌ Version ${proposedVersion} already exists on npm registry`
-          );
+            ();
         } else {
           reasons.push(`✓ Version ${proposedVersion} is available on npm`);
         }
@@ -137,8 +147,11 @@ export class ReleaseReadinessService {
       }
 
       // 4. Check for any pre-release versions
-      const publicVersions = await npmPublishService.getPublishedVersions(packageName);
-      const hasPreRelease = publicVersions.some(v => /-(alpha|beta|rc)/.test(v));
+      const publicVersions =
+        await npmPublishService.getPublishedVersions(packageName);
+      const hasPreRelease = publicVersions.some(v =>
+        /-(alpha|beta|rc)/.test(v)
+      );
       if (hasPreRelease) {
         warnings.push('⚠️  Package has pre-release versions on npm');
       }
@@ -146,7 +159,6 @@ export class ReleaseReadinessService {
       // 5. Check package.json integrity
       await this.validatePackageJson(packagePath);
       reasons.push('✓ package.json is valid');
-
     } catch (error) {
       blockers.push(
         `❌ Readiness check failed: ${error instanceof Error ? error.message : error}`
@@ -169,7 +181,10 @@ export class ReleaseReadinessService {
   /**
    * Check for meaningful changes since last tag
    */
-  private async hasMeaningfulChanges(packageName: string, packagePath: string): Promise<boolean> {
+  private async hasMeaningfulChanges(
+    packageName: string,
+    packagePath: string
+  ): Promise<boolean> {
     try {
       const { stdout } = await execAsync(
         `cd ${packagePath} && git log --oneline -1 -- .`
@@ -188,7 +203,8 @@ export class ReleaseReadinessService {
    */
   private async hasReleaseHistory(packageName: string): Promise<boolean> {
     try {
-      const versions = await npmPublishService.getPublishedVersions(packageName);
+      const versions =
+        await npmPublishService.getPublishedVersions(packageName);
       return versions.length > 0;
     } catch {
       return false;
@@ -200,8 +216,8 @@ export class ReleaseReadinessService {
    */
   private async validatePackageJson(packagePath: string): Promise<void> {
     try {
-      const { readFile } = require('fs').promises;
-      const pkgJsonPath = require('path').join(packagePath, 'package.json');
+      const { readFile } = fs.promises;
+      const pkgJsonPath = path.join(packagePath, 'package.json');
 
       const content = await readFile(pkgJsonPath, 'utf8');
       const pkgJson = JSON.parse(content);
@@ -230,17 +246,19 @@ export class ReleaseReadinessService {
   }> {
     try {
       // Check for uncommitted changes
-      const { stdout: status } = await execAsync('git status --porcelain').catch(
-        () => ({ stdout: '' })
-      );
+      const { stdout: status } = await execAsync(
+        'git status --porcelain'
+      ).catch(() => ({ stdout: '' }));
       const gitDirty = status.trim().length > 0;
 
       // Check current branch
-      const { stdout: branch } = await execAsync('git rev-parse --abbrev-ref HEAD').catch(
-        () => ({ stdout: '' })
-      );
+      const { stdout: branch } = await execAsync(
+        'git rev-parse --abbrev-ref HEAD'
+      ).catch(() => ({ stdout: '' }));
       const currentBranch = branch.trim();
-      const onValidBranch = ['main', 'master', 'release'].includes(currentBranch);
+      const onValidBranch = ['main', 'master', 'release'].includes(
+        currentBranch
+      );
 
       // Check for remote
       const { stdout: remotes } = await execAsync('git remote -v').catch(
@@ -333,8 +351,12 @@ export class ReleaseReadinessService {
     }
 
     console.log('\n' + '═'.repeat(60));
-    console.log(`📊 Summary: ${validation.summary.readyCount} ready, ${validation.summary.blockedCount} blocked, ${validation.summary.warningCount} warnings`);
-    console.log(`🚀 Can proceed: ${validation.canProceed ? '✅ YES' : '❌ NO'}\n`);
+    console.log(
+      `📊 Summary: ${validation.summary.readyCount} ready, ${validation.summary.blockedCount} blocked, ${validation.summary.warningCount} warnings`
+    );
+    console.log(
+      `🚀 Can proceed: ${validation.canProceed ? '✅ YES' : '❌ NO'}\n`
+    );
   }
 }
 

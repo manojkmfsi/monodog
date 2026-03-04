@@ -10,6 +10,7 @@ import { readFile, createReadStream } from 'fs';
 import { createHash } from 'crypto';
 import { basename, join } from 'path';
 import { secureTokenService } from './secure-token-service';
+import fs from 'fs';
 
 const execAsync = promisify(exec);
 const readFileAsync = promisify(readFile);
@@ -89,7 +90,14 @@ export class NpmPublishService {
       }
 
       // 4. Publish tarball to registry
-      await this.publishTarball(tarballPath, packageName, version, npmToken, registry, tag);
+      await this.publishTarball(
+        tarballPath,
+        packageName,
+        version,
+        npmToken,
+        registry,
+        tag
+      );
       console.info(`✓ Package published to npm registry`);
 
       // 5. Verify publication
@@ -115,10 +123,15 @@ export class NpmPublishService {
   /**
    * Validate package.json and required fields
    */
-  private async validatePackage(packagePath: string, version: string): Promise<void> {
+  private async validatePackage(
+    packagePath: string,
+    version: string
+  ): Promise<void> {
     try {
       const pkgJsonPath = join(packagePath, 'package.json');
-      const pkgJson = JSON.parse(await readFileAsync(pkgJsonPath, 'utf8')) as any;
+      const pkgJson = JSON.parse(
+        await readFileAsync(pkgJsonPath, 'utf8')
+      ) as any;
 
       if (!pkgJson.name) {
         throw new Error('package.json missing required field: name');
@@ -137,7 +150,6 @@ export class NpmPublishService {
       // Check for dist folder or compiled output
       const distPath = join(packagePath, 'dist');
       try {
-        const fs = require('fs');
         const stats = await new Promise((resolve, reject) => {
           fs.stat(distPath, (err: Error | null, data: any) => {
             if (err) reject(err);
@@ -145,13 +157,19 @@ export class NpmPublishService {
           });
         });
         if ((stats as any)?.isDirectory?.() === false) {
-          console.warn(`⚠️  dist/ folder not found, publishing source files only`);
+          console.warn(
+            `⚠️  dist/ folder not found, publishing source files only`
+          );
         }
       } catch {
-        console.warn(`⚠️  dist/ folder not found, publishing source files only`);
+        console.warn(
+          `⚠️  dist/ folder not found, publishing source files only`
+        );
       }
     } catch (error) {
-      throw new Error(`Package validation failed: ${error instanceof Error ? error.message : error}`);
+      throw new Error(
+        `Package validation failed: ${error instanceof Error ? error.message : error}`
+      );
     }
   }
 
@@ -161,23 +179,34 @@ export class NpmPublishService {
   private async buildPackage(packagePath: string): Promise<void> {
     try {
       const pkgJsonPath = join(packagePath, 'package.json');
-      const pkgJson = JSON.parse(await readFileAsync(pkgJsonPath, 'utf8')) as any;
+      const pkgJson = JSON.parse(
+        await readFileAsync(pkgJsonPath, 'utf8')
+      ) as any;
 
       if (pkgJson?.scripts?.build) {
         console.info(`🔨 Running build script...`);
         try {
-          const { stdout, stderr } = await execAsync(`cd ${packagePath} && npm run build`, {
-            maxBuffer: 10 * 1024 * 1024,
-          });
+          const { stdout, stderr } = await execAsync(
+            `cd ${packagePath} && npm run build`,
+            {
+              maxBuffer: 10 * 1024 * 1024,
+            }
+          );
           if (stdout) console.debug(stdout.slice(-500)); // Last 500 chars
           if (stderr) console.warn(stderr.slice(-500));
         } catch (buildError) {
-          console.warn(`⚠️  Build step failed:`, buildError instanceof Error ? buildError.message : buildError);
+          console.warn(
+            `⚠️  Build step failed:`,
+            buildError instanceof Error ? buildError.message : buildError
+          );
         }
       }
     } catch (error) {
       // Build might fail, but we can still try to publish
-      console.warn(`⚠️  Build step failed (continuing anyway):`, error instanceof Error ? error.message : error);
+      console.warn(
+        `⚠️  Build step failed (continuing anyway):`,
+        error instanceof Error ? error.message : error
+      );
     }
   }
 
@@ -334,7 +363,9 @@ export class NpmPublishService {
       if (!response.ok) return [];
 
       const data = (await response.json()) as any;
-      return Object.keys(data.versions || {}).sort().reverse();
+      return Object.keys(data.versions || {})
+        .sort()
+        .reverse();
     } catch {
       return [];
     }

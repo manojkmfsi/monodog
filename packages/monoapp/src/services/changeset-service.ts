@@ -12,14 +12,21 @@ import { AppLogger } from '../middleware/logger';
 import { getPackagesService } from './package-service';
 import { getWorkflowRuns } from './github-actions-service';
 import { CHANGESET_MESSAGES } from '../constants/api-messages';
-import type { VersionBump, Package, VersionBumpItem, PublishPlan } from '../types/changeset';
+import type {
+  VersionBump,
+  Package,
+  VersionBumpItem,
+  PublishPlan,
+} from '../types/changeset';
 import { VALIDATION_ERRORS } from '../constants/error-messages';
 const execPromise = promisify(exec);
 
 /**
  * Get all workspace packages
  */
-export async function getWorkspacePackages(rootPath: string): Promise<Package[]> {
+export async function getWorkspacePackages(
+  rootPath: string
+): Promise<Package[]> {
   try {
     // Get packages from package service
     const packages = await getPackagesService(rootPath);
@@ -40,15 +47,17 @@ export async function getWorkspacePackages(rootPath: string): Promise<Package[]>
 /**
  * Get existing unpublished changesets
  */
-export async function getExistingChangesets(rootPath: string): Promise<string[]> {
+export async function getExistingChangesets(
+  rootPath: string
+): Promise<string[]> {
   try {
     const changesetsDir = path.join(rootPath, '.changeset');
 
     try {
       const files = await fs.readdir(changesetsDir);
       return files
-        .filter((file) => file.endsWith('.md') && file !== 'README.md')
-        .map((file) => file.replace('.md', ''));
+        .filter(file => file.endsWith('.md') && file !== 'README.md')
+        .map(file => file.replace('.md', ''));
     } catch {
       // Directory doesn't exist yet
       return [];
@@ -66,8 +75,8 @@ export function calculateNewVersions(
   packages: Package[],
   bumps: Array<{ package: string; bumpType: VersionBump }>
 ): VersionBumpItem[] {
-  return packages.map((pkg) => {
-    const bump = bumps.find((b) => b.package === pkg.name);
+  return packages.map(pkg => {
+    const bump = bumps.find(b => b.package === pkg.name);
     const bumpType = bump?.bumpType || 'patch';
 
     const newVersion = calculateVersion(pkg.version, bumpType);
@@ -84,8 +93,11 @@ export function calculateNewVersions(
 /**
  * Calculate new version based on bump type
  */
-function calculateVersion(currentVersion: string, bumpType: VersionBump): string {
-  const parts = currentVersion.split('.').map((p) => parseInt(p, 10));
+function calculateVersion(
+  currentVersion: string,
+  bumpType: VersionBump
+): string {
+  const parts = currentVersion.split('.').map(p => parseInt(p, 10));
   const [major, minor = 0, patch = 0] = parts;
 
   switch (bumpType) {
@@ -112,7 +124,7 @@ export async function validateChangeset(
   // Validate packages exist
   const allPackages = await getWorkspacePackages(rootPath);
   for (const pkgName of packages) {
-    if (!allPackages.find((p) => p.name === pkgName)) {
+    if (!allPackages.find(p => p.name === pkgName)) {
       errors.push(`Package ${pkgName} not found`);
     }
   }
@@ -165,7 +177,7 @@ export async function generateChangeset(
     // Format changeset content
     let content = `---\n`;
     for (const pkg of packages) {
-      const bump = bumps.find((b) => b.package === pkg);
+      const bump = bumps.find(b => b.package === pkg);
       const bumpType = bump?.bumpType || 'patch';
       content += `"${pkg}": ${bumpType}\n`;
     }
@@ -175,7 +187,9 @@ export async function generateChangeset(
     // Write changeset file
     await fs.writeFile(changesetPath, content, 'utf-8');
 
-    AppLogger.info(`Changeset created: ${changesetName} by user: ${createdBy || 'unknown'}`);
+    AppLogger.info(
+      `Changeset created: ${changesetName} by user: ${createdBy || 'unknown'}`
+    );
     return {
       success: true,
       message: CHANGESET_MESSAGES.CREATED,
@@ -214,7 +228,9 @@ export async function triggerPublishPipeline(
   selectedPackages?: object[]
 ): Promise<{ success: boolean; message: string; result?: unknown }> {
   try {
-    AppLogger.info(`Publishing workflow triggered by user: ${publishedBy || 'unknown'}`);
+    AppLogger.info(
+      `Publishing workflow triggered by user: ${publishedBy || 'unknown'}`
+    );
 
     // Commit the changeset if there are any changes
     try {
@@ -255,8 +271,6 @@ export async function triggerPublishPipeline(
       // Continue anyway - changesets might already be committed
     }
 
-
-
     AppLogger.info('Publish pipeline initiated');
     return {
       success: true,
@@ -290,7 +304,6 @@ export async function checkCIPassing(
       AppLogger.warn('No access token available for CI check');
       return true; // Allow publishing if no token
     }
-
     const { runs } = await getWorkflowRuns(owner, repo, accessToken, {
       workflowId,
       workflowPath,
@@ -309,7 +322,9 @@ export async function checkCIPassing(
     if (passed) {
       AppLogger.info('CI check passed: Latest workflow run succeeded');
     } else {
-      AppLogger.warn(`CI check failed: Latest run conclusion is ${latestRun.conclusion}`);
+      AppLogger.warn(
+        `CI check failed: Latest run conclusion is ${latestRun.conclusion}`
+      );
     }
 
     return passed;
@@ -328,16 +343,20 @@ export async function checkVersionAvailableOnNpm(
   packageName: string,
   version: string
 ): Promise<boolean> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     try {
       const url = `https://registry.npmjs.org/${encodeURIComponent(packageName)}/${encodeURIComponent(version)}`;
 
-      const request = https.get(url, (response) => {
+      const request = https.get(url, response => {
         if (response.statusCode === 200) {
-          AppLogger.warn(`NPM version check: Version ${version} of ${packageName} already exists`);
+          AppLogger.warn(
+            `NPM version check: Version ${version} of ${packageName} already exists`
+          );
           resolve(false); // Version exists, not available for publishing
         } else if (response.statusCode === 404) {
-          AppLogger.info(`NPM version check: Version ${version} of ${packageName} is available`);
+          AppLogger.info(
+            `NPM version check: Version ${version} of ${packageName} is available`
+          );
           resolve(true); // Version doesn't exist, safe to publish
         } else {
           AppLogger.warn(`NPM check unexpected status ${response.statusCode}`);
@@ -345,7 +364,7 @@ export async function checkVersionAvailableOnNpm(
         }
       });
 
-      request.on('error', (error) => {
+      request.on('error', error => {
         AppLogger.error(`Failed to check npm version: ${error}`);
         resolve(true); // Allow on error
       });
@@ -361,5 +380,3 @@ export async function checkVersionAvailableOnNpm(
     }
   });
 }
-
-

@@ -11,6 +11,8 @@ import { npmPublishService } from './npm-publish-service';
 import { changeTrackerService } from './change-tracker-service';
 import { semverEngine } from './semver-engine';
 import { secureTokenService } from './secure-token-service';
+import fs from 'fs';
+import path from 'path';
 
 const execAsync = promisify(exec);
 
@@ -180,17 +182,20 @@ export class NodePublishRunner extends PublishRunner {
     }
   }
 
-  private async updatePackageJsonVersion(packagePath: string, version: string): Promise<void> {
-    const fs = require('fs').promises;
-    const path = require('path');
-
+  private async updatePackageJsonVersion(
+    packagePath: string,
+    version: string
+  ): Promise<void> {
     const pkgJsonPath = path.join(packagePath, 'package.json');
-    const content = await fs.readFile(pkgJsonPath, 'utf8');
+    const content = await fs.promises.readFile(pkgJsonPath, 'utf8');
     const pkgJson = JSON.parse(content);
 
     pkgJson.version = version;
 
-    await fs.writeFile(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + '\n');
+    await fs.promises.writeFile(
+      pkgJsonPath,
+      JSON.stringify(pkgJson, null, 2) + '\n'
+    );
   }
 
   private async commitAndTag(
@@ -205,10 +210,14 @@ export class NodePublishRunner extends PublishRunner {
       }
 
       const tagName = `${packageName}-v${version}`;
-      await execAsync(`git add . && git commit -m "chore: release ${packageName}@${version}"`);
+      await execAsync(
+        `git add . && git commit -m "chore: release ${packageName}@${version}"`
+      );
       await execAsync(`git tag ${tagName}`);
     } catch (error) {
-      throw new Error(`Git operations failed: ${error instanceof Error ? error.message : error}`);
+      throw new Error(
+        `Git operations failed: ${error instanceof Error ? error.message : error}`
+      );
     }
   }
 
@@ -216,7 +225,9 @@ export class NodePublishRunner extends PublishRunner {
     try {
       await execAsync('git push origin --follow-tags');
     } catch (error) {
-      throw new Error(`Failed to push changes: ${error instanceof Error ? error.message : error}`);
+      throw new Error(
+        `Failed to push changes: ${error instanceof Error ? error.message : error}`
+      );
     }
   }
 

@@ -220,7 +220,7 @@ export class NpmPublishService {
       // Calculate SRI (Subresource Integrity)
       const integrity = this.calculateSRI(tarballData);
 
-      const pkgJsonPath = join(basename(tarballPath).replace('.tgz', ''), '/package/', 'package.json');
+      const pkgJsonPath = join('package.json');
       const pkgJson = JSON.parse(
         await readFileAsync(join(tarballPath, '..', pkgJsonPath), 'utf8')
       ) as PackageJson;

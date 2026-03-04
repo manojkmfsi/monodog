@@ -211,7 +211,7 @@ export class NodePublishRunner extends PublishRunner {
 
       const tagName = `${packageName}-v${version}`;
       await execSync(
-        `git add . && git commit -m "chore: release ${packageName}@${version}"`
+        `git add . && git commit -m "chore: release ${packageName}@${version}" --no-verify`
       );
       await execAsync(`git tag ${tagName}`);
     } catch (error) {

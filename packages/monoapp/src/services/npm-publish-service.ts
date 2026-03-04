@@ -272,7 +272,7 @@ const doc = {
       name: packageName,
       version: version,
       description: pkgJson.description || '',
-      // dependencies: pkgJson.dependencies || {},
+      dependencies: {},
       dist: {
         shasum: shasum,
         integrity: integrity,

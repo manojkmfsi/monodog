@@ -213,7 +213,7 @@ export class NodePublishRunner extends PublishRunner {
       await execSync(
         `git add . && git commit -m "chore: release ${packageName}@${version}" --no-verify`
       );
-      await execAsync(`git tag ${tagName}`);
+      await execSync(`git tag ${tagName}`);
     } catch (error) {
       throw new Error(
         `Git operations failed: ${error instanceof Error ? error.message : error}`

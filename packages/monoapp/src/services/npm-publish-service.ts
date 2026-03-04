@@ -90,7 +90,14 @@ export class NpmPublishService {
       }
 
       // 4. Publish tarball to registry
-      await this.publishTarball(tarballPath, packageName, version, npmToken, registry, tag);
+      await this.publishTarball(
+        tarballPath,
+        packageName,
+        version,
+        npmToken,
+        registry,
+        tag
+      );
       console.info(`✓ Package published to npm registry`);
 
       // 5. Verify publication
@@ -116,10 +123,15 @@ export class NpmPublishService {
   /**
    * Validate package.json and required fields
    */
-  private async validatePackage(packagePath: string, version: string): Promise<void> {
+  private async validatePackage(
+    packagePath: string,
+    version: string
+  ): Promise<void> {
     try {
       const pkgJsonPath = join(packagePath, 'package.json');
-      const pkgJson = JSON.parse(await readFileAsync(pkgJsonPath, 'utf8')) as any;
+      const pkgJson = JSON.parse(
+        await readFileAsync(pkgJsonPath, 'utf8')
+      ) as any;
 
       if (!pkgJson.name) {
         throw new Error('package.json missing required field: name');
@@ -145,13 +157,19 @@ export class NpmPublishService {
           });
         });
         if ((stats as any)?.isDirectory?.() === false) {
-          console.warn(`⚠️  dist/ folder not found, publishing source files only`);
+          console.warn(
+            `⚠️  dist/ folder not found, publishing source files only`
+          );
         }
       } catch {
-        console.warn(`⚠️  dist/ folder not found, publishing source files only`);
+        console.warn(
+          `⚠️  dist/ folder not found, publishing source files only`
+        );
       }
     } catch (error) {
-      throw new Error(`Package validation failed: ${error instanceof Error ? error.message : error}`);
+      throw new Error(
+        `Package validation failed: ${error instanceof Error ? error.message : error}`
+      );
     }
   }
 
@@ -161,23 +179,34 @@ export class NpmPublishService {
   private async buildPackage(packagePath: string): Promise<void> {
     try {
       const pkgJsonPath = join(packagePath, 'package.json');
-      const pkgJson = JSON.parse(await readFileAsync(pkgJsonPath, 'utf8')) as any;
+      const pkgJson = JSON.parse(
+        await readFileAsync(pkgJsonPath, 'utf8')
+      ) as any;
 
       if (pkgJson?.scripts?.build) {
         console.info(`🔨 Running build script...`);
         try {
-          const { stdout, stderr } = await execAsync(`cd ${packagePath} && npm run build`, {
-            maxBuffer: 10 * 1024 * 1024,
-          });
+          const { stdout, stderr } = await execAsync(
+            `cd ${packagePath} && npm run build`,
+            {
+              maxBuffer: 10 * 1024 * 1024,
+            }
+          );
           if (stdout) console.debug(stdout.slice(-500)); // Last 500 chars
           if (stderr) console.warn(stderr.slice(-500));
         } catch (buildError) {
-          console.warn(`⚠️  Build step failed:`, buildError instanceof Error ? buildError.message : buildError);
+          console.warn(
+            `⚠️  Build step failed:`,
+            buildError instanceof Error ? buildError.message : buildError
+          );
         }
       }
     } catch (error) {
       // Build might fail, but we can still try to publish
-      console.warn(`⚠️  Build step failed (continuing anyway):`, error instanceof Error ? error.message : error);
+      console.warn(
+        `⚠️  Build step failed (continuing anyway):`,
+        error instanceof Error ? error.message : error
+      );
     }
   }
 
@@ -225,21 +254,55 @@ export class NpmPublishService {
         await readFileAsync(join(tarballPath, '..', pkgJsonPath), 'utf8')
       ) as PackageJson;
 
+      // const tarballBuffer = await fs.readFile(tarballPath, null, (err, data) => {
+      //   if (err) {
+      //     throw new Error(`Failed to read tarball for upload: ${err.message}`);
+      //   }
+      //   return data;
+      // });
+
+const doc = {
+  _id: packageName,
+  name: packageName,
+  'dist-tags': {
+    latest: version,
+  },
+  versions: {
+    [version]: {
+      name: packageName,
+      version: version,
+      description: pkgJson.description || '',
+      dependencies: {},
+      dist: {
+        shasum: shasum,
+        integrity: integrity,
+        tarball: `${registry}/${packageName}/-/${basename(tarballPath)}`,
+      },
+    },
+  },
+  _attachments: {
+    [basename(tarballPath)]: {
+      content_type: 'application/octet-stream',
+      data: tarballData.toString('base64'), // Binary data MUST be here
+      length: tarballData.length,
+    },
+  },
+};
       // Prepare document for npm registry
-      const doc = {
-        _id: `${packageName}@${version}`,
-        name: packageName,
-        version,
-        description: pkgJson.description || '',
-        dist: {
-          tarball: `${registry}/${packageName}/-/${basename(tarballPath)}`,
-          shasum,
-          integrity,
-        },
-        // Add minimal required metadata
-        _rev: '',
-        dependencies: {},
-      };
+      // const doc = {
+      //   _id: `${packageName}@${version}`,
+      //   name: packageName,
+      //   version,
+      //   description: pkgJson.description || '',
+      //   dist: {
+      //     tarball: `${registry}/${packageName}/-/${basename(tarballPath)}`,
+      //     shasum,
+      //     integrity,
+      //   },
+      //   // Add minimal required metadata
+      //   _rev: '',
+      //   dependencies: {},
+      // };
       const encodedName = packageName.replace('/', '%2f');
       // Publish via npm registry REST API
       const response = await fetch(`${registry}/${encodedName}`, {
@@ -334,7 +397,9 @@ export class NpmPublishService {
       if (!response.ok) return [];
 
       const data = (await response.json()) as any;
-      return Object.keys(data.versions || {}).sort().reverse();
+      return Object.keys(data.versions || {})
+        .sort()
+        .reverse();
     } catch {
       return [];
     }

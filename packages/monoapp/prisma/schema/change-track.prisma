@@ -1,48 +1,44 @@
-/**
- * Change Tracking Schema
- * Tracks detected changes in packages for independent versioning
- * Replaces dependency on Changesets .changeset/*.md files
- */
+
 
 model ChangeTrack {
   id                  String   @id @default(cuid())
-  
+
   // Package identification
-  packageName         String   @index
+  packageName         String   
   packageVersion      String
-  
+
   // Change detection
-  detectionMethod     DetectionMethod
+  detectionMethod     String   // was enum DetectionMethod
   detectionTimestamp  DateTime @default(now())
-  
+
   // Commit-based detection
   commits             CommitChange[]
-  
+
   // File change analysis
-  filesChanged        String[]
+  filesChanged        String   // JSON stringified array, was String[]
   linesAdded          Int      @default(0)
   linesRemoved        Int      @default(0)
-  
+
   // Change type determination
-  changeType          ChangeType
-  affectedDependents  String[]
-  
+  changeType          String   // was enum ChangeType
+  affectedDependents  String   // JSON stringified array, was String[]
+
   // Manual override support
-  userOverrideType    ChangeType?
+  userOverrideType    String?  // was enum ChangeType
   overrideReason      String?
   overrideBy          String?
   overriddenAt        DateTime?
-  
+
   // Release readiness
   isReleaseReady      Boolean  @default(false)
   lastAnalyzedCommit  String
   previousVersion     String
   proposedVersion     String
-  
+
   // Metadata
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-  
+
   @@index([packageName, createdAt])
   @@index([isReleaseReady, packageName])
 }
@@ -51,78 +47,52 @@ model CommitChange {
   id              String   @id @default(cuid())
   changeTrackId   String
   changeTrack     ChangeTrack @relation(fields: [changeTrackId], references: [id], onDelete: Cascade)
-  
+
   // Commit details
   hash            String
   message         String
   author          String
   authorEmail     String?
-  
+
   // Conventional commit parsing
-  type            ConventionalType
+  type            String   // was enum ConventionalType
   scope           String?
   isBreaking      Boolean  @default(false)
   bodyText        String?
-  
+
   // Timestamps
   committedAt     DateTime
   detectedAt      DateTime @default(now())
-  
+
   @@index([changeTrackId, hash])
   @@index([hash])
 }
 
 model VersionCalculation {
   id              String   @id @default(cuid())
-  
+
   packageName     String
   currentVersion  String
   proposedVersion String
-  
+
   // Components of calculation
-  changeType      ChangeType
-  affectedDependents String[]
-  
+  changeType      String   // was enum ChangeType
+  affectedDependents String   // JSON stringified array, was String[]
+
   // Calculation details
   majorBumps      Int      @default(0)
   minorBumps      Int      @default(0)
   patchBumps      Int      @default(0)
   breakingChanges Int      @default(0)
-  
+
   // Reason tracking
   reason          String   // Human-readable explanation
-  
+
   // Metadata
   createdAt       DateTime @default(now())
   calculatedAt    DateTime @default(now())
-  
+
   @@index([packageName, proposedVersion])
 }
 
-enum DetectionMethod {
-  commit      // Conventional commits
-  diff        // Git diff analysis
-  manual      // User-provided
-  hybrid      // Combined approach
-}
 
-enum ChangeType {
-  major       // Breaking change
-  minor       // New feature
-  patch       // Bug fix
-  none        // No release needed
-}
-
-enum ConventionalType {
-  feat        // feat: New feature (minor)
-  fix         // fix: Bug fix (patch)
-  docs        // docs: Documentation
-  style       // style: Code style
-  refactor    // refactor: Refactoring
-  test        // test: Tests
-  chore       // chore: Maintenance
-  perf        // perf: Performance
-  ci          // ci: CI/CD changes
-  revert      // revert: Reverts a commit
-  build       // build: Build system
-}

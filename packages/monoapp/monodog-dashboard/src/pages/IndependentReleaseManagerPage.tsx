@@ -7,7 +7,8 @@ import React, { useState, useEffect } from 'react';
 import IndependentReleaseInfo from '../components/IndependentReleaseInfo';
 import releaseAPI from '../services/release-api';
 import styles from './IndependentReleaseManagerPage.module.css';
-
+import apiClient from '../services/api';
+import { DASHBOARD_API_ENDPOINTS } from '../../src/constants/api-config';
 interface Package {
   name: string;
   version: string;
@@ -37,9 +38,13 @@ export default function IndependentReleaseManagerPage() {
   const fetchPackages = async () => {
     try {
       setLoading(true);
-      const res = await releaseAPI.getPackages();
-      if (res.success) {
-        setPackages(res.data.packages || []);
+            // Fetch packages
+      const packagesRes = await apiClient.get(
+        DASHBOARD_API_ENDPOINTS.PUBLISH.PACKAGES
+      );
+
+      if (packagesRes.success) {
+        setPackages(packagesRes.data.packages || []);
         setError(null);
       }
     } catch (err) {

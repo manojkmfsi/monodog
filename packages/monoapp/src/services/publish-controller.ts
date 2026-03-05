@@ -291,18 +291,6 @@ export class PublishController {
   }
 
   /**
-   * Get list of available packages
-   */
-  getAvailablePackages(workspacePath: string): Array<{
-    name: string;
-    path: string;
-    version: string;
-  }> {
-    // Would scan packages directory and return available packages
-    return [];
-  }
-
-  /**
    * Get detailed pipeline information
    */
   async getPipelineDetails(pipelineId: string): Promise<any> {

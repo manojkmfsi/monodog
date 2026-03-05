@@ -15,27 +15,6 @@ import path from 'path';
 const router = Router();
 
 /**
- * GET /api/releases/packages
- * Get list of packages available in workspace
- */
-router.get('/packages', async (req: Request, res: Response) => {
-  try {
-    const packages = publishController.getAvailablePackages(process.cwd());
-
-    res.json({
-      success: true,
-      packages,
-      count: packages.length,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-/**
  * POST /api/releases/analyze
  * Analyze changes for packages without publishing
  */
@@ -105,8 +84,7 @@ router.post('/check-readiness', async (req: Request, res: Response) => {
       currentVersion: getCurrentVersion(name, packagePaths[name]),
     }));
 
-    const readiness =
-      await releaseReadinessService.checkReleaseReadiness(packages);
+    const readiness = await releaseReadinessService.checkReleaseReadiness(packages);
 
     res.json({
       success: true,
@@ -231,8 +209,7 @@ router.get('/pipelines', async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error:
-        error instanceof Error ? error.message : 'Failed to list pipelines',
+      error: error instanceof Error ? error.message : 'Failed to list pipelines',
     });
   }
 });
@@ -260,9 +237,7 @@ router.post('/start', async (req: Request, res: Response) => {
       });
     }
 
-    console.info(
-      `📦 Starting publish pipeline for: ${packageNames.join(', ')}`
-    );
+    console.info(`📦 Starting publish pipeline for: ${packageNames.join(', ')}`);
 
     const pipeline = await publishController.publish({
       packageNames,
@@ -304,8 +279,7 @@ router.post('/cancel/:pipelineId', async (req: Request, res: Response) => {
   } catch (error) {
     res.status(400).json({
       success: false,
-      error:
-        error instanceof Error ? error.message : 'Failed to cancel pipeline',
+      error: error instanceof Error ? error.message : 'Failed to cancel pipeline',
     });
   }
 });
@@ -314,62 +288,50 @@ router.post('/cancel/:pipelineId', async (req: Request, res: Response) => {
  * GET /api/releases/npm/:packageName/versions
  * Get published versions for a package
  */
-router.get(
-  '/npm/:packageName/versions',
-  async (req: Request, res: Response) => {
-    try {
-      const { packageName } = req.params;
+router.get('/npm/:packageName/versions', async (req: Request, res: Response) => {
+  try {
+    const { packageName } = req.params;
 
-      const versions =
-        await npmPublishService.getPublishedVersions(packageName);
+    const versions = await npmPublishService.getPublishedVersions(packageName);
 
-      res.json({
-        success: true,
-        packageName,
-        versions,
-        count: versions.length,
-        latest: versions[0] || null,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to get versions',
-      });
-    }
+    res.json({
+      success: true,
+      packageName,
+      versions,
+      count: versions.length,
+      latest: versions[0] || null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get versions',
+    });
   }
-);
+});
 
 /**
  * GET /api/releases/npm/:packageName/:version/available
  * Check if a version is available on npm
  */
-router.get(
-  '/npm/:packageName/:version/available',
-  async (req: Request, res: Response) => {
-    try {
-      const { packageName, version } = req.params;
+router.get('/npm/:packageName/:version/available', async (req: Request, res: Response) => {
+  try {
+    const { packageName, version } = req.params;
 
-      const available = await npmPublishService.isVersionAvailable(
-        packageName,
-        version
-      );
+    const available = await npmPublishService.isVersionAvailable(packageName, version);
 
-      res.json({
-        success: true,
-        packageName,
-        version,
-        available,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to check version',
-      });
-    }
+    res.json({
+      success: true,
+      packageName,
+      version,
+      available,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to check version',
+    });
   }
-);
+});
 
 /**
  * GET /api/releases/health

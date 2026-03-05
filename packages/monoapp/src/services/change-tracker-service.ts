@@ -150,7 +150,7 @@ export class ChangeTrackerService {
   /**
    * Parse commit message using Conventional Commits format
    * https://www.conventionalcommits.org/
-   * 
+   *
    * Format: type(scope)!: subject
    * BREAKING CHANGE: description
    */
@@ -172,7 +172,7 @@ export class ChangeTrackerService {
 
     const [, type, scopeMatch, breakingIndicator, subject] = match;
     const scope = scopeMatch ? scopeMatch.slice(1, -1) : undefined;
-    
+
     // Check for BREAKING CHANGE keyword in body
     const isBreaking = !!breakingIndicator || (body ? /^BREAKING[\s-]CHANGE:/m.test(body) : false);
 

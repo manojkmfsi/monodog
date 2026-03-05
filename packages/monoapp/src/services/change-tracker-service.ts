@@ -6,11 +6,14 @@
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { PrismaClient } from '@prisma/client';
 
 // NOTE: ChangeTrack and CommitChange types will be imported from @prisma/client after DB integration
 // Currently using inline types below for service implementation
 
+
 const execAsync = promisify(exec);
+const prisma = new PrismaClient();
 
 type ChangeType = 'major' | 'minor' | 'patch' | 'none';
 type ConventionalType = 'feat' | 'fix' | 'docs' | 'style' | 'refactor' | 'test' | 'chore' | 'perf' | 'ci' | 'revert' | 'build';
@@ -49,6 +52,59 @@ interface AnalysisResult {
 
 export class ChangeTrackerService {
   /**
+   * Save a ChangeTrack record and its related commits to the database
+   */
+  async saveChangeTrack(result: AnalysisResult): Promise<void> {
+    // Save ChangeTrack
+    const changeTrack = await prisma.changeTrack.create({
+      data: {
+        packageName: result.packageName,
+        packageVersion: result.currentVersion,
+        detectionMethod: 'git',
+        detectionTimestamp: new Date(),
+        filesChanged: JSON.stringify(result.filesChanged.map(f => f.path)),
+        linesAdded: result.filesChanged.reduce((sum, f) => sum + (f.linesAdded || 0), 0),
+        linesRemoved: result.filesChanged.reduce((sum, f) => sum + (f.linesRemoved || 0), 0),
+        changeType: result.changeType,
+        affectedDependents: JSON.stringify(result.affectedDependents),
+        isReleaseReady: result.isReleaseReady,
+        lastAnalyzedCommit: result.commits[0]?.hash || '',
+        previousVersion: result.currentVersion,
+        proposedVersion: result.proposedVersion,
+        // createdAt, updatedAt auto
+      },
+    });
+
+    // Save related commits
+    for (const commit of result.commits) {
+      await prisma.commitChange.create({
+        data: {
+          changeTrackId: changeTrack.id,
+          hash: commit.hash,
+          message: commit.message,
+          author: commit.author,
+          authorEmail: commit.authorEmail,
+          type: commit.type,
+          scope: commit.scope,
+          isBreaking: commit.isBreaking,
+          bodyText: commit.body,
+          committedAt: commit.committedAt,
+        },
+      });
+    }
+  }
+
+  /**
+   * Load the latest ChangeTrack for a package
+   */
+  async getLatestChangeTrack(packageName: string): Promise<any> {
+    return prisma.changeTrack.findFirst({
+      where: { packageName },
+      orderBy: { createdAt: 'desc' },
+      include: { commits: true },
+    });
+  }
+  /**
    * Analyze changes for a package since last release
    */
   async analyzeChanges(
@@ -60,17 +116,17 @@ export class ChangeTrackerService {
     try {
       // 1. Get commits since last tag
       const commits = await this.getCommitsSinceTag(lastTagName, packagePath);
-      
+
       // 2. Get file diffs
       const filesChanged = await this.getFileDiffsSinceTag(lastTagName, packagePath);
-      
+
       // 3. Determine change type from commits
       const changeType = this.determineChangeType(commits);
-      
+
       // 4. Identify affected dependents
       const affectedDependents = await this.identifyAffectedDependents(packageName);
-      
-      return {
+
+      const result: AnalysisResult = {
         packageName,
         currentVersion,
         changeType,
@@ -80,6 +136,11 @@ export class ChangeTrackerService {
         proposedVersion: this.calculateNextVersion(currentVersion, changeType),
         isReleaseReady: changeType !== 'none',
       };
+
+      // Save to DB
+      await this.saveChangeTrack(result);
+
+      return result;
     } catch (error) {
       console.error(`Failed to analyze changes for ${packageName}:`, error);
       throw error;

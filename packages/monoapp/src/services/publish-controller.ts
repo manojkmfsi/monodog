@@ -120,6 +120,12 @@ export class PublishController {
       triggeredAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
+      releaseVersion: request.versionMap ? Object.values(request.versionMap).join(',') : undefined,
+      releaseNotes: undefined, // Could be set if changelog is generated
+      conclusion: undefined,
+      completedAt: undefined,
+      errorMessage: undefined,
+      errorDetails: undefined,
     });
 
     const status: PublishPipelineStatus = {
@@ -182,8 +188,14 @@ export class PublishController {
           status: result.success ? 'completed' : 'failed',
           result: result.success ? 'published' : 'error',
           error: result.errors?.join('\n') || undefined,
+          errorDetails: result.errors?.join('\n') || undefined,
           npmPackageId: result.packageId,
           publishedAt: result.success ? new Date() : undefined,
+          // tarballUrl: result.tarballUrl || undefined, // Not present in result
+          gitTagCreated: result.gitTag || undefined,
+          // gitCommitSha: result.gitCommitSha || undefined, // Not present in result
+          // gitPushCompleted: result.gitPushCompleted || false, // Not present in result
+          githubReleaseUrl: result.gitHubReleaseUrl || undefined,
         });
       }
 
@@ -196,14 +208,28 @@ export class PublishController {
       status.status = 'completed';
       status.progress = 100;
       status.completedAt = new Date().toISOString();
-      await publishPipelineService.updatePipeline(pipelineId, { status: 'completed', completedAt: new Date(), updatedAt: new Date() });
+      await publishPipelineService.updatePipeline(pipelineId, {
+        status: 'completed',
+        completedAt: new Date(),
+        updatedAt: new Date(),
+        conclusion: 'success',
+        errorMessage: undefined,
+        errorDetails: undefined,
+      });
 
       console.info(`\n✅ Publish pipeline completed: ${pipelineId}`);
     } catch (error) {
       status.status = 'failed';
       status.error = error instanceof Error ? error.message : String(error);
       status.completedAt = new Date().toISOString();
-      await publishPipelineService.updatePipeline(pipelineId, { status: 'failed', errorMessage: status.error, completedAt: new Date(), updatedAt: new Date() });
+      await publishPipelineService.updatePipeline(pipelineId, {
+        status: 'failed',
+        errorMessage: status.error,
+        errorDetails: status.error,
+        completedAt: new Date(),
+        updatedAt: new Date(),
+        conclusion: 'failure',
+      });
       console.error(`\n❌ Publish pipeline failed: ${status.error}`);
     }
 

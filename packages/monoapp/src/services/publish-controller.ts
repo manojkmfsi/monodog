@@ -120,7 +120,9 @@ export class PublishController {
       triggeredAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      releaseVersion: request.versionMap ? Object.values(request.versionMap).join(',') : undefined,
+      releaseVersion: request.versionMap
+        ? Object.values(request.versionMap).join(',')
+        : undefined,
       releaseNotes: undefined, // Could be set if changelog is generated
       conclusion: undefined,
       completedAt: undefined,
@@ -140,33 +142,52 @@ export class PublishController {
     try {
       status.startedAt = new Date().toISOString();
       status.status = 'validating';
-      await publishPipelineService.updatePipeline(pipelineId, { status: 'validating', updatedAt: new Date() });
+      await publishPipelineService.updatePipeline(pipelineId, {
+        status: 'validating',
+        updatedAt: new Date(),
+      });
 
       // 1. Get readiness
       const prep = await this.preparePublish(request);
       if (!prep.valid && !request.dryRun) {
-        await publishPipelineService.updatePipeline(pipelineId, { status: 'failed', updatedAt: new Date() });
-        throw new Error(`Packages not ready for publishing. Fix blockers and try again.`);
+        await publishPipelineService.updatePipeline(pipelineId, {
+          status: 'failed',
+          updatedAt: new Date(),
+        });
+        throw new Error(
+          `Packages not ready for publishing. Fix blockers and try again.`
+        );
       }
 
       status.status = 'ready';
       status.progress = 20;
-      await publishPipelineService.updatePipeline(pipelineId, { status: 'ready', updatedAt: new Date() });
+      await publishPipelineService.updatePipeline(pipelineId, {
+        status: 'ready',
+        updatedAt: new Date(),
+      });
 
       // 2. Get credentials
       const npmToken = await secureTokenService.getToken('npm', 'env');
-      const githubToken = request.method !== 'node' ? await secureTokenService.getToken('github', 'env') : undefined;
+      const githubToken =
+        request.method !== 'node'
+          ? await secureTokenService.getToken('github', 'env')
+          : undefined;
 
       // 3. Publish each package
       status.status = 'publishing';
-      await publishPipelineService.updatePipeline(pipelineId, { status: 'publishing', updatedAt: new Date() });
+      await publishPipelineService.updatePipeline(pipelineId, {
+        status: 'publishing',
+        updatedAt: new Date(),
+      });
       const publisherCount = request.packageNames.length;
 
       for (let i = 0; i < request.packageNames.length; i++) {
         const packageName = request.packageNames[i];
         const packagePath = request.packagePaths[packageName];
 
-        console.info(`\n📦 Publishing ${i + 1}/${publisherCount}: ${packageName}`);
+        console.info(
+          `\n📦 Publishing ${i + 1}/${publisherCount}: ${packageName}`
+        );
 
         const result = await this.publishPackage(
           packageName,
@@ -202,7 +223,11 @@ export class PublishController {
       // 4. Generate changelog entries
       if (!request.dryRun) {
         console.info('\n📝 Generating changelogs...');
-        await this.generateChangelogs(request.packageNames, request.packagePaths, status.results);
+        await this.generateChangelogs(
+          request.packageNames,
+          request.packagePaths,
+          status.results
+        );
       }
 
       status.status = 'completed';
@@ -323,7 +348,7 @@ export class PublishController {
         path: packagePath,
         newVersion: result.version,
         previousVersion: null,
-        commits: result.commits || [],
+        commits: [],
       });
     }
 

@@ -306,18 +306,45 @@ export class PublishController {
     packagePaths: Record<string, string>,
     results: Record<string, PublishRunnerResult>
   ): Promise<void> {
+    // Collect changelog data for all successful packages
+    const packages: Array<{
+      name: string;
+      path: string;
+      newVersion: string;
+      previousVersion: string | null;
+      commits: any[];
+    }> = [];
     for (const packageName of packageNames) {
       const result = results[packageName];
       if (!result?.success) continue;
+      const packagePath = packagePaths[packageName];
+      packages.push({
+        name: packageName,
+        path: packagePath,
+        newVersion: result.version,
+        previousVersion: null,
+        commits: result.commits || [],
+      });
+    }
 
-      try {
-        const packagePath = packagePaths[packageName];
-        // Would generate changelog using changelogGenerator
-        console.info(`  Generated changelog for ${packageName}`);
-      } catch (error) {
-        console.warn(`Failed to generate changelog for ${packageName}:`, error);
+    if (packages.length === 0) return;
+
+    // Generate changelog entries for all packages
+    const entries = await changelogGenerator.generateMultiple(packages);
+
+    // Write per-package changelogs
+    for (const pkg of packages) {
+      const entry = entries.get(pkg.name);
+      if (entry) {
+        await changelogGenerator.appendToChangelog(pkg.path, entry, pkg.name);
+        console.info(`  Updated CHANGELOG.md for ${pkg.name}`);
       }
     }
+
+    // Write monorepo changelog
+    const outputPath = path.join(process.cwd(), 'MONOREPO_CHANGELOG.md');
+    await changelogGenerator.generateMonorepoChangelog(entries, outputPath);
+    console.info(`  Monorepo changelog generated at ${outputPath}`);
   }
 
   /**

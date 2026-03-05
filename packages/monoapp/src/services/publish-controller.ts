@@ -17,6 +17,7 @@ import { secureTokenService } from './secure-token-service';
 import { changelogGenerator } from './changelog-generator';
 import fs from 'fs';
 import path from 'path';
+import { publishPipelineService } from './publish-pipeline-service';
 export interface PublishRequest {
   packageNames: string[];
   packagePaths: Record<string, string>;
@@ -109,6 +110,18 @@ export class PublishController {
    */
   async publish(request: PublishRequest): Promise<PublishPipelineStatus> {
     const pipelineId = this.generatePipelineId();
+    // Create pipeline in DB
+    const pipelineRecord = await publishPipelineService.createPipeline({
+      id: pipelineId,
+      packageNames: JSON.stringify(request.packageNames),
+      method: request.method || 'auto',
+      status: 'pending',
+      triggeredBy: request.userId || 'system',
+      triggeredAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
     const status: PublishPipelineStatus = {
       pipelineId,
       status: 'pending',
@@ -116,42 +129,38 @@ export class PublishController {
       packagesToPublish: request.packageNames,
       results: {},
     };
-
     this.pipelines.set(pipelineId, status);
 
     try {
       status.startedAt = new Date().toISOString();
       status.status = 'validating';
+      await publishPipelineService.updatePipeline(pipelineId, { status: 'validating', updatedAt: new Date() });
 
-      // 1. Validate packages
+      // 1. Get readiness
       const prep = await this.preparePublish(request);
       if (!prep.valid && !request.dryRun) {
-        throw new Error(
-          `Packages not ready for publishing. Fix blockers and try again.`
-        );
+        await publishPipelineService.updatePipeline(pipelineId, { status: 'failed', updatedAt: new Date() });
+        throw new Error(`Packages not ready for publishing. Fix blockers and try again.`);
       }
 
       status.status = 'ready';
       status.progress = 20;
+      await publishPipelineService.updatePipeline(pipelineId, { status: 'ready', updatedAt: new Date() });
 
       // 2. Get credentials
       const npmToken = await secureTokenService.getToken('npm', 'env');
-      const githubToken =
-        request.method !== 'node'
-          ? await secureTokenService.getToken('github', 'env')
-          : undefined;
+      const githubToken = request.method !== 'node' ? await secureTokenService.getToken('github', 'env') : undefined;
 
       // 3. Publish each package
       status.status = 'publishing';
+      await publishPipelineService.updatePipeline(pipelineId, { status: 'publishing', updatedAt: new Date() });
       const publisherCount = request.packageNames.length;
 
       for (let i = 0; i < request.packageNames.length; i++) {
         const packageName = request.packageNames[i];
         const packagePath = request.packagePaths[packageName];
 
-        console.info(
-          `\n📦 Publishing ${i + 1}/${publisherCount}: ${packageName}`
-        );
+        console.info(`\n📦 Publishing ${i + 1}/${publisherCount}: ${packageName}`);
 
         const result = await this.publishPackage(
           packageName,
@@ -164,28 +173,37 @@ export class PublishController {
 
         status.results[packageName] = result;
         status.progress = 20 + ((i + 1) / publisherCount) * 80;
+
+        // Store result in DB
+        await publishPipelineService.addPublishResult(pipelineId, {
+          packageName,
+          currentVersion: result.version,
+          newVersion: result.version,
+          status: result.success ? 'completed' : 'failed',
+          result: result.success ? 'published' : 'error',
+          error: result.errors?.join('\n') || undefined,
+          npmPackageId: result.packageId,
+          publishedAt: result.success ? new Date() : undefined,
+        });
       }
 
       // 4. Generate changelog entries
       if (!request.dryRun) {
         console.info('\n📝 Generating changelogs...');
-        await this.generateChangelogs(
-          request.packageNames,
-          request.packagePaths,
-          status.results
-        );
+        await this.generateChangelogs(request.packageNames, request.packagePaths, status.results);
       }
 
       status.status = 'completed';
       status.progress = 100;
       status.completedAt = new Date().toISOString();
+      await publishPipelineService.updatePipeline(pipelineId, { status: 'completed', completedAt: new Date(), updatedAt: new Date() });
 
       console.info(`\n✅ Publish pipeline completed: ${pipelineId}`);
     } catch (error) {
       status.status = 'failed';
       status.error = error instanceof Error ? error.message : String(error);
       status.completedAt = new Date().toISOString();
-
+      await publishPipelineService.updatePipeline(pipelineId, { status: 'failed', errorMessage: status.error, completedAt: new Date(), updatedAt: new Date() });
       console.error(`\n❌ Publish pipeline failed: ${status.error}`);
     }
 

@@ -189,6 +189,9 @@ export class PublishController {
           `\n📦 Publishing ${i + 1}/${publisherCount}: ${packageName}`
         );
 
+        // Get pre-publish version
+        const prePublishVersion = this.getCurrentVersion(packageName, packagePath);
+
         const result = await this.publishPackage(
           packageName,
           packagePath,
@@ -204,7 +207,7 @@ export class PublishController {
         // Store result in DB
         await publishPipelineService.addPublishResult(pipelineId, {
           packageName,
-          currentVersion: result.version,
+          currentVersion: prePublishVersion,
           newVersion: result.version,
           status: result.success ? 'completed' : 'failed',
           result: result.success ? 'published' : 'error',

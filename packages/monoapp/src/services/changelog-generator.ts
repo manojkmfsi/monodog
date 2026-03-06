@@ -24,17 +24,7 @@ interface ChangelogItem {
 }
 
 interface CommitInfo {
-  type:
-    | 'feat'
-    | 'fix'
-    | 'refactor'
-    | 'perf'
-    | 'style'
-    | 'docs'
-    | 'test'
-    | 'chore'
-    | 'ci'
-    | 'other';
+  type: 'feat' | 'fix' | 'refactor' | 'perf' | 'style' | 'docs' | 'test' | 'chore' | 'ci' | 'other';
   scope?: string;
   message: string;
   hash: string;
@@ -106,54 +96,64 @@ export class ChangelogGenerator {
    */
   formatEntryAsMarkdown(entry: ChangelogEntry, packageName: string): string {
     const lines: string[] = [];
-    // Version header with link and date
+
+    // Header with version and date
     const githubTag = `${packageName}@${entry.version}`;
-    lines.push(
-      `## [${githubTag}](https://github.com/manojkmfsi/monodog/releases/tag/${githubTag}) (${entry.date})`
-    );
+    lines.push(`## [${githubTag}](https://github.com/manojkmfsi/monodog/releases/tag/${githubTag}) (${entry.date})`);
     lines.push('');
-    // Package name header
-    lines.push(`# ${packageName}`);
-    lines.push('');
-    // Version subheader
-    lines.push(`## ${entry.version}`);
-    lines.push('');
-    // Patch Changes section (all fixes, improvements, and breaking changes)
-    lines.push('### Patch Changes');
-    lines.push('');
+
     // Breaking changes
-    for (const item of entry.breakingChanges) {
-      const hash = item.hash
-        ? `[\`${item.hash.slice(0, 7)}\`](https://github.com/manojkmfsi/monodog/commit/${item.hash})`
-        : '';
-      lines.push(`- ${hash} - ${item.description}`);
+    if (entry.breakingChanges.length > 0) {
+      lines.push('### ⚠️ BREAKING CHANGES');
+      for (const item of entry.breakingChanges) {
+        const scope = item.scope ? `**${item.scope}**: ` : '';
+        lines.push(`- ${scope}${item.description}`);
+      }
+      lines.push('');
     }
+
     // Features
-    for (const item of entry.features) {
-      const hash = item.hash
-        ? `[\`${item.hash.slice(0, 7)}\`](https://github.com/manojkmfsi/monodog/commit/${item.hash})`
-        : '';
-      lines.push(`- ${hash} - ${item.description}`);
+    if (entry.features.length > 0) {
+      lines.push('### Features');
+      for (const item of entry.features) {
+        const scope = item.scope ? `**${item.scope}**: ` : '';
+        const hash = item.hash ? ` ([${item.hash.slice(0, 7)}](https://github.com/manojkmfsi/monodog/commit/${item.hash}))` : '';
+        lines.push(`- ${scope}${item.description}${hash}`);
+      }
+      lines.push('');
     }
-    // Fixes
-    for (const item of entry.fixes) {
-      const hash = item.hash
-        ? `[\`${item.hash.slice(0, 7)}\`](https://github.com/manojkmfsi/monodog/commit/${item.hash})`
-        : '';
-      lines.push(`- ${hash} - ${item.description}`);
+
+    // Bug Fixes
+    if (entry.fixes.length > 0) {
+      lines.push('### Bug Fixes');
+      for (const item of entry.fixes) {
+        const scope = item.scope ? `**${item.scope}**: ` : '';
+        const hash = item.hash ? ` ([${item.hash.slice(0, 7)}](https://github.com/manojkmfsi/monodog/commit/${item.hash}))` : '';
+        lines.push(`- ${scope}${item.description}${hash}`);
+      }
+      lines.push('');
     }
+
     // Improvements
-    for (const item of entry.improvements) {
-      const hash = item.hash
-        ? `[\`${item.hash.slice(0, 7)}\`](https://github.com/manojkmfsi/monodog/commit/${item.hash})`
-        : '';
-      lines.push(`- ${hash} - ${item.description}`);
+    if (entry.improvements.length > 0) {
+      lines.push('### Improvements');
+      for (const item of entry.improvements) {
+        const scope = item.scope ? `**${item.scope}**: ` : '';
+        const hash = item.hash ? ` ([${item.hash.slice(0, 7)}](https://github.com/manojkmfsi/monodog/commit/${item.hash}))` : '';
+        lines.push(`- ${scope}${item.description}${hash}`);
+      }
+      lines.push('');
     }
-    // Internal
-    for (const item of entry.internal) {
-      lines.push(`- ${item}`);
+
+    // Internal (if any)
+    if (entry.internal.length > 0) {
+      lines.push('### Internal');
+      for (const item of entry.internal) {
+        lines.push(`- ${item}`);
+      }
+      lines.push('');
     }
-    lines.push('');
+
     return lines.join('\n');
   }
 

@@ -2,4 +2,4 @@
 
 All changes across all packages
 
-## 1.0.30 (2026-03-06)
+## 1.0.31 (2026-03-06)

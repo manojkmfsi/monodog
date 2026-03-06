@@ -184,6 +184,16 @@ export class ChangeTrackerService {
   } {
     const conventionalRegex =
       /^(feat|fix|docs|style|refactor|test|chore|perf|ci|revert|build)(\(.+\))?(!)?:\s(.+)/;
+
+    // Handle undefined or empty message
+    if (!message) {
+      return {
+        type: 'chore' as ConventionalType,
+        scope: undefined,
+        isBreaking: false,
+      };
+    }
+
     const match = message.match(conventionalRegex);
 
     if (!match) {
@@ -233,7 +243,7 @@ export class ChangeTrackerService {
         .map(line => {
           const [hash, email, author, timestamp, subject, body] =
             line.split('|||');
-          const parsed = this.parseConventionalCommit(subject, body);
+          const parsed = this.parseConventionalCommit(subject || '', body);
           return {
             hash,
             message: subject,
@@ -274,7 +284,7 @@ export class ChangeTrackerService {
         .map(line => {
           const [hash, email, author, timestamp, subject, body] =
             line.split('|||');
-          const parsed = this.parseConventionalCommit(subject, body);
+          const parsed = this.parseConventionalCommit(subject || '', body);
           return {
             hash,
             message: subject,

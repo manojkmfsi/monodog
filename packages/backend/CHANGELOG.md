@@ -1,3 +1,5 @@
+## [@monodog/backend@1.6.8](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/backend@1.6.8) (2026-03-06)
+
 ## [@monodog/backend@1.6.7](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/backend@1.6.7) (2026-03-05)
 
 # @monodog/backend

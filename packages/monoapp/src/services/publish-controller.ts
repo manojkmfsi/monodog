@@ -201,6 +201,9 @@ export class PublishController {
           request
         );
 
+        // Get new version from package.json after publish (in case publish step bumps it)
+        const postPublishVersion = this.getCurrentVersion(packageName, packagePath);
+
         status.results[packageName] = result;
         status.progress = 20 + ((i + 1) / publisherCount) * 80;
 
@@ -208,7 +211,7 @@ export class PublishController {
         await publishPipelineService.addPublishResult(pipelineId, {
           packageName,
           currentVersion: prePublishVersion,
-          newVersion: result.version,
+          newVersion: postPublishVersion,
           status: result.success ? 'completed' : 'failed',
           result: result.success ? 'published' : 'error',
           error: result.errors?.join('\n') || undefined,

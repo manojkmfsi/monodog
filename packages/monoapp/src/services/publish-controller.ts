@@ -190,7 +190,10 @@ export class PublishController {
         );
 
         // Get pre-publish version
-        const prePublishVersion = this.getCurrentVersion(packageName, packagePath);
+        const prePublishVersion = this.getCurrentVersion(
+          packageName,
+          packagePath
+        );
 
         const result = await this.publishPackage(
           packageName,
@@ -202,7 +205,10 @@ export class PublishController {
         );
 
         // Get new version from package.json after publish (in case publish step bumps it)
-        const postPublishVersion = this.getCurrentVersion(packageName, packagePath);
+        const postPublishVersion = this.getCurrentVersion(
+          packageName,
+          packagePath
+        );
 
         status.results[packageName] = result;
         status.progress = 20 + ((i + 1) / publisherCount) * 80;
@@ -337,7 +343,7 @@ export class PublishController {
     packagePaths: Record<string, string>,
     results: Record<string, PublishRunnerResult>
   ): Promise<void> {
-    // Collect changelog data for all successful packages
+    // Collect changelog data for all successful packages, including commit history
     const packages: Array<{
       name: string;
       path: string;
@@ -349,12 +355,38 @@ export class PublishController {
       const result = results[packageName];
       if (!result?.success) continue;
       const packagePath = packagePaths[packageName];
+
+      // Get previous version from package.json before publish (optional: could be stored earlier)
+      // For now, set to null to let changelog generator handle first release
+      let previousVersion: string | null = null;
+      try {
+        const pkgJsonPath = path.join(packagePath, 'package.json');
+        const content = fs.readFileSync(pkgJsonPath, 'utf8');
+        const pkgJson = JSON.parse(content);
+        previousVersion = pkgJson.version || null;
+      } catch (e) {
+        // ignore error reading previous version
+      }
+
+      // Get commit history for this package since last tag
+      let commits: any[] = [];
+      try {
+        // Use changeTrackerService to get commits since last tag
+        const lastTag = `${packageName}@${previousVersion || result.version}`;
+        commits = await changeTrackerService.getCommitsSinceTag(
+          lastTag,
+          packagePath
+        );
+      } catch (e) {
+        console.warn(`Could not get commits for ${packageName}:`, e);
+      }
+
       packages.push({
         name: packageName,
         path: packagePath,
         newVersion: result.version,
-        previousVersion: null,
-        commits: [],
+        previousVersion,
+        commits,
       });
     }
 

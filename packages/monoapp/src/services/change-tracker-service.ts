@@ -11,12 +11,22 @@ import { PrismaClient } from '@prisma/client';
 // NOTE: ChangeTrack and CommitChange types will be imported from @prisma/client after DB integration
 // Currently using inline types below for service implementation
 
-
 const execAsync = promisify(exec);
 const prisma = new PrismaClient();
 
 type ChangeType = 'major' | 'minor' | 'patch' | 'none';
-type ConventionalType = 'feat' | 'fix' | 'docs' | 'style' | 'refactor' | 'test' | 'chore' | 'perf' | 'ci' | 'revert' | 'build';
+type ConventionalType =
+  | 'feat'
+  | 'fix'
+  | 'docs'
+  | 'style'
+  | 'refactor'
+  | 'test'
+  | 'chore'
+  | 'perf'
+  | 'ci'
+  | 'revert'
+  | 'build';
 
 interface DetectedCommit {
   hash: string;
@@ -63,8 +73,14 @@ export class ChangeTrackerService {
         detectionMethod: 'git',
         detectionTimestamp: new Date(),
         filesChanged: JSON.stringify(result.filesChanged.map(f => f.path)),
-        linesAdded: result.filesChanged.reduce((sum, f) => sum + (f.linesAdded || 0), 0),
-        linesRemoved: result.filesChanged.reduce((sum, f) => sum + (f.linesRemoved || 0), 0),
+        linesAdded: result.filesChanged.reduce(
+          (sum, f) => sum + (f.linesAdded || 0),
+          0
+        ),
+        linesRemoved: result.filesChanged.reduce(
+          (sum, f) => sum + (f.linesRemoved || 0),
+          0
+        ),
         changeType: result.changeType,
         affectedDependents: JSON.stringify(result.affectedDependents),
         isReleaseReady: result.isReleaseReady,
@@ -118,13 +134,17 @@ export class ChangeTrackerService {
       const commits = await this.getCommitsSinceTag(lastTagName, packagePath);
 
       // 2. Get file diffs
-      const filesChanged = await this.getFileDiffsSinceTag(lastTagName, packagePath);
+      const filesChanged = await this.getFileDiffsSinceTag(
+        lastTagName,
+        packagePath
+      );
 
       // 3. Determine change type from commits
       const changeType = this.determineChangeType(commits);
 
       // 4. Identify affected dependents
-      const affectedDependents = await this.identifyAffectedDependents(packageName);
+      const affectedDependents =
+        await this.identifyAffectedDependents(packageName);
 
       const result: AnalysisResult = {
         packageName,
@@ -154,12 +174,16 @@ export class ChangeTrackerService {
    * Format: type(scope)!: subject
    * BREAKING CHANGE: description
    */
-  private parseConventionalCommit(message: string, body?: string): {
+  private parseConventionalCommit(
+    message: string,
+    body?: string
+  ): {
     type: ConventionalType;
     scope?: string;
     isBreaking: boolean;
   } {
-    const conventionalRegex = /^(feat|fix|docs|style|refactor|test|chore|perf|ci|revert|build)(\(.+\))?(!)?:\s(.+)/;
+    const conventionalRegex =
+      /^(feat|fix|docs|style|refactor|test|chore|perf|ci|revert|build)(\(.+\))?(!)?:\s(.+)/;
     const match = message.match(conventionalRegex);
 
     if (!match) {
@@ -174,7 +198,9 @@ export class ChangeTrackerService {
     const scope = scopeMatch ? scopeMatch.slice(1, -1) : undefined;
 
     // Check for BREAKING CHANGE keyword in body
-    const isBreaking = !!breakingIndicator || (body ? /^BREAKING[\s-]CHANGE:/m.test(body) : false);
+    const isBreaking =
+      !!breakingIndicator ||
+      (body ? /^BREAKING[\s-]CHANGE:/m.test(body) : false);
 
     return {
       type: type as ConventionalType,
@@ -184,9 +210,9 @@ export class ChangeTrackerService {
   }
 
   /**
-   * Get commits since last tag
+   * Get commits since last tag (public for changelog generation)
    */
-  private async getCommitsSinceTag(
+  async getCommitsSinceTag(
     tagName: string,
     packagePath: string
   ): Promise<DetectedCommit[]> {
@@ -205,7 +231,8 @@ export class ChangeTrackerService {
         .split('\n')
         .filter(line => line.trim())
         .map(line => {
-          const [hash, email, author, timestamp, subject, body] = line.split('|||');
+          const [hash, email, author, timestamp, subject, body] =
+            line.split('|||');
           const parsed = this.parseConventionalCommit(subject, body);
 
           return {
@@ -247,7 +274,8 @@ export class ChangeTrackerService {
         .split('\n')
         .filter(line => line.trim())
         .map(line => {
-          const [hash, email, author, timestamp, subject, body] = line.split('|||');
+          const [hash, email, author, timestamp, subject, body] =
+            line.split('|||');
           const parsed = this.parseConventionalCommit(subject, body);
 
           return {
@@ -341,7 +369,10 @@ export class ChangeTrackerService {
   /**
    * Calculate next semantic version
    */
-  private calculateNextVersion(currentVersion: string, changeType: ChangeType): string {
+  private calculateNextVersion(
+    currentVersion: string,
+    changeType: ChangeType
+  ): string {
     if (changeType === 'none') {
       return currentVersion;
     }
@@ -364,7 +395,9 @@ export class ChangeTrackerService {
   /**
    * Identify packages that depend on this package
    */
-  private async identifyAffectedDependents(packageName: string): Promise<string[]> {
+  private async identifyAffectedDependents(
+    packageName: string
+  ): Promise<string[]> {
     // TODO: Implement dependency graph analysis
     // For now, return empty array - can be enhanced with dependency resolver
     return [];

@@ -14,7 +14,9 @@ import { secureTokenService } from './secure-token-service';
 import fs from 'fs';
 import path from 'path';
 import * as PrismaPkg from '@prisma/client';
-const PrismaClient = (PrismaPkg as any).PrismaClient || (PrismaPkg as any).default || PrismaPkg;// Import the validateConfig function from your utils
+import { Package } from '../types';
+const PrismaClient =
+  (PrismaPkg as any).PrismaClient || (PrismaPkg as any).default || PrismaPkg; // Import the validateConfig function from your utils
 const prisma = new PrismaClient();
 
 const execAsync = promisify(exec);
@@ -253,12 +255,12 @@ export class NodePublishRunner extends PublishRunner {
 
   private async getPackageDependents(packageName: string): Promise<string[]> {
     // List of all package.json paths in the monorepo
-const packages = await prisma.package.findMany();
+    const packages = await prisma.package.findMany();
 
-// 2. Now you can safely map over the resulting array
-const packageJsonPaths = packages.map((pkg) =>
-  path.join(pkg.path!, 'package.json')
-);
+    // 2. Now you can safely map over the resulting array
+    const packageJsonPaths = packages.map((pkg: Package) =>
+      path.join(pkg.path!, 'package.json')
+    );
 
     const dependents: string[] = [];
     for (const pkgPath of packageJsonPaths) {
@@ -268,14 +270,14 @@ const packageJsonPaths = packages.map((pkg) =>
       } catch {
         continue;
       }
-        const deps = pkg['dependencies'] || {};
-        if (deps[packageName]) {
-          if (pkg.name && !dependents.includes(pkg.name)) {
-            dependents.push(pkg.name);
-          }
+      const deps = pkg['dependencies'] || {};
+      if (deps[packageName]) {
+        if (pkg.name && !dependents.includes(pkg.name)) {
+          dependents.push(pkg.name);
         }
+      }
     }
-    console.log(dependents)
+    console.log(dependents);
     return dependents;
   }
 }

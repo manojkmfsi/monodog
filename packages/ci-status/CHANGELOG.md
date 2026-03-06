@@ -1,3 +1,12 @@
+## [@monodog/ci-status@1.3.14](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/ci-status@1.3.14) (2026-03-06)
+
+# @monodog/ci-status
+
+## 1.3.14
+
+### Patch Changes
+
+
 ## [@monodog/ci-status@1.3.13](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/ci-status@1.3.13) (2026-03-05)
 
 # @monodog/ci-status

@@ -1,3 +1,12 @@
+## [@monodog/utils@1.0.27](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/utils@1.0.27) (2026-03-06)
+
+# @monodog/utils
+
+## 1.0.27
+
+### Patch Changes
+
+
 ## [@monodog/utils@1.0.26](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/utils@1.0.26) (2026-03-05)
 
 # @monodog/utils

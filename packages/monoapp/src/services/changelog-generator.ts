@@ -15,7 +15,6 @@ interface ChangelogEntry {
   fixes: ChangelogItem[];
   improvements: ChangelogItem[];
   internal: string[];
-  updatedDependencies?: { name: string; from: string; to: string }[];
 }
 
 interface ChangelogItem {
@@ -51,7 +50,6 @@ export class ChangelogGenerator {
       fixes: [],
       improvements: [],
       internal: [],
-      updatedDependencies: [],
     };
 
     // Categorize commits
@@ -152,15 +150,6 @@ export class ChangelogGenerator {
       lines.push('### Internal');
       for (const item of entry.internal) {
         lines.push(`- ${item}`);
-      }
-      lines.push('');
-    }
-
-    // Updated dependencies
-    if (entry.updatedDependencies && entry.updatedDependencies.length > 0) {
-      lines.push('### Updated dependencies');
-      for (const dep of entry.updatedDependencies) {
-        lines.push(`- ${dep.name}: ${dep.from} → ${dep.to}`);
       }
       lines.push('');
     }

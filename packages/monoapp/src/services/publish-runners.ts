@@ -13,6 +13,9 @@ import { semverEngine } from './semver-engine';
 import { secureTokenService } from './secure-token-service';
 import fs from 'fs';
 import path from 'path';
+import * as PrismaPkg from '@prisma/client';
+const PrismaClient = (PrismaPkg as any).PrismaClient || (PrismaPkg as any).default || PrismaPkg;// Import the validateConfig function from your utils
+const prisma = new PrismaClient();
 
 const execAsync = promisify(exec);
 
@@ -236,6 +239,7 @@ export class NodePublishRunner extends PublishRunner {
     version: string,
     githubToken: string
   ): Promise<string> {
+    //TODO
     // This would call GitHub API to create release
     // Placeholder for now - would be implemented with full GitHub integration
     const releaseUrl = `https://github.com/owner/repo/releases/tag/${packageName}-v${version}`;
@@ -248,8 +252,31 @@ export class NodePublishRunner extends PublishRunner {
   }
 
   private async getPackageDependents(packageName: string): Promise<string[]> {
-    // Return list of packages that depend on this one
-    return [];
+    // List of all package.json paths in the monorepo
+const packages = await prisma.package.findMany();
+
+// 2. Now you can safely map over the resulting array
+const packageJsonPaths = packages.map((pkg) =>
+  path.join(pkg.path!, 'package.json')
+);
+
+    const dependents: string[] = [];
+    for (const pkgPath of packageJsonPaths) {
+      let pkg;
+      try {
+        pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+      } catch {
+        continue;
+      }
+        const deps = pkg['dependencies'] || {};
+        if (deps[packageName]) {
+          if (pkg.name && !dependents.includes(pkg.name)) {
+            dependents.push(pkg.name);
+          }
+        }
+    }
+    console.log(dependents)
+    return dependents;
   }
 }
 

@@ -343,71 +343,35 @@ export class PublishController {
     packagePaths: Record<string, string>,
     results: Record<string, PublishRunnerResult>
   ): Promise<void> {
-    // Step 1: Build version map for all published packages
-    const versionMap = new Map<string, string>();
-    for (const packageName of packageNames) {
-      const result = results[packageName];
-      if (result?.success) {
-        versionMap.set(packageName, result.version);
-      }
-    }
-
-    // Step 2: Update dependencies in all monorepo packages and track changes
+    // Collect changelog data for all successful packages, including commit history
     const packages: Array<{
       name: string;
       path: string;
       newVersion: string;
       previousVersion: string | null;
       commits: any[];
-      updatedDependencies: { name: string; from: string; to: string }[];
     }> = [];
-
     for (const packageName of packageNames) {
       const result = results[packageName];
       if (!result?.success) continue;
       const packagePath = packagePaths[packageName];
 
       // Get previous version from package.json before publish (optional: could be stored earlier)
+      // For now, set to null to let changelog generator handle first release
       let previousVersion: string | null = null;
-      let pkgJson: any = {};
-      let pkgJsonPath = path.join(packagePath, 'package.json');
       try {
+        const pkgJsonPath = path.join(packagePath, 'package.json');
         const content = fs.readFileSync(pkgJsonPath, 'utf8');
-        pkgJson = JSON.parse(content);
+        const pkgJson = JSON.parse(content);
         previousVersion = pkgJson.version || null;
       } catch (e) {
         // ignore error reading previous version
       }
 
-      // Update dependencies and track changes
-      const updatedPkgJson = require('./semver-engine').semverEngine.updateDependencyVersions(pkgJson, versionMap);
-      const updatedDependencies: { name: string; from: string; to: string }[] = [];
-      const depTypes = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
-      for (const depType of depTypes) {
-        const oldDeps = pkgJson[depType] || {};
-        const newDeps = updatedPkgJson[depType] || {};
-        for (const depName of Object.keys(newDeps)) {
-          if (
-            oldDeps[depName] &&
-            newDeps[depName] &&
-            oldDeps[depName] !== newDeps[depName]
-          ) {
-            updatedDependencies.push({
-              name: depName,
-              from: oldDeps[depName],
-              to: newDeps[depName],
-            });
-          }
-        }
-      }
-      // Write updated package.json if there are changes
-      if (updatedDependencies.length > 0) {
-        fs.writeFileSync(pkgJsonPath, JSON.stringify(updatedPkgJson, null, 2) + '\n');
-      }
-
       // Get commit history for this package since last tag
       let commits: any[] = [];
       try {
+        // Use changeTrackerService to get commits since last tag
         const lastTag = `${packageName}@${previousVersion || result.version}`;
         commits = await changeTrackerService.getCommitsSinceTag(
           lastTag,
@@ -423,24 +387,13 @@ export class PublishController {
         newVersion: result.version,
         previousVersion,
         commits,
-        updatedDependencies,
       });
     }
 
     if (packages.length === 0) return;
 
-    // Step 3: Generate changelog entries for all packages (with updated dependencies)
-    const entries = new Map();
-    for (const pkg of packages) {
-      const entry = await changelogGenerator.generateEntry(
-        pkg.name,
-        pkg.newVersion,
-        pkg.previousVersion,
-        pkg.commits
-      );
-      entry.updatedDependencies = pkg.updatedDependencies;
-      entries.set(pkg.name, entry);
-    }
+    // Generate changelog entries for all packages
+    const entries = await changelogGenerator.generateMultiple(packages);
 
     // Write per-package changelogs
     for (const pkg of packages) {

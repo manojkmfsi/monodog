@@ -1,3 +1,5 @@
+## [@monodog/ci-status@1.3.25](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/ci-status@1.3.25) (2026-03-06)
+
 ## [@monodog/ci-status@1.3.18](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/ci-status@1.3.18) (2026-03-06)
 
 ## [@monodog/ci-status@1.3.14](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/ci-status@1.3.14) (2026-03-06)

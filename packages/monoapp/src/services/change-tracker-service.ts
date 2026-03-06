@@ -234,7 +234,6 @@ export class ChangeTrackerService {
           const [hash, email, author, timestamp, subject, body] =
             line.split('|||');
           const parsed = this.parseConventionalCommit(subject, body);
-
           return {
             hash,
             message: subject,
@@ -247,7 +246,6 @@ export class ChangeTrackerService {
             body: body?.trim() || undefined,
           };
         });
-
       return commits;
     } catch (error) {
       // If tag doesn't exist, get all commits (first release)
@@ -277,7 +275,6 @@ export class ChangeTrackerService {
           const [hash, email, author, timestamp, subject, body] =
             line.split('|||');
           const parsed = this.parseConventionalCommit(subject, body);
-
           return {
             hash,
             message: subject,

@@ -115,7 +115,9 @@ export class NodePublishRunner extends PublishRunner {
       this.log(`🔗 Checking for dependent packages...`);
       const dependents = await this.getPackageDependents(packageName);
       if (dependents.length > 0 && !dryRun) {
-        this.log(`  Updating versions in dependents: ${dependents.join(', ')}`);
+        this.log(
+          `Todo:  Updating versions in dependents: ${dependents.join(', ')}`
+        );
         // Dependents would be updated in cascade
       }
 

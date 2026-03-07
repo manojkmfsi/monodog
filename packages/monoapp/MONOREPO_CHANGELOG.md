@@ -2,7 +2,7 @@
 
 All changes across all packages
 
-## 1.0.40 (2026-03-06)
+## 1.3.28 (2026-03-06)
 
 ### ⚠️ BREAKING CHANGES
 

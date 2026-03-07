@@ -30,7 +30,11 @@ jobs:
 
       - name: "Install dependencies (at ROOT)"
         run: pnpm install --no-frozen-lockfile
-
+        
+      - name: "Generate prisma client"
+        working-directory: packages/monoapp
+        run: npm run generate
+        
       - name: "Create build (Backend)"
         run: pnpm run build
 
@@ -79,7 +83,11 @@ jobs:
 
       - name: 'Install dependencies with pnpm'
         run: pnpm install --no-frozen-lockfile --ignore-scripts
-
+        
+      - name: "Generate prisma client"
+        working-directory: packages/monoapp
+        run: npm run generate
+        
       - name: 'Build Backend'
         run: pnpm run build
 

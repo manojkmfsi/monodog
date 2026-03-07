@@ -1,5 +1,15 @@
 # @manojkmfsi/monoapp
 
+## 1.2.6
+
+### Patch Changes
+
+- [`5e51bc0`](https://github.com/manojkmfsi/monodog/commit/5e51bc00124a86beded3cf15ded889403549e487) - jhjhhkjhjhjhjhjhhkkhjhkj
+
+- [`54b7a2a`](https://github.com/manojkmfsi/monodog/commit/54b7a2a1285e9b064c1da2df82713e9bae3bfac9) - yuuiuiuiuiuyiu
+
+- [`02d394e`](https://github.com/manojkmfsi/monodog/commit/02d394ec8c47693dfef2822ce2b484cea59f7387) - nbnmbnnmbnmbnm
+
 ## 1.1.44
 
 ### Patch Changes

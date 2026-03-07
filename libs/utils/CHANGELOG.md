@@ -1,5 +1,39 @@
 ## [@monodog/utils@1.0.40](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/utils@1.0.40) (2026-03-06)
 
+## 1.0.41
+
+### Patch Changes
+
+- [`a8811fa`](https://github.com/manojkmfsi/monodog/commit/a8811fa47236cd2ba02929691414d849c4f78ac8) - mmmm,,,,..,
+
+- [`71a8c13`](https://github.com/manojkmfsi/monodog/commit/71a8c13b5c59a47358cb9ffe4de157c430040925) - xzzxzxzxzxzxzxz
+
+- [`54b7a2a`](https://github.com/manojkmfsi/monodog/commit/54b7a2a1285e9b064c1da2df82713e9bae3bfac9) - yuuiuiuiuiuyiu
+
+- [`75e386e`](https://github.com/manojkmfsi/monodog/commit/75e386e4d8fe44486e60a805b6cabc11823fc5e7) - hjkjnkknm,mn,
+
+- [`fee31c7`](https://github.com/manojkmfsi/monodog/commit/fee31c7914606de5b60c6243719669451d112945) - m,,m,,,....,.,,..,
+
+- [`b2a4cb2`](https://github.com/manojkmfsi/monodog/commit/b2a4cb23656dde58d2edb145752ccd072c105713) - m m,,m , , ,m,
+
+- [`2a21215`](https://github.com/manojkmfsi/monodog/commit/2a212153774978390dd33ae7715051ee2f004e55) - cxcbcbvnvnnbm
+
+- [`aea1d3d`](https://github.com/manojkmfsi/monodog/commit/aea1d3d1b3aee3c3b6567bc8f44ad4319f45bebe) - hmnn,nm,n,n,
+
+- [`aea1d3d`](https://github.com/manojkmfsi/monodog/commit/aea1d3d1b3aee3c3b6567bc8f44ad4319f45bebe) - nbmn,mn,mmn,n,m
+
+- [`aea1d3d`](https://github.com/manojkmfsi/monodog/commit/aea1d3d1b3aee3c3b6567bc8f44ad4319f45bebe) - mm,,,.,.,.,.
+
+- [`986ae22`](https://github.com/manojkmfsi/monodog/commit/986ae2214ed30d46c2b3ae56cff1760d832a5ec4) - fhgjkhlkjm.,
+
+- [`790c82e`](https://github.com/manojkmfsi/monodog/commit/790c82ef6cb00688c1f06dc8e881699b63da0fbd) - fvcvcvcvcsd
+
+- [`790c82e`](https://github.com/manojkmfsi/monodog/commit/790c82ef6cb00688c1f06dc8e881699b63da0fbd) - ddxfdfdfsfddfssdf
+
+- [`790c82e`](https://github.com/manojkmfsi/monodog/commit/790c82ef6cb00688c1f06dc8e881699b63da0fbd) - gfbbnbnmbmbm
+
+- [`429bfc6`](https://github.com/manojkmfsi/monodog/commit/429bfc6f58066f7676ab035b1dc5c2d3a968152e) - cvcbvbbcbcb
+
 ### ⚠️ BREAKING CHANGES
 
 - **monoapp**: **BREAKING**: fix(monoapp)!: updated package name

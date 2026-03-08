@@ -15,6 +15,7 @@ import { releaseReadinessService } from './release-readiness-service';
 import { npmPublishService } from './npm-publish-service';
 import { secureTokenService } from './secure-token-service';
 import { changelogGenerator } from './changelog-generator';
+import { workflowService } from './workflow-service';
 import fs from 'fs';
 import path from 'path';
 import { publishPipelineService } from './publish-pipeline-service';
@@ -106,6 +107,32 @@ export class PublishController {
   }
 
   /**
+   * Check and create workflow if needed
+   */
+  async ensureWorkflowExists(
+    packageNames: string[]
+  ): Promise<{ created: boolean; path: string }> {
+    const exists = await workflowService.workflowExists();
+
+    if (!exists) {
+      console.info(
+        '📋 Creating monodog-release.yaml workflow with selected packages...'
+      );
+      const path = await workflowService.createDefaultWorkflow(packageNames);
+      return {
+        created: true,
+        path,
+      };
+    } else {
+      console.info('✓ monodog-release.yaml workflow already exists');
+      return {
+        created: false,
+        path: workflowService.getWorkflowPath(),
+      };
+    }
+  }
+
+  /**
    * Publish packages to npm
    */
   async publish(request: PublishRequest): Promise<PublishPipelineStatus> {
@@ -166,14 +193,26 @@ export class PublishController {
         updatedAt: new Date(),
       });
 
-      // 2. Get credentials
+      // 2. Check/Create workflow file
+      console.info('🔄 Ensuring workflow file exists...');
+      const workflowResult = await this.ensureWorkflowExists(
+        request.packageNames
+      );
+      if (workflowResult.created) {
+        console.info(`📝 Created workflow file at: ${workflowResult.path}`);
+        console.info(
+          '💡 Please review and edit the workflow in the dashboard if needed.'
+        );
+      }
+
+      // 3. Get credentials
       const npmToken = await secureTokenService.getToken('npm', 'env');
       const githubToken =
         request.method !== 'node'
           ? await secureTokenService.getToken('github', 'env')
           : undefined;
 
-      // 3. Publish each package
+      // 4. Publish each package
       status.status = 'publishing';
       await publishPipelineService.updatePipeline(pipelineId, {
         status: 'publishing',
@@ -232,7 +271,7 @@ export class PublishController {
         });
       }
 
-      // 4. Generate changelog entries
+      // 5. Generate changelog entries
       if (!request.dryRun) {
         console.info('\n📝 Generating changelogs...');
         await this.generateChangelogs(

@@ -1,0 +1,35 @@
+name: Monodog Release Workflowxgzz
+'on':
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: >-
+          Comma-separated list of packages to release (e.g.,
+          @monodog/utils,@monodog/backend)
+        required: true
+        default: '@monodog/ci-status'
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+      - name: Generate Prisma client
+        working-directory: packages/monoapp
+        run: npm run generate
+      - name: Build packages
+        run: pnpm run build
+      - name: Release selected packages
+        working-directory: packages/monoapp
+        run: npm run release -- --packages="${{ inputs.packages }}"
+        if: ${{ inputs.packages }}

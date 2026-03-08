@@ -21,6 +21,7 @@ import ReleaseValidation from './components/ReleaseValidation';
 import PublishConfirmation from './components/PublishConfirmation';
 import LoadingState from './components/LoadingState';
 import ErrorState from './components/ErrorState';
+import WorkflowManagement from '../workflow-management/WorkflowManagement';
 import { DASHBOARD_ERROR_MESSAGES } from '../../constants/messages';
 import { DASHBOARD_API_ENDPOINTS } from '../../constants/api-config';
 import type { SelectedPackage, ChangesetData, ValidationResult } from './types';
@@ -31,7 +32,7 @@ export type { SelectedPackage, ChangesetData, ValidationResult };
 export default function ReleaseManager() {
   const { isAuthenticated, hasPermission } = useAuth();
   const [currentStep, setCurrentStep] = useState<
-    'select' | 'bump' | 'preview' | 'validate' | 'confirm'
+    'select' | 'workflow' | 'bump' | 'preview' | 'validate' | 'confirm'
   >('select');
   const [selectedPackages, setSelectedPackages] = useState<SelectedPackage[]>(
     []
@@ -113,7 +114,7 @@ export default function ReleaseManager() {
       affectedDependencies: pkg.dependents || [],
     }));
     setSelectedPackages(selected);
-    setCurrentStep('bump');
+    setCurrentStep('workflow');
   };
 
   const handleVersionBumpsConfirmed = (updatedPackages: SelectedPackage[]) => {
@@ -321,6 +322,10 @@ export default function ReleaseManager() {
     fetchWorkspaceData();
   };
 
+  const handleWorkflowComplete = () => {
+    setCurrentStep('bump');
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -331,11 +336,11 @@ export default function ReleaseManager() {
     );
   }
 
-  if (loading && currentStep === 'select' && allPackages.length === 0) {
+  if (loading && (currentStep === 'select' || currentStep === 'workflow') && allPackages.length === 0) {
     return <LoadingState message="Loading workspace packages..." />;
   }
 
-  if (error && currentStep === 'select') {
+  if (error && (currentStep === 'select' || currentStep === 'workflow')) {
     return <ErrorState error={error} onRetry={fetchWorkspaceData} />;
   }
 
@@ -356,10 +361,10 @@ export default function ReleaseManager() {
         </div>
         <div className="text-sm text-gray-500">
           Step{' '}
-          {['select', 'bump', 'preview', 'validate', 'confirm'].indexOf(
+          {['select', 'workflow', 'bump', 'preview', 'validate', 'confirm'].indexOf(
             currentStep
           ) + 1}{' '}
-          of 5
+          of 6
         </div>
       </div>
 
@@ -396,7 +401,7 @@ export default function ReleaseManager() {
       )}
 
       {/* Step Content */}
-      {currentStep === 'select' && !canCreateChangeset && (
+      {currentStep !== 'workflow' && currentStep === 'select' && !canCreateChangeset && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-700 font-medium">Access Denied</p>
           <p className="text-red-600 text-sm mt-1">
@@ -412,6 +417,32 @@ export default function ReleaseManager() {
           onConfirm={handlePackagesSelected}
           loading={loading}
         />
+      )}
+
+      {currentStep === 'workflow' && selectedPackages.length > 0 && canCreateChangeset && (
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Configure Release Workflow</h2>
+            <p className="text-gray-600 mb-4">
+              Set up the release workflow for: <span className="font-medium">{selectedPackages.map(p => p.name).join(', ')}</span>
+            </p>
+          </div>
+          <WorkflowManagement preselectedPackages={selectedPackages.map(p => p.name)} />
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentStep('select')}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              ← Back to Packages
+            </button>
+            <button
+              onClick={handleWorkflowComplete}
+              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              Workflow Complete → Next
+            </button>
+          </div>
+        </div>
       )}
 
       {currentStep === 'bump' && canCreateChangeset && (
@@ -461,12 +492,12 @@ export default function ReleaseManager() {
 
       {/* Progress Indicator */}
       <div className="flex gap-2 justify-center">
-        {['select', 'bump', 'preview', 'validate', 'confirm'].map(
+        {['select', 'workflow', 'bump', 'preview', 'validate', 'confirm'].map(
           (step, index) => (
             <div
               key={step}
               className={`h-2 flex-1 rounded-full transition-colors ${
-                ['select', 'bump', 'preview', 'validate', 'confirm'].indexOf(
+                ['select', 'workflow', 'bump', 'preview', 'validate', 'confirm'].indexOf(
                   currentStep
                 ) >= index
                   ? 'bg-primary-500'

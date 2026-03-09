@@ -1,6 +1,6 @@
 {
   "name": "@monodog/ci-status",
-  "version": "1.3.44",
+  "version": "1.3.45",
   "description": "CI/CD status manager for monorepo packagesdf",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.7.0",
-    "@monodog/utils": "1.0.51"
+    "@monodog/utils": "1.0.52"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

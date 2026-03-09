@@ -272,7 +272,7 @@ export async function triggerWorkflow(req: Request, res: Response) {
         repo,
         workflow: workflowId,
         ref,
-        inputs,
+        inputs
       }
     );
     if (pipelineId) {
@@ -437,8 +437,8 @@ export async function getPipelineLogs(req: Request, res: Response) {
     });
   } catch (error) {
     AppLogger.error(`Error getting pipeline logs: ${error}`);
-    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ 
-      error: 'Failed to fetch pipeline logs' 
+    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
+      error: 'Failed to fetch pipeline logs'
     });
   }
 }
@@ -469,8 +469,8 @@ export async function getRecentPipelineLogs(req: Request, res: Response) {
     });
   } catch (error) {
     AppLogger.error(`Error getting recent logs: ${error}`);
-    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ 
-      error: 'Failed to fetch recent logs' 
+    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
+      error: 'Failed to fetch recent logs'
     });
   }
 }
@@ -498,8 +498,8 @@ export async function getLogsByStage(req: Request, res: Response) {
     });
   } catch (error) {
     AppLogger.error(`Error getting stage logs: ${error}`);
-    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ 
-      error: 'Failed to fetch stage logs' 
+    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
+      error: 'Failed to fetch stage logs'
     });
   }
 }
@@ -526,8 +526,8 @@ export async function getErrorLogs(req: Request, res: Response) {
     });
   } catch (error) {
     AppLogger.error(`Error getting error logs: ${error}`);
-    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ 
-      error: 'Failed to fetch error logs' 
+    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
+      error: 'Failed to fetch error logs'
     });
   }
 }

@@ -32,6 +32,7 @@ import pipelineRouter from '../routes/pipeline-routes';
 import workflowRouter from '../routes/workflow-routes';
 import workflowMgmtRouter from '../routes/workflow-management-routes';
 import releaseRouter from '../routes/release-api';
+import tokenRouter from '../routes/token-routes';
 
 import {
   PORT_MIN,
@@ -112,6 +113,7 @@ function createApp(rootPath: string): Express {
   app.use('/api/workflows', workflowRouter);
   app.use('/api/workflows', workflowMgmtRouter);
   app.use('/api/releases', releaseRouter);
+  app.use('/api/tokens', tokenRouter);
 
   app.use('/api', router);
 

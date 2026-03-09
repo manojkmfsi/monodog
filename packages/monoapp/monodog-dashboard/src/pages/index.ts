@@ -27,3 +27,4 @@ export { default as CIPage } from './CIPage';
 export { default as ConfigPage } from './ConfigPage';
 export { default as ReleaseManagerPage } from './ReleaseManagerPage';
 export { default as IndependentReleaseManagerPage } from './IndependentReleaseManagerPage';
+export { default as TokenManagementPage } from './TokenManagementPage';

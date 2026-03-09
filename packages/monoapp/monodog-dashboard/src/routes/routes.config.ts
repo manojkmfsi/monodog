@@ -14,6 +14,7 @@ export const COMPONENT_MAP: Record<string, string> = {
   'CIIntegration': 'CIIntegration',
   'Pipeline': 'Pipeline',
   'ConfigInspector': 'ConfigInspector',
+  'TokenManagement': 'TokenManagement',
 } as const;
 
 export const routes: RouteConfig[] = [
@@ -98,6 +99,14 @@ export const routes: RouteConfig[] = [
     component: 'ConfigInspector',
     title: 'Configuration',
     description: 'Configuration file inspector',
+  },
+  {
+    path: '/tokens',
+    name: 'tokens',
+    component: 'TokenManagement',
+    title: 'Token Management',
+    description: 'Manage GitHub and NPM tokens',
+    protected: true,
   },
 ];
 

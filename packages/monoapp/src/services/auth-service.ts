@@ -136,6 +136,9 @@ export async function handleOAuthCallback(
     process.env.OAUTH_REDIRECT_URI as string
   );
 
+  process.env.GITHUB_TOKEN = tokenResponse.access_token; // Set token for subsequent API calls in this process
+
+
   // Get user information
   AppLogger.debug('Retrieving authenticated user information');
   const user = await getAuthenticatedUser(tokenResponse.access_token);

@@ -1,6 +1,6 @@
 {
   "name": "@monodog/utils",
-  "version": "1.0.44",
+  "version": "1.0.45",
   "description": "Shared utility functions for monodog monorepo dashboard",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

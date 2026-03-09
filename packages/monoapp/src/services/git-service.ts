@@ -28,7 +28,6 @@ export class GitService {
    */
   public async getAllCommits(pathFilter?: string): Promise<Commit[]> {
     try {
-
       let pathArgument = '';
       if (pathFilter) {
         // Normalize the path and ensure it's relative to the repo root
@@ -42,8 +41,8 @@ export class GitService {
       await this.validateGitRepository(pathArgument);
 
       AppLogger.debug(`Executing Git command in: ${this.repoPath}`);
-      // Use a simpler git log format
-      const command = `git log --pretty=format:"%H|%an|%ad|%s" --date=iso-strict ${pathArgument}`;
+      // Use a simpler git log format with limit to prevent memory issues
+      const command = `git log --max-count=100 --pretty=format:"%H|%an|%ad|%s" --date=iso-strict ${pathArgument}`;
       AppLogger.debug(`Git command: ${command}`);
 
       const { stdout, stderr } = await execPromise(command, {
@@ -79,7 +78,10 @@ export class GitService {
 
           commits.push(commit);
         } catch (parseError) {
-          AppLogger.error('Failed to parse commit line: ' + line, parseError as Error);
+          AppLogger.error(
+            'Failed to parse commit line: ' + line,
+            parseError as Error
+          );
         }
       }
 
@@ -127,9 +129,12 @@ export class GitService {
    */
   private async validateGitRepository(pathArgument: string): Promise<void> {
     try {
-      await execPromise('git '+pathArgument+' rev-parse --is-inside-work-tree', {
-        cwd: this.repoPath,
-      });
+      await execPromise(
+        'git ' + pathArgument + ' rev-parse --is-inside-work-tree',
+        {
+          cwd: this.repoPath,
+        }
+      );
       AppLogger.debug('Valid git repository');
     } catch (error) {
       throw new Error(

@@ -227,9 +227,9 @@ export class ChangeTrackerService {
     packagePath: string
   ): Promise<DetectedCommit[]> {
     try {
-      // Get commits since tag, limited to this package path
+      // Get commits since tag, limited to this package path, max 100 commits to prevent memory issues
       const { stdout } = await execAsync(
-        `cd ${packagePath} && git log ${tagName}..HEAD --format='%H|||%ae|||%an|||%ai|||%s|||%b' --`,
+        `cd ${packagePath} && git log ${tagName}..HEAD --max-count=100 --format='%H|||%ae|||%an|||%ai|||%s|||%b' --`,
         { shell: '/bin/bash' }
       );
 
@@ -265,12 +265,12 @@ export class ChangeTrackerService {
   }
 
   /**
-   * Get all commits for a package
+   * Get all commits for a package (limited to last 100 to prevent memory issues)
    */
   private async getAllCommits(packagePath: string): Promise<DetectedCommit[]> {
     try {
       const { stdout } = await execAsync(
-        `cd ${packagePath} && git log --format='%H|||%ae|||%an|||%ai|||%s|||%b' --`,
+        `cd ${packagePath} && git log --max-count=100 --format='%H|||%ae|||%an|||%ai|||%s|||%b' --`,
         { shell: '/bin/bash' }
       );
 

@@ -14,7 +14,7 @@ import { changeTrackerService } from './change-tracker-service';
 import { releaseReadinessService } from './release-readiness-service';
 import { npmPublishService } from './npm-publish-service';
 import { secureTokenService } from './secure-token-service';
-import { changelogGenerator } from './changelog-generator';
+// import { changelogGenerator } from './changelog-generator';
 import { workflowService } from './workflow-service';
 import { pipelineLogger } from './pipeline-logger';
 import fs from 'fs';
@@ -50,6 +50,59 @@ export interface PublishPipelineStatus {
 
 export class PublishController {
   private pipelines: Map<string, PublishPipelineStatus> = new Map();
+
+  /**
+   * Filter packages based on SELECTED_PACKAGES environment variable
+   * Format: comma-separated package names (e.g., "@monodog/utils,@monodog/core")
+   */
+  private filterSelectedPackages(
+    availablePackages: string[]
+  ): string[] {
+    const selectedPackagesEnv = process.env.SELECTED_PACKAGES?.trim();
+
+    if (!selectedPackagesEnv) {
+      // No filter - return all packages
+      return availablePackages;
+    }
+
+    // Parse comma-separated list and normalize package names
+    const selectedPackages = selectedPackagesEnv
+      .split(',')
+      .map(pkg => pkg.trim().toLowerCase())
+      .filter(pkg => pkg.length > 0);
+
+    if (selectedPackages.length === 0) {
+      // Empty filter - return all packages
+      return availablePackages;
+    }
+
+    console.info(
+      `📦 Filtering packages based on SELECTED_PACKAGES: ${selectedPackages.join(', ')}`
+    );
+
+    // Filter available packages to only include selected ones
+    const filtered = availablePackages.filter(pkg => {
+      const pkgLower = pkg.toLowerCase();
+      return selectedPackages.some(
+        selected =>
+          pkgLower === selected ||
+          pkgLower.includes(selected) ||
+          selected.includes(pkgLower)
+      );
+    });
+
+    if (filtered.length === 0) {
+      console.warn(
+        `⚠️  No packages matched the selected filter. Available: ${availablePackages.join(', ')}, Selected: ${selectedPackages.join(', ')}`
+      );
+      return availablePackages; // Fall back to all packages
+    }
+
+    console.info(
+      `✓ Filtered to ${filtered.length} package(s): ${filtered.join(', ')}`
+    );
+    return filtered;
+  }
 
   /**
    * Validate and prepare packages for publishing
@@ -137,19 +190,30 @@ export class PublishController {
    * Publish packages to npm
    */
   async publish(request: PublishRequest): Promise<PublishPipelineStatus> {
+    // Apply package filtering based on SELECTED_PACKAGES environment variable
+    const filteredPackageNames = this.filterSelectedPackages(
+      request.packageNames
+    );
+
+    // Create a new request with filtered packages
+    const filteredRequest: PublishRequest = {
+      ...request,
+      packageNames: filteredPackageNames,
+    };
+
     const pipelineId = this.generatePipelineId();
     // Create pipeline in DB
     const pipelineRecord = await publishPipelineService.createPipeline({
       id: pipelineId,
-      packageNames: JSON.stringify(request.packageNames),
-      method: request.method || 'auto',
+      packageNames: JSON.stringify(filteredRequest.packageNames),
+      method: filteredRequest.method || 'auto',
       status: 'pending',
-      triggeredBy: request.userId || 'system',
+      triggeredBy: filteredRequest.userId || 'system',
       triggeredAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      releaseVersion: request.versionMap
-        ? Object.values(request.versionMap).join(',')
+      releaseVersion: filteredRequest.versionMap
+        ? Object.values(filteredRequest.versionMap).join(',')
         : undefined,
       releaseNotes: undefined, // Could be set if changelog is generated
       conclusion: undefined,
@@ -162,7 +226,7 @@ export class PublishController {
       pipelineId,
       status: 'pending',
       progress: 0,
-      packagesToPublish: request.packageNames,
+      packagesToPublish: filteredRequest.packageNames,
       results: {},
     };
     this.pipelines.set(pipelineId, status);
@@ -171,10 +235,10 @@ export class PublishController {
       // Log pipeline start
       await pipelineLogger.info(
         pipelineId,
-        `Starting publish pipeline for packages: ${request.packageNames.join(', ')}`,
+        `Starting publish pipeline for packages: ${filteredRequest.packageNames.join(', ')}`,
         'initialization',
         undefined,
-        { method: request.method, dryRun: request.dryRun }
+        { method: filteredRequest.method, dryRun: filteredRequest.dryRun }
       );
 
       status.startedAt = new Date().toISOString();
@@ -190,8 +254,8 @@ export class PublishController {
         'Checking readiness for all packages',
         'validation'
       );
-      const prep = await this.preparePublish(request);
-      if (!prep.valid && !request.dryRun) {
+      const prep = await this.preparePublish(filteredRequest);
+      if (!prep.valid && !filteredRequest.dryRun) {
         await pipelineLogger.error(
           pipelineId,
           'Packages not ready for publishing',
@@ -228,7 +292,7 @@ export class PublishController {
         'workflow'
       );
       const workflowResult = await this.ensureWorkflowExists(
-        request.packageNames
+        filteredRequest.packageNames
       );
       if (workflowResult.created) {
         console.info(`📝 Created workflow file at: ${workflowResult.path}`);
@@ -256,7 +320,7 @@ export class PublishController {
       );
       const npmToken = await secureTokenService.getToken('npm', 'env');
       const githubToken =
-        request.method !== 'node'
+        filteredRequest.method !== 'node'
           ? await secureTokenService.getToken('github', 'env')
           : undefined;
       await pipelineLogger.info(
@@ -271,11 +335,11 @@ export class PublishController {
         status: 'publishing',
         updatedAt: new Date(),
       });
-      const publisherCount = request.packageNames.length;
+      const publisherCount = filteredRequest.packageNames.length;
 
-      for (let i = 0; i < request.packageNames.length; i++) {
-        const packageName = request.packageNames[i];
-        const packagePath = request.packagePaths[packageName];
+      for (let i = 0; i < filteredRequest.packageNames.length; i++) {
+        const packageName = filteredRequest.packageNames[i];
+        const packagePath = filteredRequest.packagePaths[packageName];
 
         console.info(
           `\n📦 Publishing ${i + 1}/${publisherCount}: ${packageName}`
@@ -296,10 +360,10 @@ export class PublishController {
         const result = await this.publishPackage(
           packageName,
           packagePath,
-          request.versionMap?.[packageName],
+          filteredRequest.versionMap?.[packageName],
           npmToken,
           githubToken,
-          request
+          filteredRequest
         );
 
         // Get new version from package.json after publish (in case publish step bumps it)
@@ -354,25 +418,25 @@ export class PublishController {
         });
       }
 
-      // 5. Generate changelog entries
-      if (!request.dryRun) {
-        console.info('\n📝 Generating changelogs...');
-        await pipelineLogger.info(
-          pipelineId,
-          'Generating changelogs for published packages',
-          'changelog'
-        );
-        await this.generateChangelogs(
-          request.packageNames,
-          request.packagePaths,
-          status.results
-        );
-        await pipelineLogger.info(
-          pipelineId,
-          'Changelogs generated successfully',
-          'changelog'
-        );
-      }
+      // 5. Generate changelog entries (disabled - handled by changesets)
+      // if (!filteredRequest.dryRun) {
+      //   console.info('\n📝 Generating changelogs...');
+      //   await pipelineLogger.info(
+      //     pipelineId,
+      //     'Generating changelogs for published packages',
+      //     'changelog'
+      //   );
+      //   await this.generateChangelogs(
+      //     filteredRequest.packageNames,
+      //     filteredRequest.packagePaths,
+      //     status.results
+      //   );
+      //   await pipelineLogger.info(
+      //     pipelineId,
+      //     'Changelogs generated successfully',
+      //     'changelog'
+      //   );
+      // }
 
       status.status = 'completed';
       status.progress = 100;
@@ -391,10 +455,10 @@ export class PublishController {
       ).length;
       await pipelineLogger.info(
         pipelineId,
-        `Pipeline completed successfully! Published ${successCount}/${request.packageNames.length} packages`,
+        `Pipeline completed successfully! Published ${successCount}/${filteredRequest.packageNames.length} packages`,
         'completion',
         undefined,
-        { successCount, totalPackages: request.packageNames.length }
+        { successCount, totalPackages: filteredRequest.packageNames.length }
       );
       console.info(`\n✅ Publish pipeline completed: ${pipelineId}`);
     } catch (error) {
@@ -487,72 +551,72 @@ export class PublishController {
   /**
    * Generate changelog entries for published packages
    */
-  private async generateChangelogs(
-    packageNames: string[],
-    packagePaths: Record<string, string>,
-    results: Record<string, PublishRunnerResult>
-  ): Promise<void> {
-    // Collect changelog data for all successful packages, including commit history
-    const packages: Array<{
-      name: string;
-      path: string;
-      newVersion: string;
-      previousVersion: string | null;
-      commits: any[];
-    }> = [];
-    for (const packageName of packageNames) {
-      const result = results[packageName];
-      if (!result?.success) continue;
-      const packagePath = packagePaths[packageName];
+  // private async generateChangelogs(
+  //   packageNames: string[],
+  //   packagePaths: Record<string, string>,
+  //   results: Record<string, PublishRunnerResult>
+  // ): Promise<void> {
+  //   // Collect changelog data for all successful packages, including commit history
+  //   const packages: Array<{
+  //     name: string;
+  //     path: string;
+  //     newVersion: string;
+  //     previousVersion: string | null;
+  //     commits: any[];
+  //   }> = [];
+  //   for (const packageName of packageNames) {
+  //     const result = results[packageName];
+  //     if (!result?.success) continue;
+  //     const packagePath = packagePaths[packageName];
 
-      // Get previous version from package.json before publish (optional: could be stored earlier)
-      // For now, set to null to let changelog generator handle first release
-      let previousVersion: string | null = null;
-      try {
-        const pkgJsonPath = path.join(packagePath, 'package.json');
-        const content = fs.readFileSync(pkgJsonPath, 'utf8');
-        const pkgJson = JSON.parse(content);
-        previousVersion = pkgJson.version || null;
-      } catch (e) {
-        // ignore error reading previous version
-      }
+  //     // Get previous version from package.json before publish (optional: could be stored earlier)
+  //     // For now, set to null to let changelog generator handle first release
+  //     let previousVersion: string | null = null;
+  //     try {
+  //       const pkgJsonPath = path.join(packagePath, 'package.json');
+  //       const content = fs.readFileSync(pkgJsonPath, 'utf8');
+  //       const pkgJson = JSON.parse(content);
+  //       previousVersion = pkgJson.version || null;
+  //     } catch (e) {
+  //       // ignore error reading previous version
+  //     }
 
-      // Get commit history for this package since last tag
-      let commits: any[] = [];
-      try {
-        // Use changeTrackerService to get commits since last tag
-        const lastTag = `${packageName}@${previousVersion || result.version}`;
-        commits = await changeTrackerService.getCommitsSinceTag(
-          lastTag,
-          packagePath
-        );
-      } catch (e) {
-        console.warn(`Could not get commits for ${packageName}:`, e);
-      }
+  //     // Get commit history for this package since last tag
+  //     let commits: any[] = [];
+  //     try {
+  //       // Use changeTrackerService to get commits since last tag
+  //       const lastTag = `${packageName}@${previousVersion || result.version}`;
+  //       commits = await changeTrackerService.getCommitsSinceTag(
+  //         lastTag,
+  //         packagePath
+  //       );
+  //     } catch (e) {
+  //       console.warn(`Could not get commits for ${packageName}:`, e);
+  //     }
 
-      packages.push({
-        name: packageName,
-        path: packagePath,
-        newVersion: result.version,
-        previousVersion,
-        commits,
-      });
-    }
+  //     packages.push({
+  //       name: packageName,
+  //       path: packagePath,
+  //       newVersion: result.version,
+  //       previousVersion,
+  //       commits,
+  //     });
+  //   }
 
-    if (packages.length === 0) return;
+  //   if (packages.length === 0) return;
 
-    // Generate changelog entries for all packages
-    const entries = await changelogGenerator.generateMultiple(packages);
+  //   // Generate changelog entries for all packages
+  //   const entries = await changelogGenerator.generateMultiple(packages);
 
-    // Write per-package changelogs
-    for (const pkg of packages) {
-      const entry = entries.get(pkg.name);
-      if (entry) {
-        await changelogGenerator.appendToChangelog(pkg.path, entry, pkg.name);
-        console.info(`  Updated CHANGELOG.md for ${pkg.name}`);
-      }
-    }
-  }
+  //   // Write per-package changelogs
+  //   for (const pkg of packages) {
+  //     const entry = entries.get(pkg.name);
+  //     if (entry) {
+  //       await changelogGenerator.appendToChangelog(pkg.path, entry, pkg.name);
+  //       console.info(`  Updated CHANGELOG.md for ${pkg.name}`);
+  //     }
+  //   }
+  // }
 
   /**
    * Get pipeline status

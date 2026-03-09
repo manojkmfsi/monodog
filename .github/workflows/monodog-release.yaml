@@ -137,8 +137,17 @@ jobs:
           git config --global credential.helper store
           echo "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com" > ~/.git-credentials
 
+      - name: Show selected packages
+        run: |
+          echo "Packages to publish: ${{ github.event.inputs.packages }}"
+          if [ -z "${{ github.event.inputs.packages }}" ]; then
+            echo "No specific packages selected - will publish all packages with changes"
+          fi
+
       - name: Generate Changeset from commit messages
         run: pnpm changeset:autogenerate
+        env:
+          SELECTED_PACKAGES: ${{ github.event.inputs.packages }}
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
@@ -151,6 +160,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # NPM_TOKEN is used for publishing to the npm registry
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Pass selected packages to publish script
+          SELECTED_PACKAGES: ${{ github.event.inputs.packages }}
 
       - name: Check Changesets Output
         run: |

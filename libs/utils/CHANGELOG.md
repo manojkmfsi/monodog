@@ -1,3 +1,1233 @@
+## [@monodog/utils@1.0.47](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/utils@1.0.47) (2026-03-09)
+
+### ⚠️ BREAKING CHANGES
+- **monoapp**: **BREAKING**: fix(monoapp)!: updated package name
+- **monoapp**: **BREAKING**: fix(monoapp)!: updated package name
+- **monoapp**: **BREAKING**: feat(monoapp)!: 75
+- **monoapp**: **BREAKING**: feat(monoapp)!: 75
+- **monoapp**: **BREAKING**: feat(monoapp)!: 71
+- **monoapp**: **BREAKING**: feat(monoapp)!: 71
+- **monoapp**: **BREAKING**: feat(monoapp)!: 70
+- **monoapp**: **BREAKING**: feat(monoapp)!: 70
+- **monoapp**: **BREAKING**: feat(monoapp)!: 69
+- **monoapp**: **BREAKING**: feat(monoapp)!: 69
+- **monoapp**: **BREAKING**: feat(monoapp)!: 68
+- **monoapp**: **BREAKING**: feat(monoapp)!: 68
+- **monoapp**: **BREAKING**: feat(monoapp)!: add ability to parse arrays
+- **monoapp**: **BREAKING**: feat(monoapp)!: add ability to parse arrays BREAKING CHANGE: incompatible
+
+### Features
+- feat: update release workflow to manual trigger for npm publishing ([dbc96c5](https://github.com/manojkmfsi/monodog/commit/dbc96c540da9ed376266d4b54f3d544fbe8b8184))
+- feat: integrate publishController into GitHub Actions workflow with full logging ([28363ee](https://github.com/manojkmfsi/monodog/commit/28363ee19611d47ec88f740eaa2953e061a6c399))
+- **monodog**: feat(monodog): Added Swagger doc, updated req type for resfresh ([707a105](https://github.com/manojkmfsi/monodog/commit/707a105a28b2d8699dac6bdf839e480f4d974dce))
+- **monodog**: feat(monodog): Added Swagger doc, updated req type for resfresh ([8ff60ce](https://github.com/manojkmfsi/monodog/commit/8ff60cec944450f47289e1d9afdaee8529a74d66))
+- **monoapp**: feat(monoapp): 76 ([1b95187](https://github.com/manojkmfsi/monodog/commit/1b951872a11c0954976f919d570d2709242842d9))
+- **monoapp**: feat(monoapp): 76 ([44f8c93](https://github.com/manojkmfsi/monodog/commit/44f8c93f8f1467a2b99fdab6c86d474134ba4204))
+- **monoapp**: feat(monoapp)!: 75 ([ecbc896](https://github.com/manojkmfsi/monodog/commit/ecbc89611cb4133e18ced35070c0c856d09a1e4a))
+- **monoapp**: feat(monoapp)!: 75 ([aaecf1d](https://github.com/manojkmfsi/monodog/commit/aaecf1dda1043af7fc055eb9301145f7002d1ed8))
+- **monoapp**: feat(monoapp): 74 ([2dd39ff](https://github.com/manojkmfsi/monodog/commit/2dd39ff3c6750e2f585f11455e578073d54b2fe8))
+- **monoapp**: feat(monoapp): 74 ([f234234](https://github.com/manojkmfsi/monodog/commit/f234234eb8ace290ff9d3054fbbdf0c7ab438dd6))
+- **monoapp**: feat(monoapp)!: 71 ([e8c9f27](https://github.com/manojkmfsi/monodog/commit/e8c9f279864e6edcc6f43937e00c613adfa48fa0))
+- **monoapp**: feat(monoapp)!: 71 ([b258270](https://github.com/manojkmfsi/monodog/commit/b258270f6a5ac42afe891d21eb5c489f5c1f9e26))
+- **monoapp**: feat(monoapp)!: 70 ([f35f772](https://github.com/manojkmfsi/monodog/commit/f35f77232cca73b7acd2964a03988811990d25d0))
+- **monoapp**: feat(monoapp)!: 70 ([cf87edf](https://github.com/manojkmfsi/monodog/commit/cf87edf6ced371119a67d024e28053e04c0b8277))
+- **monoapp**: feat(monoapp)!: 69 ([9f9c58b](https://github.com/manojkmfsi/monodog/commit/9f9c58b215708bc37f6dceb60888c4fb53213c32))
+- **monoapp**: feat(monoapp)!: 69 ([658ce3d](https://github.com/manojkmfsi/monodog/commit/658ce3ddd6095b820109a5dc130b12efe947bec8))
+- **monoapp**: feat(monoapp)!: 68 ([a20c833](https://github.com/manojkmfsi/monodog/commit/a20c83367a84b28b3f05a5cc3587abb4997d93e7))
+- **monoapp**: feat(monoapp)!: 68 ([393fc64](https://github.com/manojkmfsi/monodog/commit/393fc647951136c0801f5cc0d8da4985d136c136))
+- **monoapp**: feat(monoapp)!: add ability to parse arrays ([7229358](https://github.com/manojkmfsi/monodog/commit/7229358ca30b1511b47f5fb4f689a13f4adce4ab))
+- **monoapp**: feat(monoapp)!: add ability to parse arrays BREAKING CHANGE: incompatible ([229f8ec](https://github.com/manojkmfsi/monodog/commit/229f8eca48d4a5fcac11b2ade7ed7e8da10415e8))
+- **monoapp**: feat(monoapp): 67 ([3c68abe](https://github.com/manojkmfsi/monodog/commit/3c68abede0f4b54d7d96727fe8ecdbf2ecf7cd47))
+- **monoapp**: feat(monoapp): 67 ([2d4e457](https://github.com/manojkmfsi/monodog/commit/2d4e457a88740803109d7b7c347e554a53a0aefc))
+- feat: option to provide workspace names in monodog-conf, install package on monorepo root. ([14bb8d8](https://github.com/manojkmfsi/monodog/commit/14bb8d89fa190589a30f288c1373ff0715fd09b1))
+- feat:  installable common monodog package for front/back end ([849e50c](https://github.com/manojkmfsi/monodog/commit/849e50c8fa6f2f142e88b3413433ee212609b7ea))
+- feat: configurable dashboard ([5fa4b03](https://github.com/manojkmfsi/monodog/commit/5fa4b03e769da1f61506adbb64d1178ad54db792))
+- feat: load config from file ([8ce8224](https://github.com/manojkmfsi/monodog/commit/8ce8224be11286ffbd42b80fc7a3f7f74ed07dc9))
+- **setup**: feat(setup): make manodog installable in monorep ([91ac7b5](https://github.com/manojkmfsi/monodog/commit/91ac7b5fe006d95999407ac075bfb00ec667200f))
+- **configuration**: feat(configuration): Update Configuration and Related Components ([21065e1](https://github.com/manojkmfsi/monodog/commit/21065e134012b0da951df3592fd9e5052cf8eda4))
+- feat: installable backend and frontend setup in a monorep ([efdc2f8](https://github.com/manojkmfsi/monodog/commit/efdc2f8d49b5d30d6187629dc0628f08bd018448))
+- **setup**: feat(setup): make manodog installable in monorep ([11107aa](https://github.com/manojkmfsi/monodog/commit/11107aa4bd9fdf13310cb8e3d3b561ec5c3fc9e8))
+- **configuration**: feat(configuration): Update Configuration and Related Components ([8e61468](https://github.com/manojkmfsi/monodog/commit/8e6146864846a93692a2a0c3a433b9404926eedb))
+- **refresh**: feat(refresh): Refresh Packages with commits and dependencies. ([3fea263](https://github.com/manojkmfsi/monodog/commit/3fea263226a585686370e7e11b67ad0709ebd7c4))
+- **packageScore**: feat(packageScore): Integrate package health score ([db824ef](https://github.com/manojkmfsi/monodog/commit/db824efbfbf3a59d04d78b5032079d04b54feed7))
+- **dependency_graph**: feat(dependency_graph): Added dependency graph, package details ([6fedd05](https://github.com/manojkmfsi/monodog/commit/6fedd05f0da889984b5151f371b4ad20d3ef2f29))
+- **backend-setup**: feat(backend-setup): Integrate Package dependency page, with package fixes ([f9aee4c](https://github.com/manojkmfsi/monodog/commit/f9aee4c056a896b72d32e53287eeb21bc4825c4b))
+- **dahboard**: feat(dahboard): merge pull request #5 from lakinmindfire/backend-setup ([bbb3c42](https://github.com/manojkmfsi/monodog/commit/bbb3c42da9683a5eb1293a6e79a0e080411a4564))
+- **packages**: feat(packages): Updated 'getPackages' API, and  show packages list ([d43ccbc](https://github.com/manojkmfsi/monodog/commit/d43ccbc5f4fe89fd1795ce993924327a939f66f0))
+- **backend-setup**: feat(backend-setup): Setup backend with prisma and express ([b2978af](https://github.com/manojkmfsi/monodog/commit/b2978afe2d53bc2862fd508a444ff5ed790adbc2))
+- **theme**: feat(theme): Updated them colors ([ab5babe](https://github.com/manojkmfsi/monodog/commit/ab5babe12dc0891d8c4a23c6dd80ae4bc3244a8a))
+- **dashboard**: feat(dashboard): Setup complete dashboard UI with all required pages ([c8b0364](https://github.com/manojkmfsi/monodog/commit/c8b0364081fef41aba7cc8fe8d467fe355674855))
+- **setup**: feat(setup): Merge pull request #3 from lakinmindfire/setup ([0ee63a3](https://github.com/manojkmfsi/monodog/commit/0ee63a3f8032ede728c431a0cc54bb49e8217212))
+- **setup**: feat(setup): Structure, frontend setup with shadcn UI ([6f8f760](https://github.com/manojkmfsi/monodog/commit/6f8f760b870c627b2e7a7f190e85ae4e5dd52fcb))
+
+### Bug Fixes
+- fix: trigger workflow automatically on release process file changes ([ae86030](https://github.com/manojkmfsi/monodog/commit/ae8603092ef7c317bbbc4809efe46455ae46b775))
+- refactor: change workflow trigger from manual dispatch to automatic publish detection ([d1f5074](https://github.com/manojkmfsi/monodog/commit/d1f5074428fc0db3e94248f3e8f2d851f3b40de2))
+- fix: improve GitHub Actions workflow execution and error handling ([77392c7](https://github.com/manojkmfsi/monodog/commit/77392c727419ff4544f32e2c62826a09e7f0a5d0))
+- fix: make husky hook executable ([f7abcc7](https://github.com/manojkmfsi/monodog/commit/f7abcc7c4e7ef085dc7eaa7a307e08bb8d00d573))
+- **monodog**: fix(monodog): added  rate limit in UI ([8fbba47](https://github.com/manojkmfsi/monodog/commit/8fbba4743b96ed2d86c2f2ebf92dff5bc73e5a19))
+- **monodog**: fix(monodog): final commit ([72f673f](https://github.com/manojkmfsi/monodog/commit/72f673f93ae8983258bc4ac94f0903916c7130a5))
+- **monodog**: fix(monodog): updated ignore ([94053cb](https://github.com/manojkmfsi/monodog/commit/94053cb191c9a46a6454d67b636509749efff86b))
+- **monodog**: fix(monodog): removed file ([698aa4e](https://github.com/manojkmfsi/monodog/commit/698aa4e630c4dc254ce8cf16e3013cc0d18e6176))
+- **monodog**: fix(monodog): remove files ([0c9eb65](https://github.com/manojkmfsi/monodog/commit/0c9eb65e45b52ffc63ffda1ebd41cad8ff048413))
+- **monodog**: fix(monodog): remove source map ([191cba9](https://github.com/manojkmfsi/monodog/commit/191cba9e2c8e2f40f2b1d8a0fe5623b79c4b3079))
+- **monodog**: fix(monodog): updated ignore ([f811839](https://github.com/manojkmfsi/monodog/commit/f811839914adc46fece53adbc7fc937fd759ccb5))
+- **monodog**: fix(monodog): remove files ([2efb77d](https://github.com/manojkmfsi/monodog/commit/2efb77da3eff0eff52caf7e7a4a28faff64194fa))
+- **monodog**: fix(monodog):  added ignore ([1b4a3d1](https://github.com/manojkmfsi/monodog/commit/1b4a3d1555a6d34b96acd1089fc9cfeafaa9e3fb))
+- **monodog**: fix(monodog): added dashboard in fles ([bb4f7d4](https://github.com/manojkmfsi/monodog/commit/bb4f7d4b1f51a8a82d3fa0fdb4e83bb42b1da586))
+- **monodog**: fix(monodog):  ignore .db ([4c55284](https://github.com/manojkmfsi/monodog/commit/4c55284c95f723a540ee82e0c03406acb4cc51f9))
+- **monodog**: fix(monodog): added files in pack.json ([e864cb5](https://github.com/manojkmfsi/monodog/commit/e864cb58d479228a97d8ee463321647ab7534a36))
+- **monodog**: fix(monodog): remove npmignore ([656c631](https://github.com/manojkmfsi/monodog/commit/656c6312076ad7f046c5a4ea92b3b6b98bded4ba))
+- **monodog**: fix(monodog): updated release file ([f511006](https://github.com/manojkmfsi/monodog/commit/f5110063510dbe6428f4f0512db9c054b967e10d))
+- **monodog**: fix(monodog): updated release ([d80a4d2](https://github.com/manojkmfsi/monodog/commit/d80a4d2b79f42be60c9ad99a005e50419ed35588))
+- **monodog**: fix(monodog):  updated release for dashboard ([799ab92](https://github.com/manojkmfsi/monodog/commit/799ab9257ce6ba8f9c4f81b16b2436c595979c75))
+- **monodog**: fix(monodog): Remove dist and updated text ([6acc3e1](https://github.com/manojkmfsi/monodog/commit/6acc3e1262ab5eac1c9bee022edb7e7b1770d811))
+- **monodog**: fix(monodog):  fix  pipeline issues and optimize code ([9656e41](https://github.com/manojkmfsi/monodog/commit/9656e41b25c066859a41bed77781b64ae73def41))
+- **monodog**: fix(monodog): remove heroicon dependency ([3cbafc7](https://github.com/manojkmfsi/monodog/commit/3cbafc7459c67f37d13e93ab3d0b28222b977187))
+- **monodog**: fix(monodog): remove heroicon dependency ([6d52f8b](https://github.com/manojkmfsi/monodog/commit/6d52f8b85a6261c6e4683de0bb74aeb2f2f1562d))
+- **monodog**: fix(monodog): fix health score ([0f77825](https://github.com/manojkmfsi/monodog/commit/0f778259a5a96e616c59981284058ee5a1c64717))
+- **monodog**: fix(monodog): fix health score ([d497a69](https://github.com/manojkmfsi/monodog/commit/d497a69b925877ed5e27049f91e59be0a5dba972))
+- **monodog**: fix(monodog): updated baseurl ([97bb906](https://github.com/manojkmfsi/monodog/commit/97bb9065bdc9c140afd22c7527e82dd56f62aa13))
+- **monodog**: fix(monodog): updated baseurl ([46581d9](https://github.com/manojkmfsi/monodog/commit/46581d9fa39284ea8369c362ca0c17fac304c846))
+- **monodog**: fix(monodog): undo last version ([ea63305](https://github.com/manojkmfsi/monodog/commit/ea633056b8f8130b732232b28230b1a5e10bb80d))
+- **monodog**: fix(monodog): undo last version ([f099abf](https://github.com/manojkmfsi/monodog/commit/f099abf81d18809bf9a3c716dac94e30d6962704))
+- **monodog**: fix(monodog): do not update pnpm-workspace ([6e7d451](https://github.com/manojkmfsi/monodog/commit/6e7d45183de99bc56775696adeb4052afca53959))
+- **monodog**: fix(monodog): do not update pnpm-workspace ([d5d85ae](https://github.com/manojkmfsi/monodog/commit/d5d85aeefa2bc7bc226c061fb7cb75afb9268e00))
+- **monodog**: fix(monodog): publish issue ([150bde0](https://github.com/manojkmfsi/monodog/commit/150bde053b71a11a95ca057c11699885fe0412e9))
+- **monodog**: fix(monodog): publish issue ([36678ee](https://github.com/manojkmfsi/monodog/commit/36678ee768baf786174f61b75220ae199e09510b))
+- **monodog**: fix(monodog): Updated frontend type issues, pre publish… ([6b7a4f0](https://github.com/manojkmfsi/monodog/commit/6b7a4f01059fe3d2a783d7748e110a37144e31a1))
+- **monodog): fix(monodog**: fix(monodog): fix(monodog): Updated frontend type issues, pre publish fixes ([903fbd6](https://github.com/manojkmfsi/monodog/commit/903fbd6b89f69c049fcf859f10b15d1801580e02))
+- **monodog**: fix(monodog): updated Frontend icon ([6032f5f](https://github.com/manojkmfsi/monodog/commit/6032f5f7322e23a6f7079de968b4819a0f5b2716))
+- **monodog**: fix(monodog): updated Frontend icon ([c179098](https://github.com/manojkmfsi/monodog/commit/c17909842275d920fd446d2543365582d3146977))
+- **monodog**: fix(monodog): remove migration file ([537a776](https://github.com/manojkmfsi/monodog/commit/537a77650edace195eb6c8d46c54602e315a844c))
+- **monodog**: fix(monodog): remove migration file ([fd053b5](https://github.com/manojkmfsi/monodog/commit/fd053b5523eb777f4c8f950d257b2adea4572375))
+- **monodog**: fix(monodog): Remove config from prod ([7f17034](https://github.com/manojkmfsi/monodog/commit/7f17034514729778c43dc71a715f93b0922e8924))
+- **monodog**: fix(monodog): Remove config from prod ([6d9e324](https://github.com/manojkmfsi/monodog/commit/6d9e32481414db87489a48354e088ba6dfb73392))
+- **monodog**: fix(monodog): remove turbo ([a2e1ef5](https://github.com/manojkmfsi/monodog/commit/a2e1ef5dd8b0b0f411e9d420894c310f954debf2))
+- **monodog**: fix(monodog): remove turbo ([3de90a2](https://github.com/manojkmfsi/monodog/commit/3de90a2320b459bc1e7b8889f308d5ac5004153d))
+- **monodog**: fix(monodog): remove src from package ([3c78108](https://github.com/manojkmfsi/monodog/commit/3c781089853a801c8cc7e5c9293eea2331995fa8))
+- **monodog**: fix(monodog): remove src from package ([18494f2](https://github.com/manojkmfsi/monodog/commit/18494f248b2ed88bac124ae51087fd26988cf713))
+- **monodog**: fix(monodog): hide maintainers ([ca87f77](https://github.com/manojkmfsi/monodog/commit/ca87f7705fb35c22e8ce0b4cea5321cb7dd8a023))
+- **monodog**: fix(monodog): hide maintainers ([c53456d](https://github.com/manojkmfsi/monodog/commit/c53456d27ac5633c85369f88369fd8ca55bd32c3))
+- **monodog**: fix(monodog): updated package.json ([9ada2b7](https://github.com/manojkmfsi/monodog/commit/9ada2b758b002640778182328c96fbbb6efd0b87))
+- **monodog**: fix(monodog): updated package.json ([8197c7c](https://github.com/manojkmfsi/monodog/commit/8197c7c7516c9bfd6a600a590a8407a77e1292af))
+- **monodog**: fix(monodog): upload dashboard dist ([2b2196e](https://github.com/manojkmfsi/monodog/commit/2b2196e78ef30cc8873ad5e0247100fec522e1f0))
+- **monodog**: fix(monodog): upload dashboard dist ([833d50b](https://github.com/manojkmfsi/monodog/commit/833d50b0a9c344e3b9999daef79953b9132f4f88))
+- **monodog**: fix(monodog): fixes ([6cfcade](https://github.com/manojkmfsi/monodog/commit/6cfcadeabc6dae632b2793cc5d0e70dd077a4eeb))
+- **monodog**: fix(monodog): fixes ([a79ab91](https://github.com/manojkmfsi/monodog/commit/a79ab91690dd970a2e78f11b3f8403c6f6a52e6d))
+- **monodog**: fix(monodog): comment console log in dashboard ([6e204a7](https://github.com/manojkmfsi/monodog/commit/6e204a7470ab3e4ec0c388dca9552923658ccfdc))
+- **monodog**: fix(monodog): comment console log in dashboard ([a0cc860](https://github.com/manojkmfsi/monodog/commit/a0cc860722135e201c0de120ea7279603f4793d7))
+- **monodog**: fix(monodog): Updated logging - replace console logs with morgan ([2d5e45f](https://github.com/manojkmfsi/monodog/commit/2d5e45f785a607703c3fecd25444cde0adc69637))
+- **monodog**: fix(monodog): Updated logging - replace console logs with morgan ([d4c2494](https://github.com/manojkmfsi/monodog/commit/d4c24943a670d527ac8bbafe0a87a5797bd0195c))
+- **monodog**: fix(monodog): updated docs ([0e64dc8](https://github.com/manojkmfsi/monodog/commit/0e64dc86b95dc4fca55e7827be922fea1bad82b0))
+- **monodog**: fix(monodog): updated docs ([5b549db](https://github.com/manojkmfsi/monodog/commit/5b549db0141d1a802fe671688dced4adee66aedb))
+- **monodog**: fix(monodog): updated docs and default host port ([398d171](https://github.com/manojkmfsi/monodog/commit/398d171930fe3cd54e02366a41a38d9be5c08016))
+- **monodog**: fix(monodog): implement constants for server ([3cd2466](https://github.com/manojkmfsi/monodog/commit/3cd2466938c43aa7cca0b1a0651374bd7a670d14))
+- **monodog**: fix(monodog): Added morgan and split prisma schema ([44700f7](https://github.com/manojkmfsi/monodog/commit/44700f7191b92325f7fe06d8c22f7be7469c01d9))
+- **monodog**: fix(monodog): Added morgan and split prisma schema ([cec0cc0](https://github.com/manojkmfsi/monodog/commit/cec0cc01e2b41bac7ef243557745400231459886))
+- **monodog**: fix(monodog): added separate folder for middleware, kebab case filename ([2eefb86](https://github.com/manojkmfsi/monodog/commit/2eefb86234796345a600553b5a5741f81ac77c34))
+- **monodog**: fix(monodog): added separate folder for middleware, kebab case filename ([3210b33](https://github.com/manojkmfsi/monodog/commit/3210b33945eac8ad8888f7d241324785a0b778f6))
+- **monodog**: fix(monodog): Added types for backend nodejs ([776d3d5](https://github.com/manojkmfsi/monodog/commit/776d3d5d879d5eebb06ffa8beb2c5205e4d8c0bf))
+- **monodog**: fix(monodog): Added types for backend nodejs ([3ebde77](https://github.com/manojkmfsi/monodog/commit/3ebde776b2044595cfb9101c042811580b59779f))
+- **monodog**: fix(monodog): remove env ([76a466c](https://github.com/manojkmfsi/monodog/commit/76a466c497786b12b2fa2bf3ce886d21e85434ae))
+- **monodog**: fix(monodog): remove env ([00aac3a](https://github.com/manojkmfsi/monodog/commit/00aac3a400a2620dbadf96cab81da07b052d906c))
+- **monodog**: fix(monodog):  Remove  unnecessary icons, ([09f4a21](https://github.com/manojkmfsi/monodog/commit/09f4a2106ab4b901d9fd8e09a7ef96c5d4443100))
+- **monodog**: fix(monodog):  Remove  unnecessary icons, files ([81e4c4a](https://github.com/manojkmfsi/monodog/commit/81e4c4a7c5fe69f6c60fc1f7c112fac028cd8608))
+- **monodog**: fix(monodog): updated security,workspce fallback, docs ([49646c1](https://github.com/manojkmfsi/monodog/commit/49646c1d7f9ac950d4a7c08d71bcfc5a372abe1f))
+- **monodog**: fix(monodog): updated security,workspce fallback, docs ([8aefb52](https://github.com/manojkmfsi/monodog/commit/8aefb525f3fab96f4642f7450ed187798297adcc))
+- **monodog**: fix(monodog):  Restructure backend app ([8e5cbdb](https://github.com/manojkmfsi/monodog/commit/8e5cbdbdf4a7f782f84055f88cc432dad03e58d2))
+- **monodog**: fix(monodog):  Restructure backend app ([2a339a5](https://github.com/manojkmfsi/monodog/commit/2a339a560736cb89e18f5050970feb6a50a19876))
+- fix: updated refresh package ([9354df9](https://github.com/manojkmfsi/monodog/commit/9354df95104e2a6bf948c24ce3dd55a4be8b9da7))
+- **monodog**: fix(monodog): removed icons ([f387a0a](https://github.com/manojkmfsi/monodog/commit/f387a0a6df84e9f78d78af301a2b72393b90cdf2))
+- **monodog**: fix(monodog): updated installation instruction ([92c5da6](https://github.com/manojkmfsi/monodog/commit/92c5da683df486d2e1a42918b76c4ff60e45ba70))
+- **monodog**: fix(monodog): updated installation process ([4aed3d5](https://github.com/manojkmfsi/monodog/commit/4aed3d50d1646ad223e772db9ab1722c3bd15ab7))
+- **monodog**: fix(monodog): remove postinstall ([054d206](https://github.com/manojkmfsi/monodog/commit/054d206288c9286ada0c4d7e92a5f50956d14b34))
+- **monodog**: fix(monodog): updated installation script ([c5164d3](https://github.com/manojkmfsi/monodog/commit/c5164d3992620bba9b4b3260a759a99a58510d69))
+- **monodog**: fix(monodog): updated installation script ([1246680](https://github.com/manojkmfsi/monodog/commit/12466800972c966a352b4181c83d4eaa3a33cc3b))
+- **monodog**: fix(monodog): fix doc ([2069498](https://github.com/manojkmfsi/monodog/commit/2069498ec4084feba27aec1115cd9d370e69efc4))
+- **monodog**: fix(monodog): fix doc ([518e891](https://github.com/manojkmfsi/monodog/commit/518e891edaf9bde9796bcb1bf9bc8696db6bbeca))
+- **monodog**: fix(monodog): updated monodog folder ([4db0a67](https://github.com/manojkmfsi/monodog/commit/4db0a67044ebc648f541b4fc173304198376f9a6))
+- **monodog**: fix(monodog): updated monodog folder ([60c8585](https://github.com/manojkmfsi/monodog/commit/60c8585020967bab4a111baeb316496b65942361))
+- fix: updated doc ([949e9ab](https://github.com/manojkmfsi/monodog/commit/949e9ab7f06596e59645c066f0c076fc2c7e9613))
+- fix: updated doc ([1ab7cbb](https://github.com/manojkmfsi/monodog/commit/1ab7cbbadf954f0cc4453e79b0a8588b160ce422))
+- **monodog**: fix(monodog): updated pkg name ([c8b7040](https://github.com/manojkmfsi/monodog/commit/c8b704063a8d353f5aa2ffcf6ebc8532d94a350c))
+- **monodog**: fix(monodog): updated pkg name ([9e34c5f](https://github.com/manojkmfsi/monodog/commit/9e34c5f8eab0291d0b20b2261c8f62965c9ee3c8))
+- **monodog**: fix(monodog): updated pkg name ([e17da63](https://github.com/manojkmfsi/monodog/commit/e17da63024e5ca8daf679d400b7ead301e37d519))
+- **monodog**: fix(monodog): updated pkg name ([a6346bb](https://github.com/manojkmfsi/monodog/commit/a6346bb3021fa53923be7c6ebdbcb17f6aff01a0))
+- **monoapp**: fix(monoapp)!: updated package name ([190a472](https://github.com/manojkmfsi/monodog/commit/190a472c44bb3793a9038bc2cdd3f5a11248b072))
+- **monoapp**: fix(monoapp)!: updated package name ([07f19a5](https://github.com/manojkmfsi/monodog/commit/07f19a532cd1f05777a584a2b960bb1636c022e0))
+- **monoapp**: fix(monoapp): updated org ([2a36463](https://github.com/manojkmfsi/monodog/commit/2a36463bec328df6deecd411b8fe67c348b4c8d0))
+- **monoapp**: fix(monoapp): updated org ([6da77b6](https://github.com/manojkmfsi/monodog/commit/6da77b6040a1fe60ea3fa1fa70d9036a804284ff))
+- fix: updated pkg json ([b246462](https://github.com/manojkmfsi/monodog/commit/b2464623624259a5d87e401096f198aa4059944c))
+- fix: updated pkg json ([142087b](https://github.com/manojkmfsi/monodog/commit/142087bb218521437063288a7f4c01584b34e797))
+- **monoapp**: fix(monoapp): 73 ([c27774b](https://github.com/manojkmfsi/monodog/commit/c27774b0d83090f7f6d6da94829ee4972dc9181d))
+- **monoapp**: fix(monoapp): 73 ([a9715c4](https://github.com/manojkmfsi/monodog/commit/a9715c4c293c3e33c8df0f5c70020a45925ce612))
+- **monoapp**: fix(monoapp): 72 ([fc450aa](https://github.com/manojkmfsi/monodog/commit/fc450aa520af5955e6ab58e5c78f1bf507e86ad4))
+- **monoapp**: fix(monoapp): 72 ([9512a00](https://github.com/manojkmfsi/monodog/commit/9512a00ddab93a1b73a16afd1baa792bc3e41f42))
+- **monoapp**: fix(monoapp): 66 ([1f0aaca](https://github.com/manojkmfsi/monodog/commit/1f0aaca75e941717ab29106096033d19ca5ef0b3))
+- **monoapp**: fix(monoapp): 66 ([9413a5f](https://github.com/manojkmfsi/monodog/commit/9413a5fa5a5a2763e239ac3f200f275d6939bb20))
+- **ci-status**: fix(ci-status): 65 ([2c5af1f](https://github.com/manojkmfsi/monodog/commit/2c5af1f981ce377f6850201438fe4634c1fad29e))
+- **ci-status**: fix(ci-status): 65 ([d25e4b8](https://github.com/manojkmfsi/monodog/commit/d25e4b82015a7b1033ab07bbb7a5e352e1d215f6))
+- **ci-status**: fix(ci-status): 64 ([ff5fab0](https://github.com/manojkmfsi/monodog/commit/ff5fab0894eafa684cd96e96d13cfcdb4466e595))
+- **ci-status**: fix(ci-status): 64 ([2da0fe2](https://github.com/manojkmfsi/monodog/commit/2da0fe2aaa37a9c5d119356736d37e486412d41e))
+- **backend**: fix(backend): 63 (#45) ([6266159](https://github.com/manojkmfsi/monodog/commit/6266159cc8b7493e44e72a5daede5e43b7d1c5d4))
+- **backend**: fix(backend): 63 ([de3c3ab](https://github.com/manojkmfsi/monodog/commit/de3c3ab4234bab2a00520028a62b8e67199ef306))
+- **backend**: fix(backend): 62 ([c84de3e](https://github.com/manojkmfsi/monodog/commit/c84de3e7b447d1a6eeb1c985679869a20d4a80e3))
+- **backend**: fix(backend): 61 ([fb43e3b](https://github.com/manojkmfsi/monodog/commit/fb43e3b49489ef20d2a19c69dca052aae56eb52a))
+- **backend**: fix(backend): 61 ([09bddbb](https://github.com/manojkmfsi/monodog/commit/09bddbb4454008e1dd4d6b5f33a44a1508ccc0a7))
+- **backend**: fix(backend): 60 ([f0c2b9f](https://github.com/manojkmfsi/monodog/commit/f0c2b9f7e501c75d991b4f74b19c1d1aa62e6aa6))
+- **backend**: fix(backend): 60 ([dd2fb74](https://github.com/manojkmfsi/monodog/commit/dd2fb7425071e1dd500425f0860c8caead47b349))
+- **backend**: fix(backend): 59 ([9b6f8cb](https://github.com/manojkmfsi/monodog/commit/9b6f8cbe7d86d3ff909662a78bb1bbcd55387b7b))
+- **backend**: fix(backend): 58 ([567113d](https://github.com/manojkmfsi/monodog/commit/567113d1b35762a65a4723220c230609d4d19d6d))
+- **backend**: fix(backend): 57 ([53e1042](https://github.com/manojkmfsi/monodog/commit/53e10426268a1261d5d52c5c8b7f5d1a371e6145))
+- **backend**: fix(backend): 57 ([5037ee4](https://github.com/manojkmfsi/monodog/commit/5037ee4a9d7d71211a0b8b35109267c353d7b562))
+- **monoapp**: fix(monoapp): 56 ([aefcc64](https://github.com/manojkmfsi/monodog/commit/aefcc64cd05c9b2823937d720ce449ca74c43600))
+- **monoapp**: fix(monoapp): 56 ([debbe1e](https://github.com/manojkmfsi/monodog/commit/debbe1e2bc37ac9e060a91a1f7522f8dd7115c07))
+- **monoapp**: fix(monoapp): 55 ([637d7a6](https://github.com/manojkmfsi/monodog/commit/637d7a6a67efcf62959cb81b18e0c589d193e6c2))
+- **monoapp**: fix(monoapp): 54 (#31) ([9ed0934](https://github.com/manojkmfsi/monodog/commit/9ed09343ff94aaf40e614475f851bce78f38fdcc))
+- **monoapp**: fix(monoapp): 54 ([59e7fa7](https://github.com/manojkmfsi/monodog/commit/59e7fa7bd5b35b047526d3b5399c26a20bc3c839))
+- **monoapp**: fix(monoapp):  53 ([8a08776](https://github.com/manojkmfsi/monodog/commit/8a08776ac5f438cab31eba8045e2baddb31c6427))
+- **monoapp**: fix(monoapp):  53 ([b07f555](https://github.com/manojkmfsi/monodog/commit/b07f55506dd4898537c4b6ad0e3d4788be6b3d30))
+- **monoapp**: fix(monoapp): 52 ([1da586e](https://github.com/manojkmfsi/monodog/commit/1da586e1c5c2c2fc47595a4bffdd65427348a1c8))
+- **monoapp**: fix(monoapp): 51 ([9e8d240](https://github.com/manojkmfsi/monodog/commit/9e8d240860c4403d6b5564b9c2e36fda25b4fd47))
+- **monoapp**: fix(monoapp): 51 ([98d5c90](https://github.com/manojkmfsi/monodog/commit/98d5c9017ed2dc3c90cad1de1b35b012907a9f49))
+- **monoapp**: fix(monoapp): 50 (#25) ([b86d09b](https://github.com/manojkmfsi/monodog/commit/b86d09b8017afd083c5281b48c76a85baaea05c9))
+- **50**: fix(50): monoapp ([d5dfd58](https://github.com/manojkmfsi/monodog/commit/d5dfd5893fdd2b433c5d98437c1beee6a7c9c3f7))
+- **monoapp**: fix(monoapp): 49 ([b50bd51](https://github.com/manojkmfsi/monodog/commit/b50bd51b9313c6c4793b77756f090b77e347f595))
+- **monoapp**: fix(monoapp): 48 ([c99c812](https://github.com/manojkmfsi/monodog/commit/c99c812b85441bcf2cf1ca599bc1a74f465f04d6))
+- **monoapp**: fix(monoapp): 48 ([f6d55b4](https://github.com/manojkmfsi/monodog/commit/f6d55b40fc9a9585124f91e3e66e07a445da3e7f))
+- **backend**: fix(backend): 47 ([20e0e05](https://github.com/manojkmfsi/monodog/commit/20e0e05c09bb71cb086d97b7c38faae302a14c86))
+- **backend**: fix(backend): 47 ([419ff4b](https://github.com/manojkmfsi/monodog/commit/419ff4bf2766614056a614058839d418cb8f4052))
+- **ci-status**: fix(ci-status): 46 ([b70133c](https://github.com/manojkmfsi/monodog/commit/b70133cb36d36ba7c935333c71806be3dbdb5712))
+- **ci-status**: fix(ci-status): 46 ([ed9472a](https://github.com/manojkmfsi/monodog/commit/ed9472ac78bec6f511ad6baeaca9ec26532be1f4))
+- **ci-status**: fix(ci-status): 45 ([0058618](https://github.com/manojkmfsi/monodog/commit/0058618108ae93e68499cff16217bf991edd8ad9))
+- **ci-status**: fix(ci-status):  44 ([bfd47b3](https://github.com/manojkmfsi/monodog/commit/bfd47b3a1c8fe6cdb20e44bbe3727e6a1da4d33e))
+- **ci-status**: fix(ci-status): 43 ([23d4603](https://github.com/manojkmfsi/monodog/commit/23d4603c2e73694d6797f37304b19808b879b425))
+- **ci-status**: fix(ci-status): 43 ([a937fb2](https://github.com/manojkmfsi/monodog/commit/a937fb2a2c5efed06a940e8ccea707f19a8c305c))
+- **ci-status**: fix(ci-status): 43 ([dcaa22d](https://github.com/manojkmfsi/monodog/commit/dcaa22d3c090cfcc121b970348223d651c5e9d46))
+- **ci-status**: fix(ci-status): 42 ([d1c64df](https://github.com/manojkmfsi/monodog/commit/d1c64dfb2b6939375e87656aca893339d6bfdbf5))
+- **ci-status**: fix(ci-status): 42 ([68fcc1e](https://github.com/manojkmfsi/monodog/commit/68fcc1e4dff173f7fc1236fdccd967149dd6f562))
+- **ci-status**: fix(ci-status): 41 ([f92269a](https://github.com/manojkmfsi/monodog/commit/f92269a1dcf1c7dc7a08b8a5daf7b71d2256f3eb))
+- **ci-status**: fix(ci-status): 41 ([67865be](https://github.com/manojkmfsi/monodog/commit/67865be97a1937580f2b4fe5520c4d7b22c48577))
+- **monoapp**: fix(monoapp): 40 ([73e1d44](https://github.com/manojkmfsi/monodog/commit/73e1d44413ef6a19d3f6f80013120ba4fd6f8c7e))
+- **monoapp**: fix(monoapp): 40 ([a121504](https://github.com/manojkmfsi/monodog/commit/a121504a817a3dbcd7f39f996d8fac0fd0169882))
+- **monoapp**: fix(monoapp): 39 ([9c2cc21](https://github.com/manojkmfsi/monodog/commit/9c2cc219fb1eae0281f723442cfe7a76aa85c1f8))
+- **monoapp**: fix(monoapp): 39 ([87b8b1e](https://github.com/manojkmfsi/monodog/commit/87b8b1e955ef1c74b1d0abad7fb5ae6bb4ba751e))
+- **monoapp**: fix(monoapp): 38 ([d382c17](https://github.com/manojkmfsi/monodog/commit/d382c175a2825d3cd630fd91f1f08e8e131415a6))
+- **monoapp**: fix(monoapp): 36 ([090a6a7](https://github.com/manojkmfsi/monodog/commit/090a6a77ef3713a4298f1a1d503635cb062d6730))
+- **monoapp**: fix(monoapp): 35 ([a44dbf3](https://github.com/manojkmfsi/monodog/commit/a44dbf37cfed677e8b5eb1fdff498b95be6b64cb))
+- **monoapp**: fix(monoapp): 34 ([7463d20](https://github.com/manojkmfsi/monodog/commit/7463d20bef8b366f2d3c682225aa84b661e45f61))
+- **monoapp**: fix(monoapp): 33 ([a67fb02](https://github.com/manojkmfsi/monodog/commit/a67fb02c1da843baeabbb4d53ebd56b184337c75))
+- **monoapp**: fix(monoapp): 32 ([f4d610a](https://github.com/manojkmfsi/monodog/commit/f4d610a3f6b287b1f7022b106f4f47865e26ad85))
+- **monoapp**: fix(monoapp): 31 ([a924db0](https://github.com/manojkmfsi/monodog/commit/a924db0682dc658624758b3a5898c3cbe44fdd7f))
+- **monoapp**: fix(monoapp): 30 ([659b0e6](https://github.com/manojkmfsi/monodog/commit/659b0e693536bc5cdda7607c7dae886587b50583))
+- **monoapp**: fix(monoapp): 29 ([c8fd13d](https://github.com/manojkmfsi/monodog/commit/c8fd13ddda8cab3d358fbc6b912ffc62366b4dad))
+- fix: 28 ([93f7b92](https://github.com/manojkmfsi/monodog/commit/93f7b9275c16f2cf172ade54e09f0e3a05a2c283))
+- fix: 27 ([37ba619](https://github.com/manojkmfsi/monodog/commit/37ba619e4af72b05e5b55e768d9e2852a88588fb))
+- fix: 26 ([de289dd](https://github.com/manojkmfsi/monodog/commit/de289dd6157d094f9170f7b94cd7b50731e280b1))
+- fix: 25 ([a50540e](https://github.com/manojkmfsi/monodog/commit/a50540e36560fa0da82d89f3e4136ed8f1b89de8))
+- fix: 24 ([840e31b](https://github.com/manojkmfsi/monodog/commit/840e31b9781ae43c202a37f4e46ad3fe58772540))
+- fix: 23 ([5bd3a49](https://github.com/manojkmfsi/monodog/commit/5bd3a490be1c5562d2e1a0f6a4753b12049f345a))
+- fix: 23 ([966e65d](https://github.com/manojkmfsi/monodog/commit/966e65df2be1e69d23253377664778a13294ea66))
+- fix: 22 ([e82bac0](https://github.com/manojkmfsi/monodog/commit/e82bac005fdcc5e1c87c8719e9f6348e7e67c018))
+- fix: 21 ([73bd20d](https://github.com/manojkmfsi/monodog/commit/73bd20de05cd84f2899667417ed8ef23ee33e718))
+- fix: 20 ([ac73a1d](https://github.com/manojkmfsi/monodog/commit/ac73a1dec71c541b804025d63f54d33d7a305b97))
+- fix: 19 ([df4a435](https://github.com/manojkmfsi/monodog/commit/df4a435cb986fb08572c00671e8f1093a8e12594))
+- fix: 18 ([c0c3383](https://github.com/manojkmfsi/monodog/commit/c0c3383bb49797376ac2d02d2c0aafba4e6b1a4d))
+- fix: 17 ([5519572](https://github.com/manojkmfsi/monodog/commit/55195724bdf171917fbd88e8bc0bcc3cbc4c3abf))
+- fix: 16 ([f2b7eff](https://github.com/manojkmfsi/monodog/commit/f2b7eff867ba2248419ea8a0900173be2dbacb30))
+- fix: 15 ([b3538a4](https://github.com/manojkmfsi/monodog/commit/b3538a4812d484f6d6e6226f18a12a9c29755520))
+- fix: 14 ([5f00184](https://github.com/manojkmfsi/monodog/commit/5f00184fbd8b5f795057957392ab86391c93c9a4))
+- fix: 13 ([ecd589c](https://github.com/manojkmfsi/monodog/commit/ecd589c5d0a88360b4006789d5ed87df449d810c))
+- fix: 12 ([60e1057](https://github.com/manojkmfsi/monodog/commit/60e1057fd0423b1b27f57476f0e46c687f1da61b))
+- fix: 11 ([c0f7a0b](https://github.com/manojkmfsi/monodog/commit/c0f7a0b4ea17d40ab8e614f857b8b078886dce9b))
+- fix: 8 ([8cb1e1a](https://github.com/manojkmfsi/monodog/commit/8cb1e1aa1f7f12a91232b0bca7cd4f49a88a9e91))
+- fix: 7 ([1991b92](https://github.com/manojkmfsi/monodog/commit/1991b92b099c35ddb4aa46ac06ba99a3d724b409))
+- fix: 6 ([0b35795](https://github.com/manojkmfsi/monodog/commit/0b357959b515beffe4d75db12b43368698dad40d))
+- fix: fix4 ([a008882](https://github.com/manojkmfsi/monodog/commit/a0088823254ecfe02fe2b68e606d1cd3d4c7a6eb))
+- fix: fix3 ([d6bee2e](https://github.com/manojkmfsi/monodog/commit/d6bee2e8213b5ea5cc1d965dd1ff62fe85738d12))
+- fix: fix1 ([731439c](https://github.com/manojkmfsi/monodog/commit/731439ceaa757584613352ea89e859eaaace2eb5))
+- fix: updated doc baseurl ([0b2d29a](https://github.com/manojkmfsi/monodog/commit/0b2d29a630e4d77d9fb605f03faa2e0178fb434c))
+- fix: updated docs release ([384b3a8](https://github.com/manojkmfsi/monodog/commit/384b3a845e94d8b58101c7d24abc58ea61bb887f))
+- fix: test, build setup ([33a958c](https://github.com/manojkmfsi/monodog/commit/33a958ce2af94b23309234fffba1a330a2718c30))
+- fix: update version ([f64d274](https://github.com/manojkmfsi/monodog/commit/f64d27466adf260d4c32f2cadd6f4f4144d17502))
+- fix: force migrate on install ([72dd64d](https://github.com/manojkmfsi/monodog/commit/72dd64dde3ae51d37aeefab4bd85e9a31517a3b3))
+- fix: Missing Health status in package, Fix duplicate configuration json ([f9d4234](https://github.com/manojkmfsi/monodog/commit/f9d42341fb598987a92bb2e4c8733574ece0ef27))
+- fix: fix installation setup ([e9879ac](https://github.com/manojkmfsi/monodog/commit/e9879ac976778a03ba92257711306d93b6e3d02c))
+- **merge**: fix(merge): fix merge issue ([4628de2](https://github.com/manojkmfsi/monodog/commit/4628de23398c29a3d455e4ea2cba3ddcd814d15e))
+- **merge**: fix(merge): fix merge issue ([e74e094](https://github.com/manojkmfsi/monodog/commit/e74e094b67f74db56f08abb1485bee6bf130432f))
+- **package**: fix(package): Fix health status in packages and dependency page ([de28d75](https://github.com/manojkmfsi/monodog/commit/de28d75d2ad9af001545af5cc939b2673e488956))
+- **build**: fix(build): Fix building issue in dashboard app ([6412724](https://github.com/manojkmfsi/monodog/commit/641272430ec8deb44235bc647880fe25690616c0))
+- **setup**: fix(setup): Update release.yml ([d5d1c16](https://github.com/manojkmfsi/monodog/commit/d5d1c16e0d3fb7c6ad89022803a04223e6a31a99))
+
+### Internal
+- chore: release @monodog/utils@1.0.47
+- Merge pull request #214 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 3 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- bnmnmn
+- chore: release @monodog/utils@1.0.45
+- chore: release @monodog/utils@1.0.45
+- chore: release @monodog/ci-status@1.3.39
+- chore: release @monodog/utils@1.0.44
+- chore: release @monodog/utils@1.0.44
+- chore: release @monodog/ci-status@1.3.38
+- chore: release @monodog/utils@1.0.43
+- chore: release @monodog/utils@1.0.42
+- add: pipeline logging diagnostic tools and troubleshooting guide
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- jjn,mn,m
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: release @monodog/ci-status@1.3.37
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- mm.,m.m.m.ppp
+- chore: release @monodog/ci-status@1.3.36
+- ,..m m ,
+- docs: update guides for automatic workflow trigger approach
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- docs: add comprehensive workflow testing guide and implementation summary
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: release @monodog/ci-status@1.3.35
+- mmmmm
+- chore: release @monodog/backend@1.6.14
+- chore: release @monodog/ci-status@1.3.34
+- chore: release @monodog/ci-status@1.3.33
+- chore: release @monodog/ci-status@1.3.32
+- Merge pull request #213 from manojkmfsi/independent
+- chore: release @monodog/ci-status@1.3.31
+- Merge pull request #212 from manojkmfsi/independent
+- fdfdfd
+- created chset
+- chore: release @monodog/ci-status@1.3.30
+- Merge pull request #211 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 4 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- Update release.yml
+- fix
+- final inde
+- chore: release @monodog/ci-status@1.3.28
+- klk;k;l;
+- zxzcx
+- chore: release @monodog/utils@1.0.40
+- chore: release @monodog/ci-status@1.3.26
+- gjhkk,
+- chore: release @monodog/utils@1.0.36
+- updated code
+- cc
+- chore: release @monodog/ci-status@1.3.25
+- chore: release @manojkmfsi/monodog@1.2.4
+- chore: release @monodog/ci-status@1.3.19
+- chore: release @monodog/backend@1.6.9
+- chore: release @monodog/backend@1.6.9
+- chore: release @manojkmfsi/monodog@1.2.4
+- chore: release @monodog/ci-status@1.3.18
+- chore: release @monodog/ci-status@1.3.18
+- chore: release @monodog/utils@1.0.31
+- chore: release @monodog/utils@1.0.30
+- chore: release @monodog/ci-status@1.3.17
+- chore: release @monodog/utils@1.0.30
+- chore: release @monodog/ci-status@1.3.16
+- chore: release @monodog/ci-status@1.3.16
+- nnneww
+- chore: release @monodog/utils@1.0.29
+- chore: release @monodog/backend@1.6.8
+- chore: release @monodog/backend@1.6.8
+- chore: release @monodog/ci-status@1.3.15
+- chore: release @monodog/ci-status@1.3.15
+- chore: release @monodog/utils@1.0.28
+- chore: release @monodog/utils@1.0.27
+- chore: release @monodog/ci-status@1.3.14
+- jklkmlkmll,
+- chore: release @monodog/utils@1.0.26
+- jj
+- hjhjjn,
+- chore: release @monodog/ci-status@1.3.13
+- chore: release @monodog/backend@1.6.7
+- chore: release @monodog/utils@1.0.25
+- chore: release @monodog/ci-status@1.3.12
+- hhkhkhkjhk
+- chore: release @manojkmfsi/monodog@1.2.3
+- chore: release @monodog/utils@1.0.24
+- chore: release @manojkmfsi/monodog@1.2.2
+- chore: release @monodog/ci-status@1.3.11
+- chore: release @monodog/ci-status@1.3.10
+- chore: release @manojkmfsi/monodog@1.2.1
+- chore: release @monodog/ci-status@1.3.9
+- chore: release @monodog/utils@1.0.23
+- chore: release @monodog/ci-status@1.3.8
+- chore: release @monodog/utils@1.0.22
+- chore: release @monodog/backend@1.6.6
+- chore: release @monodog/ci-status@1.3.7
+- chore: release @manojkmfsi/monodog@1.2.0
+- chore: release @manojkmfsi/monodog@1.1.48
+- chore: release @manojkmfsi/monodog@1.2.0
+- chore: release @manojkmfsi/monodog@1.1.47
+- chore: release @manojkmfsi/monodog@1.1.46
+- chore: release @monodog/ci-status@1.3.6
+- chore: release @monodog/ci-status@1.3.5
+- chore: release @monodog/ci-status@1.3.4
+- chore: release @monodog/utils@1.0.21
+- chore: release @monodog/ci-status@1.3.4
+- chore: release @monodog/ci-status@1.3.3
+- chore: release @manojkmfsi/monodog@1.1.45
+- chore: release @monodog/backend@1.6.4
+- chore: release @monodog/utils@1.0.20
+- chore: release @monodog/backend@1.6.4
+- chore: release @monodog/backend@1.6.4
+- chore: release @monodog/backend@1.6.4
+- chore: release @monodog/backend@1.6.4
+- chore: release @monodog/utils@1.0.20
+- chore: release @monodog/utils@1.0.20
+- chore: release @monodog/ci-status@1.3.3
+- chore: publish changeset
+- Merge pull request #210 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 3 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #209 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- Merge pull request #208 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- remove source map
+- Merge pull request #207 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- Merge pull request #206 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- Merge pull request #205 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- fix(monodog)
+- Merge pull request #204 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- Merge pull request #203 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- Merge pull request #202 from manojkmfsi/changeset-release/main
+- Merge branch 'main' into changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- Merge pull request #201 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- Merge pull request #200 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- Merge pull request #199 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 1 package(s)
+- undefined
+- undefined
+- Merge pull request #198 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 5 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #197 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 5 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #195 from manojkmfsi/changeset-release/main
+- Version Packages
+- RELEASING: Releasing 5 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- create route, controller, service pattern for auth and permission
+- fix build and ui
+- Merge pull request #194 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 5 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- fix lint
+- fix types
+- Merge pull request #193 from manojkmfsi/changeset-release/main
+- chore: publish changeset
+- added pipeline
+- RELEASING: Releasing 5 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #192 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #191 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #190 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 3 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #189 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 5 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #188 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 4 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #187 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #186 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 3 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #185 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 4 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #184 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 4 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #183 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 5 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #182 from manojkmfsi/changeset-release/main
+- Merge branch 'main' into changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- Merge pull request #181 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 3 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #180 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #179 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 4 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #178 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 4 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #177 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 4 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #176 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- Merge pull request #175 from manojkmfsi/changeset-release/main
+- chore: publish changeset
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #174 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #173 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- Merge pull request #172 from manojkmfsi/changeset-release/main
+- updated ui
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- ui fix
+- Merge pull request #171 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 4 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- integrate permission
+- chore: publish changeset
+- Merge pull request #170 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #169 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 4 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #168 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 4 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- chore: publish changeset
+- fix login redirect
+- Merge pull request #167 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #166 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #165 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 3 package(s)
+- undefined
+- undefined
+- undefined
+- undefined
+- chore: publish changeset
+- Merge pull request #164 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- Merge pull request #163 from manojkmfsi/feature/publish-control
+- chore: publish changeset
+- Merge pull request #162 from manojkmfsi/changeset-release/main
+- RELEASING: Releasing 2 package(s)
+- undefined
+- undefined
+- undefined
+- Merge pull request #161 from manojkmfsi/feature/publish-control
+- changeset commit
+- Merge pull request #160 from manojkmfsi/feature/publish-control
+- changeset commit
+- Merge pull request #159 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #158 from manojkmfsi/feature/publish-control
+- changeset commit
+- changeset release
+- Merge pull request #157 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #156 from manojkmfsi/feature/publish-control
+- chore: publish changeset
+- Merge pull request #155 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #154 from manojkmfsi/feature/publish-control
+- chore: publish changeset
+- enable publish
+- Merge pull request #153 from manojkmfsi/changeset-release/main
+- chore: publish changeset
+- Version Packages
+- Merge pull request #152 from manojkmfsi/feature/publish-control
+- chore: publish changeset
+- Merge pull request #151 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #150 from manojkmfsi/feature/publish-control
+- chore: publish changeset
+- ci-status public
+- Merge pull request #149 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #148 from manojkmfsi/feature/publish-control
+- chore: publish changeset
+- Merge pull request #147 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #146 from manojkmfsi/feature/publish-control
+- chore: publish changeset
+- chore: publish changeset
+- Merge pull request #145 from manojkmfsi/changeset-release/main
+- Version Packages
+- Feature/publish control
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- chore: publish changeset
+- fixed theme
+- Github oAuth with permission
+- chore: Updated docs menu,  images
+- chore: Updated docs menu,  images
+- Merge pull request #142 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #140 from manojkmfsi/changeset-release/main
+- Version Packages
+- chore: updated doc
+- chore: fixed baseurl - Merge pull request #138 from manojkmfsi/installable-package
+- chore: fixed baseurl
+- Merge pull request #137 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #135 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #133 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #131 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #128 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge branch 'main' into installable-package
+- Merge pull request #126 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #124 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #122 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #120 from manojkmfsi/changeset-release/main
+- Version Packages
+- fix
+- Merge pull request #118 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #116 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #114 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #112 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #110 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #108 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #106 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #104 from manojkmfsi/installable-package
+- Merge pull request #103 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #101 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #99 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #97 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #95 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #93 from manojkmfsi/installable-package
+- Merge pull request #92 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #90 from manojkmfsi/changeset-release/main
+- Version Packages
+- Merge pull request #88 from manojkmfsi/changeset-release/main
+- Version Packages
+- chore(release): updated installation docs
+- Version Packages
+- chore(release): updated installation process
+- Version Packages
+- Merge pull request #85 from manojkmfsi/changeset-release/main
+- Version Packages
+- chore(release): updated installation script
+- Version Packages
+- Update README.md
+- chore(release): updated monodog folder
+- Version Packages
+- chore(release): updated pkg name
+- Version Packages
+- chore(release):update pkg name
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): updated org
+- Version Packages
+- chore(release): version packages 76
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): 75
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): version packages 74
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): 73
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): version packages 72
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): 71
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): Version Packages 67
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): version packages 66
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): 65
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): version packages
+- Version Packages
+- Merge branch 'main' into test
+- chore(release):Version Packages (#46)
+- Merge branch 'main' into test
+- chore(release): 62
+- Version Packages
+- Merge branch 'main' into test
+- fic(backend): 62
+- Version Packages
+- Merge branch 'main' into test
+- chore(release): Version Packages (#40)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- Merge branch 'main' into test
+- Test (#38)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- Merge branch 'main' into test
+- release(backend): Version Packages (#37)
+-  fix(backend): 58
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- Merge branch 'main' into test
+- chore(release): Version Packages (#35)
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- undefined
+- Merge branch 'main' into test
+- Test (#32)
+- undefined
+- undefined
+- undefined
+- Merge branch 'main' into test
+-  fix(monoapp): 52
+- Merge branch 'main' into test
+- chore(release): version packages (#28)
+- undefined
+- undefined
+- undefined
+- Merge branch 'main' into test
+- chore(release): version packages (#26)
+- Merge pull request #24 from manojkmfsi/test
+- Merge pull request #23 from manojkmfsi/changeset-release/main
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- Merge pull request #17 from manojkmfsi/test
+- chore(release): version packages
+- chore(release): version packages
+-  fix(ci-status): 44
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- chore(release): version packages
+- Merge pull request #4 from manojkmfsi/test
+- Merge pull request #3 from manojkmfsi/test
+- Merge pull request #2 from manojkmfsi/changeset-release/main
+- Version Packages
+- fix:10
+- chorer: fix9
+- chore:fix8
+- fix:5
+- chore:fix
+- chore: fix
+- chore: fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore: fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore: fix
+- chore:fix
+- chore: fix
+- chore:fix
+- chore:fix
+- chore: fix
+- chore:fix
+- chore: fix
+- chore: fix
+- chore: fix
+- chore:fix
+- chore: fix
+- chore: fix
+- chore: fix
+- chore: fix
+- chore: fix
+- chore: fix
+- chore: fix
+- chore:fix
+- chore: fix
+- chore:fix
+- chore:fix
+- chore: fix
+- chore:fix
+- chore:fix
+- chore: fix
+- chore: fix
+- chore: fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore:fix
+- chore: check new npm
+- chore: force semantic version install
+- chore: fix build
+- chore: fix prisma error
+- chore: updated release version
+- chore: created build
+- Merge pull request #1 from manojkmfsi/installable-package
+- chore: Added documentation
+- chore: fix optional workspace config, README
+- chore:  Updated repository origin and package name
+- chore: Remove unnecessary code and commit fixes
+- chore: fix invalid package issue
+- chore: unit tests for back
+- chore: update version to 1.2.140
+- chore: Auto detect workspace packages
+- chore: fix .npmignore for dashboard setup
+- chore: fix lint , build, formating issue
+- chore: separate script for serve and setup
+- Merge branch 'development' into installable-package
+- fix(build):Fix build issue for monorep, enable backend cli
+- fix(build):Fix build issue for monorep, enable backend cli
+- Merge pull request #10 from NikhilMeshram01/feature/configuration
+- Merge branch 'development' into feature/configuration
+- Merge pull request #9 from NikhilMeshram01/feature/configuration
+- Merge branch 'development' into feature/configuration
+- fix(config) : Configuration Page Issues resolved
+- feat(config) : Configuration Page Backend Integration
+- Merge pull request #8 from lakinmindfire/backend-setup
+- index on feature/healthMetrics: bbb3c42 feat(dahboard): merge pull request #5 from lakinmindfire/backend-setup
+- index on feature/healthMetrics: bbb3c42 feat(dahboard): merge pull request #5 from lakinmindfire/backend-setup
+- index on feature/healthMetrics: bbb3c42 feat(dahboard): merge pull request #5 from lakinmindfire/backend-setup
+- Merge branch 'backend-setup' into development
+- chore: ignore local SQLite database file
+- index on feature/healthMetrics: bbb3c42 feat(dahboard): merge pull request #5 from lakinmindfire/backend-setup
+- chore: ignore local SQLite database file
+- index on feature/healthMetrics: bbb3c42 feat(dahboard): merge pull request #5 from lakinmindfire/backend-setup
+- Merge pull request #6 from NikhilMeshram01/feature/healthMetrics
+- chore: ignore local SQLite database file
+- Fix(config): show configuration
+- WIP on feature/healthMetrics: bbb3c42 feat(dahboard): merge pull request #5 from lakinmindfire/backend-setup
+- index on feature/healthMetrics: bbb3c42 feat(dahboard): merge pull request #5 from lakinmindfire/backend-setup
+- setup: Created project structure and setup monorep with react
+- docs: Added issue templates(bug_report, config, feature_request)
+
 ## [@monodog/utils@1.0.45](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/utils@1.0.45) (2026-03-09)
 
 ## 1.0.46

@@ -2,7 +2,7 @@
 
 All changes across all packages
 
-## 1.3.35 (2026-03-09)
+## 1.3.36 (2026-03-09)
 
 ### ⚠️ BREAKING CHANGES
 
@@ -23,6 +23,7 @@ All changes across all packages
 
 ### ✨ Features
 
+- feat: integrate publishController into GitHub Actions workflow with full logging
 - feat(monodog): Added Swagger doc, updated req type for resfresh
 - feat(monodog): Added Swagger doc, updated req type for resfresh
 - feat(monoapp): 76
@@ -66,6 +67,8 @@ All changes across all packages
 
 ### 🐛 Bug Fixes
 
+- refactor: change workflow trigger from manual dispatch to automatic publish detection
+- fix: improve GitHub Actions workflow execution and error handling
 - fix: make husky hook executable
 - fix(monodog): added rate limit in UI
 - fix(monodog): final commit

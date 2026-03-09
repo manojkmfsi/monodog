@@ -1,5 +1,15 @@
 ## [@monodog/backend@1.6.14](https://github.com/manojkmfsi/monodog/releases/tag/@monodog/backend@1.6.14) (2026-03-09)
 
+## 1.6.15
+
+### Patch Changes
+
+- [`aef3f42`](https://github.com/manojkmfsi/monodog/commit/aef3f428463490ddd5fdc02b73e1cf69ecad0757) - xxxxxxxxxxxx
+
+- Updated dependencies [[`c9f7ca1`](https://github.com/manojkmfsi/monodog/commit/c9f7ca16e912eddcfef6606f5bfdd13861ae0955), [`93e1103`](https://github.com/manojkmfsi/monodog/commit/93e110305f47d2e585a47b51e9d7a5fafe4538b9), [`86d2574`](https://github.com/manojkmfsi/monodog/commit/86d25745afb5d451093e6c5b5589a3c08c0747e6), [`f925e0c`](https://github.com/manojkmfsi/monodog/commit/f925e0c92f1fded47d85edfd1bc478a67cdd1ea4), [`5495ab5`](https://github.com/manojkmfsi/monodog/commit/5495ab573e6162c9d448df535ce18494ec45817d), [`eb52380`](https://github.com/manojkmfsi/monodog/commit/eb5238080a470251b0bf5c9933f38b2578489bf2), [`deb662f`](https://github.com/manojkmfsi/monodog/commit/deb662fdf30f338ab1b2c8172260d46da59d67d7), [`3f77af9`](https://github.com/manojkmfsi/monodog/commit/3f77af9fec097c043ccc81ada83c6312d01bc1a5), [`3972eca`](https://github.com/manojkmfsi/monodog/commit/3972ecac92b15f54f9c3c719b307413033091643), [`ded0e00`](https://github.com/manojkmfsi/monodog/commit/ded0e00fea533f544f8a6bb07acb6c45c91b015f), [`23adaaa`](https://github.com/manojkmfsi/monodog/commit/23adaaaef8de1defa2154e12c6fbcae38e6fb2ab)]:
+  - @monodog/ci-status@1.3.40
+  - @monodog/utils@1.0.46
+
 ### ⚠️ BREAKING CHANGES
 
 - **monoapp**: **BREAKING**: fix(monoapp)!: updated package name

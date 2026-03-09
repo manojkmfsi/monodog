@@ -2,7 +2,7 @@
 
 All changes across all packages
 
-## 1.0.43 (2026-03-09)
+## 1.0.44 (2026-03-09)
 
 ### ⚠️ BREAKING CHANGES
 - **BREAKING**: fix(monoapp)!: updated package name

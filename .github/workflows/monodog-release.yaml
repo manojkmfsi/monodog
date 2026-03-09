@@ -60,7 +60,8 @@ jobs:
           echo "🔍 Detecting publish changes in commit..."
 
           # Get the commit message
-          COMMIT_MSG=$(git log -1 --pretty=%B)
+          COMMIT_MSG=$(git log -1 --pretty=%B)Integrate the actual publish-controller into the workflow?
+
           echo "📝 Commit message: $COMMIT_MSG"
 
           # Get changed files
@@ -94,7 +95,7 @@ jobs:
             try {
               console.log('📦 Loading pipeline logger...');
               const { pipelineLogger } = require('./dist/services/pipeline-logger');
-              
+
               if (!pipelineLogger) {
                 throw new Error('pipelineLogger not found');
               }
@@ -134,7 +135,7 @@ jobs:
               console.log(`  Event Type: Publish Detection`);
               console.log(`  Commit: ${commitSha.substring(0, 7)}`);
               console.log(`  Status: Logged Successfully`);
-              
+
               process.exit(0);
             } catch (error) {
               console.error('❌ Failed to log publish event');

@@ -4,9 +4,21 @@
  */
 
 import * as PrismaPkg from '@prisma/client';
+
+// Initialize Prisma Client - handle both module patterns
 const PrismaClient =
-  (PrismaPkg as any).PrismaClient || (PrismaPkg as any).default || PrismaPkg;
-const prisma = new PrismaClient();
+  (PrismaPkg as any).PrismaClient ||
+  (PrismaPkg as any).default?.PrismaClient ||
+  (PrismaPkg as any).default ||
+  PrismaPkg;
+
+let prisma: any;
+try {
+  prisma = new PrismaClient();
+} catch (error) {
+  console.error('Failed to initialize Prisma client:', error);
+  prisma = null;
+}
 
 export interface PipelineLogEntry {
   publishPipelineId: string;
@@ -23,6 +35,16 @@ export class PipelineLogger {
    */
   async log(entry: PipelineLogEntry): Promise<void> {
     try {
+      if (!prisma) {
+        console.warn('Prisma client not initialized, skipping log:', entry.message);
+        return;
+      }
+
+      if (!prisma.pipelineLog) {
+        console.warn('PipelineLog model not available in Prisma client, skipping log:', entry.message);
+        return;
+      }
+
       await prisma.pipelineLog.create({
         data: {
           publishPipelineId: entry.publishPipelineId,
@@ -131,6 +153,11 @@ export class PipelineLogger {
     }
   ): Promise<any[]> {
     try {
+      if (!prisma?.pipelineLog) {
+        console.warn('PipelineLog model not available');
+        return [];
+      }
+
       return await prisma.pipelineLog.findMany({
         where: {
           publishPipelineId: pipelineId,
@@ -157,6 +184,11 @@ export class PipelineLogger {
     }
   ): Promise<any[]> {
     try {
+      if (!prisma?.pipelineLog) {
+        console.warn('PipelineLog model not available');
+        return [];
+      }
+
       return await prisma.pipelineLog.findMany({
         where: {
           ...(filters?.level && { level: filters.level }),
@@ -179,6 +211,11 @@ export class PipelineLogger {
     stage: string
   ): Promise<any[]> {
     try {
+      if (!prisma?.pipelineLog) {
+        console.warn('PipelineLog model not available');
+        return [];
+      }
+
       return await prisma.pipelineLog.findMany({
         where: {
           publishPipelineId: pipelineId,
@@ -197,6 +234,11 @@ export class PipelineLogger {
    */
   async getErrorLogs(pipelineId: string): Promise<any[]> {
     try {
+      if (!prisma?.pipelineLog) {
+        console.warn('PipelineLog model not available');
+        return [];
+      }
+
       return await prisma.pipelineLog.findMany({
         where: {
           publishPipelineId: pipelineId,
@@ -215,6 +257,11 @@ export class PipelineLogger {
    */
   async clearPipelineLogs(pipelineId: string): Promise<number> {
     try {
+      if (!prisma?.pipelineLog) {
+        console.warn('PipelineLog model not available');
+        return 0;
+      }
+
       const result = await prisma.pipelineLog.deleteMany({
         where: { publishPipelineId: pipelineId },
       });

@@ -1,15 +1,18 @@
 name: Monodog Release Workflow
 
 on:
-  workflow_dispatch:
-    inputs:
-      packages:
-        description: 'Comma-separated list of packages to publish (e.g., @monodog/ci-status,@monodog/utils)'
-        required: true
-        default: '@monodog/ci-status'
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/*/package.json'
+      - 'packages/*/CHANGELOG.md'
+      - 'libs/*/package.json'
+      - 'CHANGELOG.md'
+      - '.changeset/**'
 
 jobs:
-  publish-to-npm:
+  release-workflow:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,60 +22,24 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: '8'
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build all packages
-        run: pnpm run build
-
-      - name: Configure git
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-
       - name: Publish to npm
         run: |
           echo ""
           echo "═════════════════════════════════════════════════════════"
-          echo "  Monodog Publish to npm"
+          echo "  Monodog Release Workflow Triggered"
           echo "═════════════════════════════════════════════════════════"
-          echo ""
-          echo "📦 Packages to publish:"
-          echo "  ${{ inputs.packages }}"
           echo ""
           echo "📊 Event Details:"
           echo "  Branch: main"
           echo "  Commit: ${{ github.sha }}"
           echo "  Actor: ${{ github.actor }}"
           echo ""
-          echo "✅ Publishing packages to npm..."
-          echo "📈 Release process:"
-          echo "  1. Detecting publish changes"
-          echo "  2. Logging events to database"
-          echo "  3. Publishing to npm registry"
-          echo "  4. Creating GitHub releases"
+          echo "✅ Release workflow has been triggered"
+          echo "📈 Release process will:"
+          echo "  1. Detect and validate publish changes"
+          echo "  2. Log events to database"
+          echo "  3. Publish packages to npm registry"
+          echo "  4. Create GitHub releases and tags"
           echo ""
           echo "🔗 Monitor: /pipeline?tab=logs"
           echo ""

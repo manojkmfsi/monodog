@@ -2,7 +2,7 @@
 
 All changes across all packages
 
-## 1.3.36 (2026-03-09)
+## 1.3.37 (2026-03-09)
 
 ### ⚠️ BREAKING CHANGES
 
@@ -23,6 +23,7 @@ All changes across all packages
 
 ### ✨ Features
 
+- feat: update release workflow to manual trigger for npm publishing
 - feat: integrate publishController into GitHub Actions workflow with full logging
 - feat(monodog): Added Swagger doc, updated req type for resfresh
 - feat(monodog): Added Swagger doc, updated req type for resfresh

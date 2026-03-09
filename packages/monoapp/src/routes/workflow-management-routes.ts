@@ -6,6 +6,7 @@
 import express, { Request, Response } from 'express';
 import { workflowService } from '../services/workflow-service';
 import { authenticationMiddleware } from '../middleware/auth-middleware';
+import * as githubActionsService from '../services/github-actions-service';
 
 const workflowMgmtRouter = express.Router();
 
@@ -53,7 +54,8 @@ workflowMgmtRouter.post(
         return;
       }
 
-      const filePath = await workflowService.createDefaultWorkflow(packageNames);
+      const filePath =
+        await workflowService.createDefaultWorkflow(packageNames);
       res.json({
         success: true,
         message: 'Workflow created successfully',
@@ -204,6 +206,62 @@ workflowMgmtRouter.delete(
         success: true,
         message: 'Workflow deleted successfully',
       });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+);
+
+/**
+ * POST /api/workflows/dispatch
+ * Dispatch the monodog-release workflow
+ * Body: { packages?: string[] }
+ */
+workflowMgmtRouter.post(
+  '/dispatch',
+  authenticationMiddleware,
+  async (req: Request, res: Response) => {
+    try {
+      if (!req.user || !req.accessToken) {
+        res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+        });
+        return;
+      }
+
+      const { packages } = req.body as { packages?: string[] };
+
+      // Dispatch the workflow with selected packages
+      const packagesInput =
+        packages && packages.length > 0 ? packages.join(',') : '';
+
+      const result = await githubActionsService.triggerWorkflow(
+        req.accessToken,
+        {
+          owner: 'manojkmfsi',
+          repo: 'monodog',
+          workflow: 'monodog-release.yaml',
+          ref: 'main',
+          inputs: packagesInput ? { packages: packagesInput } : {},
+        }
+      );
+
+      if (result.response.success) {
+        res.json({
+          success: true,
+          message: 'Release workflow dispatched successfully',
+          packages: packages || [],
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: result.response.message,
+        });
+      }
     } catch (error) {
       res.status(500).json({
         success: false,

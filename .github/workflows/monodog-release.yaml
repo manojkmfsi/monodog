@@ -1,24 +1,13 @@
 name: Monodog Release Workflow
 
 on:
-  # Trigger on manual button click
+  # Trigger only on manual button click
   workflow_dispatch:
     inputs:
       packages:
         description: 'Comma-separated list of packages (e.g., @monodog/utils,@monodog/core)'
         required: true
         default: ''
-  # Trigger automatically on publish commit (changesets creates version updates and changelogs)
-  # push:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'package.json'
-  #     - 'packages/*/package.json'
-  #     - 'libs/*/package.json'
-  #     - 'CHANGELOG.md'
-  #     - 'packages/*/CHANGELOG.md'
-  #     - 'libs/*/CHANGELOG.md'
 
 jobs:
   build:
@@ -139,6 +128,7 @@ jobs:
 
       - name: Show selected packages
         run: |
+          echo "📋 Workflow triggered: Manual dispatch (click Run workflow button)"
           echo "Packages to publish: ${{ github.event.inputs.packages }}"
           if [ -z "${{ github.event.inputs.packages }}" ]; then
             echo "No specific packages selected - will publish all packages with changes"
@@ -180,3 +170,24 @@ jobs:
           else
             echo "No packages were published in this run"
           fi
+
+      - name: Workflow Summary
+        run: |
+          echo "════════════════════════════════════════════════════════════"
+          echo "💡 Monodog Release Workflow Complete"
+          echo "════════════════════════════════════════════════════════════"
+          echo "✓ Triggered by: Manual dispatch (Run workflow button)"
+          if [ "${{ steps.changesets.outputs.published }}" == "true" ]; then
+            echo "✓ Packages published to npm successfully"
+            echo "✓ Publishing commit created and pushed"
+            echo "✓ GitHub releases created"
+            echo ""
+            echo "📢 Next steps:"
+            echo "  1. Verify packages are live on npm"
+            echo "  2. Check GitHub Releases for release notes"
+            echo "  3. Verify your repository secrets are updated with new token"
+          else
+            echo "ℹ️  No changes detected for publishing"
+            echo "Create changesets first using: pnpm changeset"
+          fi
+          echo "════════════════════════════════════════════════════════════"

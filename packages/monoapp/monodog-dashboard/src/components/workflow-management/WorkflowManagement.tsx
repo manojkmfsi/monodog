@@ -35,9 +35,14 @@ interface WorkflowConfig {
   };
 }
 
-export default function WorkflowManagement({ preselectedPackages = [] }: { preselectedPackages?: string[] }) {
+export default function WorkflowManagement({
+  preselectedPackages = [],
+}: {
+  preselectedPackages?: string[];
+}) {
   const [workflowExists, setWorkflowExists] = useState(false);
-  const [selectedPackages, setSelectedPackages] = useState<string[]>(preselectedPackages);
+  const [selectedPackages, setSelectedPackages] =
+    useState<string[]>(preselectedPackages);
   const [workflow, setWorkflow] = useState<WorkflowConfig | null>(null);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -85,9 +90,8 @@ export default function WorkflowManagement({ preselectedPackages = [] }: { prese
   const fetchAvailablePackages = async () => {
     try {
       const response = await apiClient.get('/packages');
-      const packages = response.data.packages?.map(
-        (pkg: any) => pkg.name
-      ) || [];
+      const packages =
+        response.data.packages?.map((pkg: any) => pkg.name) || [];
       setAvailablePackages(packages);
     } catch (err) {
       console.error('Error fetching packages:', err);
@@ -199,6 +203,36 @@ export default function WorkflowManagement({ preselectedPackages = [] }: { prese
     );
   };
 
+  const handleDispatchWorkflow = async () => {
+    if (selectedPackages.length === 0) {
+      setError('Please select at least one package to publish');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await apiClient.post('/workflows/dispatch', {
+        packages: selectedPackages,
+      });
+
+      if (response.data.success) {
+        setSuccess(
+          `✅ Release workflow dispatched! Publishing: ${selectedPackages.join(', ')}`
+        );
+        setTimeout(() => setSuccess(null), 5000);
+      } else {
+        setError(response.data.error || 'Failed to dispatch workflow');
+      }
+    } catch (err) {
+      console.error('Error dispatching workflow:', err);
+      setError('Failed to dispatch release workflow');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold mb-6">Workflow Management</h2>
@@ -242,7 +276,8 @@ export default function WorkflowManagement({ preselectedPackages = [] }: { prese
           ))}
         </div>
         <p className="text-xs text-gray-500 mt-2">
-          Selected: {selectedPackages.length > 0 ? selectedPackages.join(', ') : 'None'}
+          Selected:{' '}
+          {selectedPackages.length > 0 ? selectedPackages.join(', ') : 'None'}
         </p>
       </div>
 
@@ -258,6 +293,20 @@ export default function WorkflowManagement({ preselectedPackages = [] }: { prese
           </button>
         ) : (
           <>
+            <button
+              onClick={handleDispatchWorkflow}
+              disabled={loading || selectedPackages.length === 0}
+              className="px-6 py-2 bg-purple-600 text-white rounded font-semibold hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <span className="animate-spin">⚙️</span>
+                  Publishing...
+                </>
+              ) : (
+                <>✨ Commit & Publish</>
+              )}
+            </button>
             <button
               onClick={updateSelectedPackages}
               disabled={loading || selectedPackages.length === 0}
@@ -326,7 +375,8 @@ export default function WorkflowManagement({ preselectedPackages = [] }: { prese
             </p>
             {selectedPackages.length > 0 && (
               <p>
-                <strong>Selected Packages:</strong> {selectedPackages.join(', ')}
+                <strong>Selected Packages:</strong>{' '}
+                {selectedPackages.join(', ')}
               </p>
             )}
             <p className="text-xs text-gray-500 mt-3">

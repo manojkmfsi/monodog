@@ -144,6 +144,13 @@ jobs:
             echo "No specific packages selected - will publish all packages with changes"
           fi
 
+      - name: Clean up old tarballs
+        run: |
+          echo "Cleaning up old .tgz files from package directories..."
+          find packages -name "*.tgz" -delete
+          find libs -name "*.tgz" -delete
+          echo "✓ Cleanup complete"
+
       - name: Generate Changeset from commit messages
         run: pnpm changeset:autogenerate
         env:

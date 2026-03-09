@@ -6,7 +6,11 @@ import { authenticationMiddleware } from '../middleware/auth-middleware';
 import {
   getRecentPipelines,
   updatePipelineStatus,
-  getPipelineAuditLogs
+  getPipelineAuditLogs,
+  getPipelineLogs,
+  getRecentPipelineLogs,
+  getLogsByStage,
+  getErrorLogs,
 } from '../controllers/pipeline-controller';
 
 const pipelineRouter = express.Router();
@@ -37,6 +41,45 @@ pipelineRouter.get(
   getPipelineAuditLogs
 );
 
-export default pipelineRouter;
+/**
+ * GET /api/pipelines/:pipelineId/logs
+ * Get detailed execution logs for a pipeline (with optional filters)
+ */
+pipelineRouter.get(
+  '/:pipelineId/logs',
+  authenticationMiddleware,
+  getPipelineLogs
+);
 
+/**
+ * GET /api/pipelines/logs/recent
+ * Get recent logs across all pipelines
+ */
+pipelineRouter.get(
+  '/logs/recent',
+  authenticationMiddleware,
+  getRecentPipelineLogs
+);
+
+/**
+ * GET /api/pipelines/:pipelineId/logs/stage/:stage
+ * Get logs filtered by stage
+ */
+pipelineRouter.get(
+  '/:pipelineId/logs/stage/:stage',
+  authenticationMiddleware,
+  getLogsByStage
+);
+
+/**
+ * GET /api/pipelines/:pipelineId/logs/errors
+ * Get error logs for a pipeline
+ */
+pipelineRouter.get(
+  '/:pipelineId/logs/errors',
+  authenticationMiddleware,
+  getErrorLogs
+);
+
+export default pipelineRouter;
 

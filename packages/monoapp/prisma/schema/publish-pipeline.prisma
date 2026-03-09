@@ -21,6 +21,7 @@ model PublishPipeline {
 
   // Progress tracking
   packageResults      PublishResult[]
+  logs                PipelineLog[]
 
   // Error handling
   errorMessage        String?
@@ -116,4 +117,27 @@ model UserSecret {
   @@index([userId])
 }
 
+model PipelineLog {
+  id                  String   @id @default(cuid())
+  
+  // Pipeline reference
+  publishPipelineId   String
+  publishPipeline     PublishPipeline @relation(fields: [publishPipelineId], references: [id], onDelete: Cascade)
+  
+  // Log context
+  packageName         String?
+  stage               String   // e.g., "validation", "publishing", "tagging", "changelog"
+  level               String   @default("info") // "info", "warning", "error", "debug"
+  
+  // Message and details
+  message             String
+  details             String?  // JSON stringified additional context
+  
+  // Timestamps
+  timestamp           DateTime @default(now())
+  
+  @@index([publishPipelineId, timestamp])
+  @@index([publishPipelineId, packageName])
+  @@index([level, timestamp])
+}
 

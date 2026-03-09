@@ -9,6 +9,7 @@ import '../types/controllers';
 import { AppLogger } from '../middleware/logger';
 import * as pipelineService from '../services/pipeline-service';
 import * as githubActionsService from '../services/github-actions-service';
+import { pipelineLogger } from '../services/pipeline-logger';
 import type { WorkflowJob } from '../types/github-actions';
 import { OPERATION_ERRORS, AUTH_ERRORS, VALIDATION_ERRORS } from '../constants/error-messages';
 import { HTTP_STATUS_UNAUTHORIZED, HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_INTERNAL_SERVER_ERROR } from '../constants/http';
@@ -405,5 +406,128 @@ export async function rerunWorkflow(req: Request, res: Response) {
   } catch (error) {
     AppLogger.error(`Error rerunning workflow: ${error}`);
     res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ error: OPERATION_ERRORS.FAILED_TO_RERUN_WORKFLOW });
+  }
+}
+/**
+ * Get detailed pipeline logs
+ * GET /api/pipelines/:pipelineId/logs
+ */
+export async function getPipelineLogs(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(HTTP_STATUS_UNAUTHORIZED).json({ error: AUTH_ERRORS.UNAUTHORIZED });
+    }
+
+    const { pipelineId } = req.params;
+    const packageName = req.query.packageName as string;
+    const stage = req.query.stage as string;
+    const level = req.query.level as string;
+
+    const logs = await pipelineLogger.getPipelineLogs(pipelineId, {
+      packageName,
+      stage,
+      level,
+    });
+
+    res.json({
+      success: true,
+      pipelineId,
+      logs,
+      count: logs.length,
+    });
+  } catch (error) {
+    AppLogger.error(`Error getting pipeline logs: ${error}`);
+    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ 
+      error: 'Failed to fetch pipeline logs' 
+    });
+  }
+}
+
+/**
+ * Get recent pipeline logs across all pipelines
+ * GET /api/pipelines/logs/recent
+ */
+export async function getRecentPipelineLogs(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(HTTP_STATUS_UNAUTHORIZED).json({ error: AUTH_ERRORS.UNAUTHORIZED });
+    }
+
+    const limit = Math.min(parseInt(req.query.limit as string) || 100, 500);
+    const level = req.query.level as string;
+    const stage = req.query.stage as string;
+
+    const logs = await pipelineLogger.getRecentLogs(limit, {
+      level,
+      stage,
+    });
+
+    res.json({
+      success: true,
+      logs,
+      count: logs.length,
+    });
+  } catch (error) {
+    AppLogger.error(`Error getting recent logs: ${error}`);
+    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ 
+      error: 'Failed to fetch recent logs' 
+    });
+  }
+}
+
+/**
+ * Get logs by stage
+ * GET /api/pipelines/:pipelineId/logs/stage/:stage
+ */
+export async function getLogsByStage(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(HTTP_STATUS_UNAUTHORIZED).json({ error: AUTH_ERRORS.UNAUTHORIZED });
+    }
+
+    const { pipelineId, stage } = req.params;
+
+    const logs = await pipelineLogger.getLogsByStage(pipelineId, stage);
+
+    res.json({
+      success: true,
+      pipelineId,
+      stage,
+      logs,
+      count: logs.length,
+    });
+  } catch (error) {
+    AppLogger.error(`Error getting stage logs: ${error}`);
+    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ 
+      error: 'Failed to fetch stage logs' 
+    });
+  }
+}
+
+/**
+ * Get error logs for a pipeline
+ * GET /api/pipelines/:pipelineId/logs/errors
+ */
+export async function getErrorLogs(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(HTTP_STATUS_UNAUTHORIZED).json({ error: AUTH_ERRORS.UNAUTHORIZED });
+    }
+
+    const { pipelineId } = req.params;
+
+    const logs = await pipelineLogger.getErrorLogs(pipelineId);
+
+    res.json({
+      success: true,
+      pipelineId,
+      logs,
+      count: logs.length,
+    });
+  } catch (error) {
+    AppLogger.error(`Error getting error logs: ${error}`);
+    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ 
+      error: 'Failed to fetch error logs' 
+    });
   }
 }

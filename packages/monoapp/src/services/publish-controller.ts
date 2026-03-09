@@ -16,6 +16,7 @@ import { npmPublishService } from './npm-publish-service';
 import { secureTokenService } from './secure-token-service';
 import { changelogGenerator } from './changelog-generator';
 import { workflowService } from './workflow-service';
+import { pipelineLogger } from './pipeline-logger';
 import fs from 'fs';
 import path from 'path';
 import { publishPipelineService } from './publish-pipeline-service';
@@ -167,6 +168,15 @@ export class PublishController {
     this.pipelines.set(pipelineId, status);
 
     try {
+      // Log pipeline start
+      await pipelineLogger.info(
+        pipelineId,
+        `Starting publish pipeline for packages: ${request.packageNames.join(', ')}`,
+        'initialization',
+        undefined,
+        { method: request.method, dryRun: request.dryRun }
+      );
+
       status.startedAt = new Date().toISOString();
       status.status = 'validating';
       await publishPipelineService.updatePipeline(pipelineId, {
@@ -175,8 +185,20 @@ export class PublishController {
       });
 
       // 1. Get readiness
+      await pipelineLogger.info(
+        pipelineId,
+        'Checking readiness for all packages',
+        'validation'
+      );
       const prep = await this.preparePublish(request);
       if (!prep.valid && !request.dryRun) {
+        await pipelineLogger.error(
+          pipelineId,
+          'Packages not ready for publishing',
+          'validation',
+          undefined,
+          { blockers: prep.readiness }
+        );
         await publishPipelineService.updatePipeline(pipelineId, {
           status: 'failed',
           updatedAt: new Date(),
@@ -192,9 +214,19 @@ export class PublishController {
         status: 'ready',
         updatedAt: new Date(),
       });
+      await pipelineLogger.info(
+        pipelineId,
+        'All packages passed readiness checks',
+        'validation'
+      );
 
       // 2. Check/Create workflow file
       console.info('🔄 Ensuring workflow file exists...');
+      await pipelineLogger.info(
+        pipelineId,
+        'Checking for monodog-release.yaml workflow',
+        'workflow'
+      );
       const workflowResult = await this.ensureWorkflowExists(
         request.packageNames
       );
@@ -203,14 +235,35 @@ export class PublishController {
         console.info(
           '💡 Please review and edit the workflow in the dashboard if needed.'
         );
+        await pipelineLogger.info(
+          pipelineId,
+          `Created workflow file at ${workflowResult.path}`,
+          'workflow'
+        );
+      } else {
+        await pipelineLogger.info(
+          pipelineId,
+          'Using existing monodog-release.yaml workflow',
+          'workflow'
+        );
       }
 
       // 3. Get credentials
+      await pipelineLogger.info(
+        pipelineId,
+        'Retrieving authentication tokens',
+        'credentials'
+      );
       const npmToken = await secureTokenService.getToken('npm', 'env');
       const githubToken =
         request.method !== 'node'
           ? await secureTokenService.getToken('github', 'env')
           : undefined;
+      await pipelineLogger.info(
+        pipelineId,
+        'Authentication tokens retrieved successfully',
+        'credentials'
+      );
 
       // 4. Publish each package
       status.status = 'publishing';
@@ -226,6 +279,12 @@ export class PublishController {
 
         console.info(
           `\n📦 Publishing ${i + 1}/${publisherCount}: ${packageName}`
+        );
+        await pipelineLogger.info(
+          pipelineId,
+          `Publishing package ${i + 1} of ${publisherCount}`,
+          'publishing',
+          packageName
         );
 
         // Get pre-publish version
@@ -252,6 +311,30 @@ export class PublishController {
         status.results[packageName] = result;
         status.progress = 20 + ((i + 1) / publisherCount) * 80;
 
+        // Log publish result
+        if (result.success) {
+          await pipelineLogger.info(
+            pipelineId,
+            `Successfully published ${packageName} from ${prePublishVersion} to ${postPublishVersion}`,
+            'publishing',
+            packageName,
+            {
+              oldVersion: prePublishVersion,
+              newVersion: postPublishVersion,
+              packageId: result.packageId,
+              gitTag: result.gitTag,
+            }
+          );
+        } else {
+          await pipelineLogger.error(
+            pipelineId,
+            `Failed to publish ${packageName}`,
+            'publishing',
+            packageName,
+            { errors: result.errors }
+          );
+        }
+
         // Store result in DB
         await publishPipelineService.addPublishResult(pipelineId, {
           packageName,
@@ -274,10 +357,20 @@ export class PublishController {
       // 5. Generate changelog entries
       if (!request.dryRun) {
         console.info('\n📝 Generating changelogs...');
+        await pipelineLogger.info(
+          pipelineId,
+          'Generating changelogs for published packages',
+          'changelog'
+        );
         await this.generateChangelogs(
           request.packageNames,
           request.packagePaths,
           status.results
+        );
+        await pipelineLogger.info(
+          pipelineId,
+          'Changelogs generated successfully',
+          'changelog'
         );
       }
 
@@ -293,6 +386,14 @@ export class PublishController {
         errorDetails: undefined,
       });
 
+      const successCount = Object.values(status.results).filter(r => r.success).length;
+      await pipelineLogger.info(
+        pipelineId,
+        `Pipeline completed successfully! Published ${successCount}/${request.packageNames.length} packages`,
+        'completion',
+        undefined,
+        { successCount, totalPackages: request.packageNames.length }
+      );
       console.info(`\n✅ Publish pipeline completed: ${pipelineId}`);
     } catch (error) {
       status.status = 'failed';
@@ -306,6 +407,13 @@ export class PublishController {
         updatedAt: new Date(),
         conclusion: 'failure',
       });
+      await pipelineLogger.error(
+        pipelineId,
+        `Pipeline failed: ${status.error}`,
+        'completion',
+        undefined,
+        { errorMessage: status.error }
+      );
       console.error(`\n❌ Publish pipeline failed: ${status.error}`);
     }
 

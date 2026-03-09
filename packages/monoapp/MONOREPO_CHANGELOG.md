@@ -2,10 +2,9 @@
 
 All changes across all packages
 
-## 1.3.37 (2026-03-09)
+## 1.0.42 (2026-03-09)
 
 ### ⚠️ BREAKING CHANGES
-
 - **BREAKING**: fix(monoapp)!: updated package name
 - **BREAKING**: fix(monoapp)!: updated package name
 - **BREAKING**: feat(monoapp)!: 75
@@ -22,7 +21,6 @@ All changes across all packages
 - **BREAKING**: feat(monoapp)!: add ability to parse arrays BREAKING CHANGE: incompatible
 
 ### ✨ Features
-
 - feat: update release workflow to manual trigger for npm publishing
 - feat: integrate publishController into GitHub Actions workflow with full logging
 - feat(monodog): Added Swagger doc, updated req type for resfresh
@@ -46,7 +44,7 @@ All changes across all packages
 - feat(monoapp): 67
 - feat(monoapp): 67
 - feat: option to provide workspace names in monodog-conf, install package on monorepo root.
-- feat: installable common monodog package for front/back end
+- feat:  installable common monodog package for front/back end
 - feat: configurable dashboard
 - feat: load config from file
 - feat(setup): make manodog installable in monorep
@@ -59,7 +57,7 @@ All changes across all packages
 - feat(dependency_graph): Added dependency graph, package details
 - feat(backend-setup): Integrate Package dependency page, with package fixes
 - feat(dahboard): merge pull request #5 from lakinmindfire/backend-setup
-- feat(packages): Updated 'getPackages' API, and show packages list
+- feat(packages): Updated 'getPackages' API, and  show packages list
 - feat(backend-setup): Setup backend with prisma and express
 - feat(theme): Updated them colors
 - feat(dashboard): Setup complete dashboard UI with all required pages
@@ -67,11 +65,11 @@ All changes across all packages
 - feat(setup): Structure, frontend setup with shadcn UI
 
 ### 🐛 Bug Fixes
-
+- fix: trigger workflow automatically on release process file changes
 - refactor: change workflow trigger from manual dispatch to automatic publish detection
 - fix: improve GitHub Actions workflow execution and error handling
 - fix: make husky hook executable
-- fix(monodog): added rate limit in UI
+- fix(monodog): added  rate limit in UI
 - fix(monodog): final commit
 - fix(monodog): updated ignore
 - fix(monodog): removed file
@@ -79,16 +77,16 @@ All changes across all packages
 - fix(monodog): remove source map
 - fix(monodog): updated ignore
 - fix(monodog): remove files
-- fix(monodog): added ignore
+- fix(monodog):  added ignore
 - fix(monodog): added dashboard in fles
-- fix(monodog): ignore .db
+- fix(monodog):  ignore .db
 - fix(monodog): added files in pack.json
 - fix(monodog): remove npmignore
 - fix(monodog): updated release file
 - fix(monodog): updated release
-- fix(monodog): updated release for dashboard
+- fix(monodog):  updated release for dashboard
 - fix(monodog): Remove dist and updated text
-- fix(monodog): fix pipeline issues and optimize code
+- fix(monodog):  fix  pipeline issues and optimize code
 - fix(monodog): remove heroicon dependency
 - fix(monodog): remove heroicon dependency
 - fix(monodog): fix health score
@@ -137,12 +135,12 @@ All changes across all packages
 - fix(monodog): Added types for backend nodejs
 - fix(monodog): remove env
 - fix(monodog): remove env
-- fix(monodog): Remove unnecessary icons,
-- fix(monodog): Remove unnecessary icons, files
+- fix(monodog):  Remove  unnecessary icons,
+- fix(monodog):  Remove  unnecessary icons, files
 - fix(monodog): updated security,workspce fallback, docs
 - fix(monodog): updated security,workspce fallback, docs
-- fix(monodog): Restructure backend app
-- fix(monodog): Restructure backend app
+- fix(monodog):  Restructure backend app
+- fix(monodog):  Restructure backend app
 - fix: updated refresh package
 - fix(monodog): removed icons
 - fix(monodog): updated installation instruction
@@ -192,8 +190,8 @@ All changes across all packages
 - fix(monoapp): 55
 - fix(monoapp): 54 (#31)
 - fix(monoapp): 54
-- fix(monoapp): 53
-- fix(monoapp): 53
+- fix(monoapp):  53
+- fix(monoapp):  53
 - fix(monoapp): 52
 - fix(monoapp): 51
 - fix(monoapp): 51
@@ -207,7 +205,7 @@ All changes across all packages
 - fix(ci-status): 46
 - fix(ci-status): 46
 - fix(ci-status): 45
-- fix(ci-status): 44
+- fix(ci-status):  44
 - fix(ci-status): 43
 - fix(ci-status): 43
 - fix(ci-status): 43

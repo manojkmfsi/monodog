@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ArrowDownIcon, ArrowUpIcon, MagnifyingGlassIcon, XMarkIcon } from '../../icons/index';
+import apiClient from '../../services/api';
 
 interface LogEntry {
   id: string;
@@ -81,8 +82,7 @@ export default function PipelineLogs({
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      let url = '/api/pipelines';
-
+      let url = '/pipelines';
       if (pipelineId) {
         url += `/${pipelineId}/logs`;
         if (selectedLevel) url += `?level=${selectedLevel}`;
@@ -93,8 +93,8 @@ export default function PipelineLogs({
         if (selectedLevel) url += `&level=${selectedLevel}`;
         if (selectedStage) url += `&stage=${selectedStage}`;
       }
+          const response = await apiClient.get(url);
 
-      const response = await axios.get(url);
       setLogs(response.data.logs || []);
       setError(null);
     } catch (err) {

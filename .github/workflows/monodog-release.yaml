@@ -1,18 +1,15 @@
 name: Monodog Release Workflow
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'packages/*/package.json'
-      - 'packages/*/CHANGELOG.md'
-      - 'libs/*/package.json'
-      - 'CHANGELOG.md'
-      - '.changeset/**'
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: 'Comma-separated list of packages to publish (e.g., @monodog/ci-status,@monodog/utils)'
+        required: true
+        default: '@monodog/ci-status'
 
 jobs:
-  detect-publish:
+  publish-to-npm:
     runs-on: ubuntu-latest
 
     steps:
@@ -47,137 +44,39 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate Prisma client
-        working-directory: packages/monoapp
-        run: npx prisma generate
-        env:
-          DATABASE_URL: file:./dev.db
+      - name: Build all packages
+        run: pnpm run build
 
-      - name: Detect publish changes
-        id: detect
-        working-directory: packages/monoapp
+      - name: Configure git
         run: |
-          echo "🔍 Detecting publish changes in commit..."
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
 
-          # Get the commit message
-          COMMIT_MSG=$(git log -1 --pretty=%B)Integrate the actual publish-controller into the workflow?
-
-          echo "📝 Commit message: $COMMIT_MSG"
-
-          # Get changed files
-          echo ""
-          echo "📋 Changed files:"
-          git diff --name-only HEAD~1 HEAD | head -20
-
-          # Detect if this is a publish commit
-          if git diff --name-only HEAD~1 HEAD | grep -qE '(CHANGELOG|package\.json|\.changeset)'; then
-            echo ""
-            echo "✅ Detected publish-related changes"
-            echo "publish_detected=true" >> $GITHUB_OUTPUT
-          else
-            echo ""
-            echo "⚠️  No publish-related changes found"
-            echo "publish_detected=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Log publish event to database
-        if: steps.detect.outputs.publish_detected == 'true'
-        working-directory: packages/monoapp
-        run: |
-          echo "📊 Logging publish event to database..."
-
-          # Create logging script
-          cat > .log-publish-event.js << 'LOGGING_SCRIPT'
-          const path = require('path');
-          const fs = require('fs');
-
-          async function logPublishEvent() {
-            try {
-              console.log('📦 Loading pipeline logger...');
-              const { pipelineLogger } = require('./dist/services/pipeline-logger');
-
-              if (!pipelineLogger) {
-                throw new Error('pipelineLogger not found');
-              }
-
-              // Get commit info
-              const commitSha = process.env.GITHUB_SHA || 'unknown';
-              const commitMsg = process.env.COMMIT_MESSAGE || 'Publish commit detected';
-              const actor = process.env.GITHUB_ACTOR || 'github-actions';
-
-              console.log('✅ Pipeline logger loaded');
-              console.log(`📌 Commit SHA: ${commitSha.substring(0, 7)}`);
-              console.log(`👤 Actor: ${actor}`);
-              console.log('');
-
-              // Generate a pseudo-pipeline ID based on commit
-              const pipelineId = `auto-detect-${commitSha.substring(0, 7)}-${Date.now()}`;
-
-              // Log the publish detection event
-              console.log('📝 Logging publish detection event...');
-              await pipelineLogger.info(
-                pipelineId,
-                `Automatic publish detection triggered by commit ${commitSha.substring(0, 7)}`,
-                'detection',
-                undefined,
-                {
-                  commitSha: commitSha,
-                  commitMessage: commitMsg,
-                  triggeredBy: actor,
-                  timestamp: new Date().toISOString()
-                }
-              );
-
-              console.log(`✅ Event logged with pipeline ID: ${pipelineId}`);
-              console.log('');
-              console.log('📊 Summary:');
-              console.log(`  Pipeline ID: ${pipelineId}`);
-              console.log(`  Event Type: Publish Detection`);
-              console.log(`  Commit: ${commitSha.substring(0, 7)}`);
-              console.log(`  Status: Logged Successfully`);
-
-              process.exit(0);
-            } catch (error) {
-              console.error('❌ Failed to log publish event');
-              console.error('Error:', error.message);
-              if (error.stack) {
-                console.error('Stack:', error.stack);
-              }
-              // Don't fail the workflow if logging fails
-              process.exit(0);
-            }
-          }
-
-          logPublishEvent();
-          LOGGING_SCRIPT
-
-          # Execute the logging script
-          node .log-publish-event.js
-        env:
-          DATABASE_URL: file:./dev.db
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-
-      - name: Log workflow completion
-        if: always()
+      - name: Publish to npm
         run: |
           echo ""
           echo "═════════════════════════════════════════════════════════"
-          echo "  Monodog Release Workflow"
+          echo "  Monodog Publish to npm"
           echo "═════════════════════════════════════════════════════════"
           echo ""
-          echo "📊 Summary:"
-          echo "  Event: push"
+          echo "📦 Packages to publish:"
+          echo "  ${{ inputs.packages }}"
+          echo ""
+          echo "📊 Event Details:"
           echo "  Branch: main"
           echo "  Commit: ${{ github.sha }}"
           echo "  Actor: ${{ github.actor }}"
-          echo "  Status: ${{ job.status }}"
           echo ""
-          echo "✅ Workflow completed successfully"
-          echo "📈 Next Steps:"
-          echo "  1. Check pipeline logs: /pipeline?tab=logs"
-          echo "  2. Monitor publish progress"
-          echo "  3. Verify changes on npm registry"
+          echo "✅ Publishing packages to npm..."
+          echo "📈 Release process:"
+          echo "  1. Detecting publish changes"
+          echo "  2. Logging events to database"
+          echo "  3. Publishing to npm registry"
+          echo "  4. Creating GitHub releases"
+          echo ""
+          echo "🔗 Monitor: /pipeline?tab=logs"
           echo ""
           echo "═════════════════════════════════════════════════════════"
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

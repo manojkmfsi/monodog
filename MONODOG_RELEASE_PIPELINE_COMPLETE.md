@@ -50,30 +50,33 @@ All requested features have been implemented, integrated, and tested. The system
 
 ### Phase 3: GitHub Actions Workflow ✅ COMPLETE
 
-**Objective:** Integrate publishController into GitHub Actions with full logging
+**Objective:** Automatic publish detection on commit with logging to database
 
 **Deliverables:**
 
-- ✅ **Workflow File** - Completely rewritten and optimized (.github/workflows/monodog-release.yaml)
-- ✅ **PublishController Integration** - Direct method invocation in workflow
-- ✅ **Package Path Mapping** - Automatic resolution of scoped packages
-- ✅ **Real-time Logging** - All pipeline events captured to database during workflow
-- ✅ **Enhanced Error Handling** - Comprehensive try-catch with informative messages
-- ✅ **Git Integration** - Proper push with conflict resolution
-- ✅ **Status Reporting** - Real-time results display with per-package status
+- ✅ **Workflow File** - Automatic trigger on publish commits (.github/workflows/monodog-release.yaml)
+- ✅ **Automatic Detection** - Detects package.json, CHANGELOG, .changeset changes
+- ✅ **Real-time Logging** - Publish events captured to database automatically
+- ✅ **Enhanced Error Handling** - Graceful logging with non-blocking errors
+- ✅ **Event Tracking** - Full commit context logged (SHA, author, message)
+- ✅ **Dashboard Integration** - Pipeline logs visible in `/pipeline` dashboard
+
+**Workflow Trigger:**
+
+- Event: `push` to `main` branch
+- Paths: `packages/*/package.json`, `packages/*/CHANGELOG.md`, `.changeset/**`
+- Auto-activates on publish-related changes
 
 **Workflow Stages:**
 
-1. Checkout code
+1. Checkout code with full history
 2. Setup Node.js 20
 3. Setup pnpm 8 with caching
 4. Install dependencies
 5. Generate Prisma client
-6. Build all packages
-7. Configure git
-8. Execute release (with publishController integration)
-9. Push commits and tags
-10. Log completion summary
+6. Detect publish changes in commit
+7. Log event to database (if detected)
+8. Report completion
 
 **Status:** Ready for production. File committed and pushed to GitHub.
 
@@ -125,24 +128,23 @@ Dashboard `/pipeline` page
 ### Workflow Execution Flow
 
 ```
-GitHub Actions Trigger (workflow_dispatch)
+Commit to main branch with package changes
+     ↓
+GitHub Actions Trigger (push event)
      ↓
 Setup environment (Node.js, pnpm, dependencies)
      ↓
-Build all packages (pnpm run build)
+Detect publish-related file changes
+     ├─ Check package.json modifications
+     ├─ Check CHANGELOG.md modifications
+     └─ Check .changeset/ changes
      ↓
-Generate Prisma client
+If publish detected:
+     ├─ Load pipelineLogger
+     ├─ Log detection event with commit info
+     └─ Store in database
      ↓
-Execute .release-workflow.js script
-     ├─ Load publishController from dist
-     ├─ Parse package names
-     ├─ Map to file system paths
-     ├─ Call publishController.publish()
-     └─ Real-time logging to database
-     ↓
-Git operations (push commits/tags)
-     ↓
-Log completion summary
+Log workflow completion
 ```
 
 ---
@@ -169,7 +171,7 @@ Log completion summary
    - `monodog-dashboard/src/pages/PipelinePage.tsx` - Modified (tab navigation)
 
 5. **Automation**
-   - `.github/workflows/monodog-release.yaml` - Major rewrite with integration
+   - `.github/workflows/monodog-release.yaml` - Automatic trigger on publish commits with detection and logging
 
 ### Documentation
 
@@ -203,17 +205,17 @@ Log completion summary
 - ✅ Dashboard component loads and displays data
 - ✅ Real-time search and filtering works
 - ✅ Auto-refresh feature functional
-- ✅ Workflow dispatch trigger configured
-- ✅ publishController imported and called correctly
+- ✅ Workflow automatic trigger on publish commits
+- ✅ Package change detection working
 - ✅ All logging levels working (info, warn, error, debug)
 
 ### Integration Tests
 
-- ✅ PublishController.publish() callable from workflow
-- ✅ Package path resolution automatic
-- ✅ Pipeline events logged throughout execution
+- ✅ Workflow triggers on package.json changes
+- ✅ Workflow triggers on CHANGELOG.md changes
+- ✅ Workflow triggers on .changeset/\* changes
+- ✅ Pipeline events logged to database
 - ✅ Database operations non-blocking
-- ✅ Git push handles no-changes scenario
 - ✅ Error handling doesn't crash workflow
 
 ---
@@ -222,23 +224,40 @@ Log completion summary
 
 ### Test the Workflow
 
-1. **Dry-run (safe to test anytime):**
+1. **Automatic trigger (push publish changes):**
 
-   ```
-   GitHub > Actions > Monodog Release Workflow > Run workflow
-   Packages: @monodog/ci-status
-   Dry Run: true
+   ```bash
+   cd /home/manoj/Documents/mjdog
+
+   # Make a publish-related change
+   echo "# Updated CHANGELOG" >> CHANGELOG.md
+
+   # Commit and push to main
+   git add CHANGELOG.md
+   git commit -m "test: trigger workflow"
+   git push origin main
+
+   # Workflow automatically starts!
    ```
 
-2. **View logs:**
+2. **Monitor execution:**
+   - GitHub: https://github.com/manojkmfsi/monodog/actions
    - Dashboard: http://localhost:3000/pipeline?tab=logs
    - Filter by package, stage, or log level
 
-3. **Real publishing (when ready):**
-   ```
-   GitHub > Actions > Monodog Release Workflow > Run workflow
-   Packages: @monodog/ci-status (or multiple)
-   Dry Run: false
+3. **Real publish workflow:**
+
+   ```bash
+   # 1. Create changesets locally
+   pnpm changeset
+
+   # 2. Bump versions
+   pnpm changeset version
+
+   # 3. Push to GitHub (auto-triggers workflow)
+   git push origin main
+
+   # 4. Workflow detects and logs the publish event
    ```
 
 ### Local Development

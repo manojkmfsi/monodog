@@ -1,0 +1,142 @@
+name: Monodog Release Workflow
+'on':
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: >-
+          Comma-separated list of packages to release (e.g.,
+          @monodog/utils,@monodog/backend)
+        required: true
+        default: '@monodog/ci-status'
+      dryRun:
+        description: 'Perform a dry run (no actual publishing)'
+        required: false
+        default: 'false'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+      
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Generate Prisma client
+        working-directory: packages/monoapp
+        run: npx prisma generate
+        env:
+          DATABASE_URL: file:./dev.db
+      
+      - name: Build packages
+        run: pnpm run build
+      
+      - name: Configure git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+      
+      - name: Parse package names
+        id: packages
+        run: |
+          PACKAGES="${{ inputs.packages }}"
+          PACKAGES_JSON=$(echo "$PACKAGES" | jq -R 'split(",") | map(select(length > 0) | gsub("^\\s+|\\s+$";""))')
+          echo "list=$PACKAGES_JSON" >> $GITHUB_OUTPUT
+          echo "count=$(echo $PACKAGES_JSON | jq 'length')" >> $GITHUB_OUTPUT
+      
+      - name: Release packages
+        working-directory: packages/monoapp
+        run: |
+          # Create release directory
+          mkdir -p .release
+          
+          # Create a Node script to run the publish controller
+          cat > .release/run-release.js << 'RELEASE_SCRIPT'
+          const { publishController } = require('../dist/services/publish-controller.js');
+          
+          const packages = JSON.parse(process.env.PACKAGES);
+          const dryRun = process.env.DRY_RUN === 'true';
+          
+          const packagePaths = {};
+          for (const pkg of packages) {
+            // Map package name to path
+            const name = pkg.split('/').pop();
+            packagePaths[pkg] = `./packages/${name}`;
+          }
+          
+          console.log('🚀 Starting release for packages:', packages);
+          console.log('📦 Package paths:', packagePaths);
+          console.log('🔄 Dry run:', dryRun);
+          
+          publishController.publish({
+            packageNames: packages,
+            packagePaths,
+            method: 'node',
+            dryRun,
+            autoTag: true,
+            createReleases: true,
+            userId: 'github-actions'
+          }).then(result => {
+            console.log('\n✅ Release completed:');
+            console.log(JSON.stringify(result, null, 2));
+            process.exit(result.status === 'completed' ? 0 : 1);
+          }).catch(error => {
+            console.error('\n❌ Release failed:', error);
+            process.exit(1);
+          });
+          RELEASE_SCRIPT
+          
+          node .release/run-release.js
+        env:
+          PACKAGES: ${{ steps.packages.outputs.list }}
+          DRY_RUN: ${{ inputs.dryRun }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DATABASE_URL: file:./dev.db
+        if: ${{ inputs.packages && steps.packages.outputs.count > 0 }}
+      
+      - name: Push changes and tags
+        if: ${{ inputs.packages && inputs.dryRun == 'false' }}
+        run: |
+          # Push all commits and tags
+          if git diff --quiet; then
+            echo "No changes to push"
+          else
+            git add .
+            git commit -m "chore: release updates from GitHub Actions" --no-verify || true
+            git push origin main || true
+          fi
+          
+          git push --tags origin main || true
+        continue-on-error: true
+
+
+

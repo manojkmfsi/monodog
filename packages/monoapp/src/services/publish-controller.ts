@@ -386,7 +386,9 @@ export class PublishController {
         errorDetails: undefined,
       });
 
-      const successCount = Object.values(status.results).filter(r => r.success).length;
+      const successCount = Object.values(status.results).filter(
+        r => r.success
+      ).length;
       await pipelineLogger.info(
         pipelineId,
         `Pipeline completed successfully! Published ${successCount}/${request.packageNames.length} packages`,
@@ -550,11 +552,6 @@ export class PublishController {
         console.info(`  Updated CHANGELOG.md for ${pkg.name}`);
       }
     }
-
-    // Write monorepo changelog
-    const outputPath = path.join(process.cwd(), 'MONOREPO_CHANGELOG.md');
-    await changelogGenerator.generateMonorepoChangelog(entries, outputPath);
-    console.info(`  Monorepo changelog generated at ${outputPath}`);
   }
 
   /**

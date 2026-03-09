@@ -1,24 +1,35 @@
 name: Monodog Release Workflow
 
 on:
-  # Allows your custom orchestrator to trigger this without a commit
+  # Trigger on manual button click
   workflow_dispatch:
     inputs:
       packages:
         description: 'Comma-separated list of packages (e.g., @monodog/utils,@monodog/core)'
         required: true
         default: ''
+  # Trigger automatically on publish commit (changesets creates version updates and changelogs)
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'package.json'
+  #     - 'packages/*/package.json'
+  #     - 'libs/*/package.json'
+  #     - 'CHANGELOG.md'
+  #     - 'packages/*/CHANGELOG.md'
+  #     - 'libs/*/CHANGELOG.md'
 
 jobs:
   build:
-    name: "@mindfiredigital/monodog Build, Lint, and Test"
+    name: '@mindfiredigital/monodog Build, Lint, and Test'
     runs-on: ubuntu-latest
     permissions:
-        contents: write # Required to create release tags and update the changelog
-        pull-requests: write # Required for creating release pull requests (if configured)
+      contents: write # Required to create release tags and update the changelog
+      pull-requests: write # Required for creating release pull requests (if configured)
 
     steps:
-      - name: "Checkout repository"
+      - name: 'Checkout repository'
         uses: actions/checkout@v3
 
       - name: Set up Node.js
@@ -31,32 +42,32 @@ jobs:
         with:
           version: 8
 
-      - name: "Install dependencies (at ROOT)"
+      - name: 'Install dependencies (at ROOT)'
         run: pnpm install --no-frozen-lockfile
 
-      - name: "Generate prisma client"
+      - name: 'Generate prisma client'
         working-directory: packages/monoapp
         run: npm run generate
 
-      - name: "Create build (Backend)"
+      - name: 'Create build (Backend)'
         run: pnpm run build
 
-      - name: "Lint code"
+      - name: 'Lint code'
         run: pnpm run lint
 
-      - name: "Run tests"
+      - name: 'Run tests'
         run: pnpm test
 
       # Use the 'working-directory' flag specifically for Dashboard
-      - name: "Install dependencies (at Dashboard)"
+      - name: 'Install dependencies (at Dashboard)'
         working-directory: packages/monoapp/monodog-dashboard
         run: npm install
 
-      - name: "Create build (Dashboard)"
+      - name: 'Create build (Dashboard)'
         working-directory: packages/monoapp/monodog-dashboard
         run: npm run build
 
-      - name: "Lint code"
+      - name: 'Lint code'
         working-directory: packages/monoapp/monodog-dashboard
         run: npm run lint
 
@@ -87,7 +98,7 @@ jobs:
       - name: 'Install dependencies with pnpm'
         run: pnpm install --no-frozen-lockfile --ignore-scripts
 
-      - name: "Generate prisma client"
+      - name: 'Generate prisma client'
         working-directory: packages/monoapp
         run: npm run generate
 
@@ -95,11 +106,11 @@ jobs:
         run: pnpm run build
 
       # Use the 'working-directory' flag specifically for Dashboard
-      - name: "Install dependencies - Dashboard"
+      - name: 'Install dependencies - Dashboard'
         working-directory: packages/monoapp/monodog-dashboard
         run: npm install
 
-      - name: "Build Dashboard"
+      - name: 'Build Dashboard'
         working-directory: packages/monoapp/monodog-dashboard
         run: npm run build
 
@@ -107,6 +118,24 @@ jobs:
         run: |
           git config --local user.email "github-actions@github.com"
           git config --local user.name "GitHub Actions"
+
+      - name: Verify GitHub Token is available
+        run: |
+          if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then
+            echo "⚠️  WARNING: GITHUB_TOKEN secret is not configured"
+          else
+            echo "✓ GITHUB_TOKEN is available"
+          fi
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "⚠️  WARNING: NPM_TOKEN secret is not configured"
+          else
+            echo "✓ NPM_TOKEN is available"
+          fi
+
+      - name: Configure git credentials for push
+        run: |
+          git config --global credential.helper store
+          echo "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com" > ~/.git-credentials
 
       - name: Generate Changeset from commit messages
         run: pnpm changeset:autogenerate
@@ -116,9 +145,20 @@ jobs:
         uses: changesets/action@v1.4.1
         with:
           publish: npx changeset publish
-        # env:
-        #   # GITHUB_TOKEN is used for GitHub releases/tags/comments
-        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #   # NPM_TOKEN is used for publishing to the npm registry
-        #   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          commit: 'chore: release packages'
+        env:
+          # GITHUB_TOKEN is used for GitHub releases/tags/comments and pushing commits
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # NPM_TOKEN is used for publishing to the npm registry
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Check Changesets Output
+        run: |
+          echo "Changesets action output:"
+          echo "Published: ${{ steps.changesets.outputs.published }}"
+          echo "Has changesets: ${{ steps.changesets.outputs.hasChangesets }}"
+          if [ "${{ steps.changesets.outputs.published }}" == "true" ]; then
+            echo "✓ Packages were published successfully"
+          else
+            echo "No packages were published in this run"
+          fi

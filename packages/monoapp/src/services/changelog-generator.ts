@@ -24,7 +24,17 @@ interface ChangelogItem {
 }
 
 interface CommitInfo {
-  type: 'feat' | 'fix' | 'refactor' | 'perf' | 'style' | 'docs' | 'test' | 'chore' | 'ci' | 'other';
+  type:
+    | 'feat'
+    | 'fix'
+    | 'refactor'
+    | 'perf'
+    | 'style'
+    | 'docs'
+    | 'test'
+    | 'chore'
+    | 'ci'
+    | 'other';
   scope?: string;
   message: string;
   hash: string;
@@ -99,7 +109,9 @@ export class ChangelogGenerator {
 
     // Header with version and date
     const githubTag = `${packageName}@${entry.version}`;
-    lines.push(`## [${githubTag}](https://github.com/manojkmfsi/monodog/releases/tag/${githubTag}) (${entry.date})`);
+    lines.push(
+      `## [${githubTag}](https://github.com/manojkmfsi/monodog/releases/tag/${githubTag}) (${entry.date})`
+    );
     lines.push('');
 
     // Breaking changes
@@ -117,7 +129,9 @@ export class ChangelogGenerator {
       lines.push('### Features');
       for (const item of entry.features) {
         const scope = item.scope ? `**${item.scope}**: ` : '';
-        const hash = item.hash ? ` ([${item.hash.slice(0, 7)}](https://github.com/manojkmfsi/monodog/commit/${item.hash}))` : '';
+        const hash = item.hash
+          ? ` ([${item.hash.slice(0, 7)}](https://github.com/manojkmfsi/monodog/commit/${item.hash}))`
+          : '';
         lines.push(`- ${scope}${item.description}${hash}`);
       }
       lines.push('');
@@ -128,7 +142,9 @@ export class ChangelogGenerator {
       lines.push('### Bug Fixes');
       for (const item of entry.fixes) {
         const scope = item.scope ? `**${item.scope}**: ` : '';
-        const hash = item.hash ? ` ([${item.hash.slice(0, 7)}](https://github.com/manojkmfsi/monodog/commit/${item.hash}))` : '';
+        const hash = item.hash
+          ? ` ([${item.hash.slice(0, 7)}](https://github.com/manojkmfsi/monodog/commit/${item.hash}))`
+          : '';
         lines.push(`- ${scope}${item.description}${hash}`);
       }
       lines.push('');
@@ -139,7 +155,9 @@ export class ChangelogGenerator {
       lines.push('### Improvements');
       for (const item of entry.improvements) {
         const scope = item.scope ? `**${item.scope}**: ` : '';
-        const hash = item.hash ? ` ([${item.hash.slice(0, 7)}](https://github.com/manojkmfsi/monodog/commit/${item.hash}))` : '';
+        const hash = item.hash
+          ? ` ([${item.hash.slice(0, 7)}](https://github.com/manojkmfsi/monodog/commit/${item.hash}))`
+          : '';
         lines.push(`- ${scope}${item.description}${hash}`);
       }
       lines.push('');
@@ -232,57 +250,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     }
 
     return entries;
-  }
-
-  /**
-   * Generate comprehensive monorepo changelog
-   */
-  async generateMonorepoChangelog(
-    entries: Map<string, ChangelogEntry>,
-    outputPath: string
-  ): Promise<void> {
-    const lines: string[] = [];
-
-    lines.push('# Monorepo Changelog');
-    lines.push('');
-    lines.push('All changes across all packages');
-    lines.push('');
-
-    // Sort entries by date (newest first)
-    const sortedEntries = Array.from(entries.values()).sort((a, b) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
-
-    for (const entry of sortedEntries) {
-      lines.push(`## ${entry.version} (${entry.date})`);
-      lines.push('');
-
-      if (entry.breakingChanges.length > 0) {
-        lines.push('### ⚠️ BREAKING CHANGES');
-        for (const item of entry.breakingChanges) {
-          lines.push(`- ${item.description}`);
-        }
-        lines.push('');
-      }
-
-      if (entry.features.length > 0) {
-        lines.push('### ✨ Features');
-        for (const item of entry.features) {
-          lines.push(`- ${item.description}`);
-        }
-        lines.push('');
-      }
-
-      if (entry.fixes.length > 0) {
-        lines.push('### 🐛 Bug Fixes');
-        for (const item of entry.fixes) {
-          lines.push(`- ${item.description}`);
-        }
-        lines.push('');
-      }
-    }
-
-    await writeFile(outputPath, lines.join('\n'));
   }
 }
 

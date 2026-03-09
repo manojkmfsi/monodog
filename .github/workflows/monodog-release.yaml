@@ -146,12 +146,16 @@ jobs:
         env:
           SELECTED_PACKAGES: ${{ github.event.inputs.packages }}
 
+      - name: Add delay for GitHub API indexing
+        run: sleep 3
+
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1.4.1
         with:
           publish: npx changeset publish
           commit: 'chore: release packages'
+          createGithubReleases: true
         env:
           # GITHUB_TOKEN is used for GitHub releases/tags/comments and pushing commits
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

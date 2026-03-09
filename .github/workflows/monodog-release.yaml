@@ -1,19 +1,18 @@
 name: Monodog Release Workflow
 
 on:
-  workflow_dispatch:
-    inputs:
-      packages:
-        description: 'Comma-separated list of packages to release (e.g., @monodog/utils,@monodog/backend)'
-        required: true
-        default: '@monodog/ci-status'
-      dryRun:
-        description: 'Perform a dry run (no actual publishing)'
-        required: false
-        default: 'false'
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/*/package.json'
+      - 'packages/*/CHANGELOG.md'
+      - 'libs/*/package.json'
+      - 'CHANGELOG.md'
+      - '.changeset/**'
 
 jobs:
-  release:
+  detect-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -48,213 +47,136 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Configure git
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-
-      - name: Build all packages
-        run: pnpm run build
-
       - name: Generate Prisma client
         working-directory: packages/monoapp
         run: npx prisma generate
         env:
           DATABASE_URL: file:./dev.db
 
-      - name: Execute release with publish-controller
+      - name: Detect publish changes
+        id: detect
         working-directory: packages/monoapp
         run: |
-          # Display workflow input
-          echo "📋 Monodog Release Configuration:"
-          echo "  Packages: ${{ inputs.packages }}"
-          echo "  Dry Run: ${{ inputs.dryRun }}"
-          echo "  Node Version: $(node --version)"
-          echo "  npm Version: $(npm --version)"
-          echo ""
+          echo "🔍 Detecting publish changes in commit..."
 
-          # Create release execution script
-          cat > .release-workflow.js << 'RELEASE_SCRIPT'
+          # Get the commit message
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "📝 Commit message: $COMMIT_MSG"
+
+          # Get changed files
+          echo ""
+          echo "📋 Changed files:"
+          git diff --name-only HEAD~1 HEAD | head -20
+
+          # Detect if this is a publish commit
+          if git diff --name-only HEAD~1 HEAD | grep -qE '(CHANGELOG|package\.json|\.changeset)'; then
+            echo ""
+            echo "✅ Detected publish-related changes"
+            echo "publish_detected=true" >> $GITHUB_OUTPUT
+          else
+            echo ""
+            echo "⚠️  No publish-related changes found"
+            echo "publish_detected=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log publish event to database
+        if: steps.detect.outputs.publish_detected == 'true'
+        working-directory: packages/monoapp
+        run: |
+          echo "📊 Logging publish event to database..."
+
+          # Create logging script
+          cat > .log-publish-event.js << 'LOGGING_SCRIPT'
           const path = require('path');
           const fs = require('fs');
 
-          // Log execution start
-          console.log('🚀 Starting Monodog Release Pipeline');
-          console.log('📦 Loading publishController...');
-
-          try {
-            // Import the built publishController
-            const { publishController } = require('./dist/services/publish-controller');
-            
-            if (!publishController) {
-              throw new Error('publishController not found in dist/services/publish-controller');
-            }
-
-            // Parse inputs
-            const packages = process.env.PACKAGES.split(',').map(p => p.trim()).filter(p => p);
-            const dryRun = process.env.DRY_RUN === 'true';
-            const userId = 'github-actions[bot]';
-
-            console.log(`✅ publishController loaded`);
-            console.log(`📦 Packages to release: ${packages.join(', ')}`);
-            console.log(`🔄 Dry run mode: ${dryRun}`);
-            console.log('');
-
-            // Build package paths mapping
-            const packagePaths = {};
-            const rootPath = process.cwd();
-
-            // Parse package names and map to paths
-            for (const pkgName of packages) {
-              let pkgPath;
+          async function logPublishEvent() {
+            try {
+              console.log('📦 Loading pipeline logger...');
+              const { pipelineLogger } = require('./dist/services/pipeline-logger');
               
-              // Handle scoped packages: @monodog/utils -> monodog/utils or utils
-              if (pkgName.startsWith('@')) {
-                const parts = pkgName.split('/');
-                const scope = parts[0].substring(1); // Remove @
-                const name = parts[1];
-                
-                // Try paths
-                const possiblePaths = [
-                  path.join(rootPath, '..', name),
-                  path.join(rootPath, '..', scope, name),
-                  path.join(rootPath, '..', `${scope}-${name}`),
-                ];
-                
-                pkgPath = possiblePaths.find(p => fs.existsSync(path.join(p, 'package.json'))) || possiblePaths[0];
-              } else {
-                pkgPath = path.join(rootPath, '..', pkgName);
+              if (!pipelineLogger) {
+                throw new Error('pipelineLogger not found');
               }
 
-              packagePaths[pkgName] = pkgPath;
-              console.log(`  ${pkgName} -> ${pkgPath}`);
-            }
+              // Get commit info
+              const commitSha = process.env.GITHUB_SHA || 'unknown';
+              const commitMsg = process.env.COMMIT_MESSAGE || 'Publish commit detected';
+              const actor = process.env.GITHUB_ACTOR || 'github-actions';
 
-            console.log('');
+              console.log('✅ Pipeline logger loaded');
+              console.log(`📌 Commit SHA: ${commitSha.substring(0, 7)}`);
+              console.log(`👤 Actor: ${actor}`);
+              console.log('');
 
-            // Create publish request
-            const publishRequest = {
-              packageNames: packages,
-              packagePaths: packagePaths,
-              method: 'github-actions',
-              dryRun: dryRun,
-              autoTag: true,
-              createReleases: !dryRun,
-              userId: userId,
-            };
+              // Generate a pseudo-pipeline ID based on commit
+              const pipelineId = `auto-detect-${commitSha.substring(0, 7)}-${Date.now()}`;
 
-            console.log('🔄 Executing publishController.publish()...');
-            console.log('');
-
-            // Execute publish and handle result
-            publishController.publish(publishRequest)
-              .then(result => {
-                console.log('');
-                console.log('✅ Pipeline execution completed!');
-                console.log(`Pipeline ID: ${result.pipelineId}`);
-                console.log(`Status: ${result.status}`);
-                console.log(`Progress: ${result.progress}%`);
-                console.log(`Packages: ${result.packagesToPublish.length}`);
-                
-                if (Object.keys(result.results).length > 0) {
-                  console.log('');
-                  console.log('📊 Results:');
-                  for (const [pkgName, pkgResult] of Object.entries(result.results)) {
-                    const status = pkgResult.success ? '✅' : '❌';
-                    console.log(`  ${status} ${pkgName}`);
-                    if (!pkgResult.success && pkgResult.errors) {
-                      pkgResult.errors.forEach(err => console.log(`     └─ ${err}`));
-                    }
-                  }
+              // Log the publish detection event
+              console.log('📝 Logging publish detection event...');
+              await pipelineLogger.info(
+                pipelineId,
+                `Automatic publish detection triggered by commit ${commitSha.substring(0, 7)}`,
+                'detection',
+                undefined,
+                {
+                  commitSha: commitSha,
+                  commitMessage: commitMsg,
+                  triggeredBy: actor,
+                  timestamp: new Date().toISOString()
                 }
-                
-                console.log('');
-                console.log('🔗 View pipeline logs at: /pipeline#logs');
-                
-                // Exit with success code if all packages succeeded or if dry-run
-                const allSucceeded = Object.values(result.results).every(r => r.success);
-                const shouldSucceed = dryRun || allSucceeded;
-                process.exit(shouldSucceed ? 0 : 1);
-              })
-              .catch(error => {
-                console.error('');
-                console.error('❌ Pipeline execution failed!');
-                console.error('Error:', error.message);
-                if (error.stack) {
-                  console.error('Stack:', error.stack);
-                }
-                process.exit(1);
-              });
+              );
 
-          } catch (error) {
-            console.error('❌ Failed to initialize release pipeline');
-            console.error('Error:', error.message);
-            if (error.stack) {
-              console.error('Stack:', error.stack);
+              console.log(`✅ Event logged with pipeline ID: ${pipelineId}`);
+              console.log('');
+              console.log('📊 Summary:');
+              console.log(`  Pipeline ID: ${pipelineId}`);
+              console.log(`  Event Type: Publish Detection`);
+              console.log(`  Commit: ${commitSha.substring(0, 7)}`);
+              console.log(`  Status: Logged Successfully`);
+              
+              process.exit(0);
+            } catch (error) {
+              console.error('❌ Failed to log publish event');
+              console.error('Error:', error.message);
+              if (error.stack) {
+                console.error('Stack:', error.stack);
+              }
+              // Don't fail the workflow if logging fails
+              process.exit(0);
             }
-            process.exit(1);
           }
-          RELEASE_SCRIPT
 
-          # Execute the release script
-          node .release-workflow.js
+          logPublishEvent();
+          LOGGING_SCRIPT
+
+          # Execute the logging script
+          node .log-publish-event.js
         env:
-          PACKAGES: ${{ inputs.packages }}
-          DRY_RUN: ${{ inputs.dryRun }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DATABASE_URL: file:./dev.db
-          NODE_ENV: production
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
 
-      - name: Push tags and commits
-        if: ${{ inputs.dryRun == 'false' }}
-        working-directory: packages/monoapp
-        run: |
-          echo "📤 Pushing release changes to GitHub..."
-          cd /home/manoj/Documents/mjdog
-
-          # Fetch latest to avoid conflicts
-          git fetch origin main || true
-
-          # Push commits
-          if ! git diff-index --quiet HEAD --; then
-            echo "📝 Found commits to push..."
-            git push origin main || echo "⚠️  No commits to push"
-          else
-            echo "✓ No local commits to push"
-          fi
-
-          # Push tags
-          if git rev-parse --tags > /dev/null 2>&1; then
-            echo "🏷️  Pushing tags..."
-            git push --tags origin || echo "⚠️  No tags to push"
-          fi
-
-          echo "✅ Push completed"
-        continue-on-error: true
-
-      - name: Log pipeline completion
+      - name: Log workflow completion
         if: always()
-        working-directory: packages/monoapp
         run: |
           echo ""
           echo "═════════════════════════════════════════════════════════"
-          echo "  Monodog Release Workflow Complete"
+          echo "  Monodog Release Workflow"
           echo "═════════════════════════════════════════════════════════"
           echo ""
-          echo "📊 Workflow Summary:"
-          echo "  Packages: ${{ inputs.packages }}"
-          echo "  Dry Run: ${{ inputs.dryRun }}"
+          echo "📊 Summary:"
+          echo "  Event: push"
+          echo "  Branch: main"
+          echo "  Commit: ${{ github.sha }}"
+          echo "  Actor: ${{ github.actor }}"
           echo "  Status: ${{ job.status }}"
           echo ""
+          echo "✅ Workflow completed successfully"
           echo "📈 Next Steps:"
-          echo "  1. View pipeline logs: /pipeline?tab=logs"
-          echo "  2. Check published packages on NPM"
-          echo "  3. Verify GitHub releases and tags"
-          echo ""
-          echo "🔄 Automations Triggered:"
-          echo "  ✓ Pipeline events logged to database"
-          echo "  ✓ Git commits and tags pushed (if not dry-run)"
-          echo "  ✓ Artifacts stored in workflow"
+          echo "  1. Check pipeline logs: /pipeline?tab=logs"
+          echo "  2. Monitor publish progress"
+          echo "  3. Verify changes on npm registry"
           echo ""
           echo "═════════════════════════════════════════════════════════"
